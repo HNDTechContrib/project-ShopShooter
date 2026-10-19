@@ -1,0 +1,6 @@
+{
+  "name": "DiskonBlaster: Shop & Shoot E-Commerce",
+  "description": "Game shooter interaktif e-commerce untuk mengumpulkan poin diskon belanja, menembak target produk acak dan cepat, power-up eksklusif, serta kompetisi mingguan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

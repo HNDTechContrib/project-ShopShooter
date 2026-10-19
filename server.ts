@@ -1,0 +1,384 @@
+import express from 'express';
+import http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ noServer: true });
+
+server.on('upgrade', (req, socket, head) => {
+  try {
+    const { pathname } = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+    if (pathname === '/ws') {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req);
+      });
+    }
+  } catch (err) {
+    console.error('WebSocket upgrade error:', err);
+  }
+});
+
+app.use(express.json());
+
+interface PlayerState {
+  id: string;
+  username: string;
+  team: 'blue' | 'red';
+  color: string;
+  x: number;
+  y: number;
+  angle: number;
+  score: number;
+  hp: number;
+  maxHp: number;
+  kills: number;
+  deaths: number;
+  isReady: boolean;
+  isBot?: boolean;
+  customization?: any;
+  ws?: WebSocket;
+}
+
+interface RoomState {
+  code: string;
+  players: Record<string, PlayerState>;
+  gameState: 'waiting' | 'playing' | 'ended';
+  blueScore: number;
+  redScore: number;
+  timeLeft: number;
+  totalSlots: 2 | 4 | 6 | 8;
+  bots: any[];
+}
+
+const rooms: Record<string, RoomState> = {};
+
+wss.on('connection', (ws: WebSocket) => {
+  let currentRoom: string | null = null;
+  let playerId: string | null = null;
+
+  ws.on('message', (data: string) => {
+    try {
+      const msg = JSON.parse(data.toString());
+
+      if (msg.type === 'join-room') {
+        const { roomCode, player, totalSlots, asHost } = msg;
+        console.log('Join room request:', { roomCode, playerID: player?.id, asHost });
+        if (!roomCode || !player?.id) return;
+        currentRoom = roomCode.toUpperCase();
+        console.log('Current room set to:', currentRoom);
+        playerId = player.id;
+
+        if (currentRoom && (!rooms[currentRoom] || asHost)) {
+          const slots = totalSlots || 4;
+          rooms[currentRoom] = {
+            code: currentRoom,
+            players: {},
+            gameState: 'waiting',
+            blueScore: 0,
+            redScore: 0,
+            timeLeft: 90,
+            totalSlots: slots,
+            bots: [],
+          };
+        }
+
+        if (currentRoom && playerId) {
+          const room = rooms[currentRoom];
+          const existingP = room.players[playerId];
+          const humanEntries = Object.keys(room.players).length;
+          // Player's chosen team if provided, otherwise preserve or balance
+          const assignedTeam = player.team || existingP?.team || (humanEntries % 2 === 0 ? 'blue' : 'red');
+
+          room.players[playerId] = {
+            ...player,
+            team: assignedTeam,
+            color: assignedTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+            x: 220 + Math.random() * 60,
+            y: assignedTeam === 'blue' ? 440 : 760,
+            angle: 0,
+            ws,
+          };
+
+          // Broadcast updated room state to all in room
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'change-team' && currentRoom && playerId) {
+        const room = rooms[currentRoom];
+        if (room && room.players[playerId]) {
+          const newTeam = msg.team === 'red' ? 'red' : 'blue';
+          room.players[playerId].team = newTeam;
+          room.players[playerId].color = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
+          room.players[playerId].x = 220 + Math.random() * 60;
+          room.players[playerId].y = newTeam === 'blue' ? 440 : 760;
+          room.players[playerId].angle = 0;
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'player-update' && currentRoom && playerId) {
+        const room = rooms[currentRoom];
+        if (room && room.players[playerId]) {
+          Object.assign(room.players[playerId], msg.updates);
+          // Broadcast to other players
+          broadcastToRoom(currentRoom, {
+            type: 'player-moved',
+            playerId,
+            updates: msg.updates,
+          }, playerId);
+        }
+      } else if (msg.type === 'update-name' && currentRoom && playerId) {
+        const room = rooms[currentRoom];
+        if (room && room.players[playerId]) {
+          room.players[playerId].username = msg.username;
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'player-shoot' && currentRoom && playerId) {
+        broadcastToRoom(currentRoom, {
+          type: 'bullet-fired',
+          playerId,
+          bullet: msg.bullet,
+        }, playerId);
+      } else if (msg.type === 'bot-hit' && currentRoom) {
+        broadcastToRoom(currentRoom, {
+          type: 'bot-damaged',
+          botId: msg.botId,
+          damage: msg.damage,
+          scorerId: msg.scorerId,
+          points: msg.points,
+        });
+      } else if (msg.type === 'add-bot' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room) {
+          const botNames = ['Cyber_Sniper', 'Valkyrie_Bot', 'Titan_Mech', 'Shadow_Reaper', 'Nexus_Bot', 'Apex_Bot'];
+          const botId = `server-bot-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+          const currentCount = Object.keys(room.players).length + (room.bots ? room.bots.length : 0);
+          if (currentCount < room.totalSlots) {
+            const team = currentCount % 2 === 0 ? 'red' : 'blue';
+            if (!room.bots) room.bots = [];
+            room.bots.push({
+              id: botId,
+              username: `${botNames[room.bots.length % botNames.length]} (BOT)`,
+              team,
+              x: 220 + Math.random() * 60,
+              y: team === 'blue' ? 380 + (room.bots.length * 80) : 740 + (room.bots.length * 80),
+              angle: 0,
+              score: 0,
+              hp: 100,
+              maxHp: 100,
+              kills: 0,
+              deaths: 0,
+              isReady: true,
+              isBot: true,
+              color: team === 'blue' ? '#38bdf8' : '#f43f5e',
+            });
+            broadcastToRoom(currentRoom, {
+              type: 'room-updated',
+              room: sanitizeRoom(room),
+            });
+          }
+        }
+      } else if (msg.type === 'start-match' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room) {
+          room.gameState = 'playing';
+          room.timeLeft = 60;
+          broadcastToRoom(currentRoom, {
+            type: 'match-started',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'kick-player' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room) {
+          const targetId = msg.targetId;
+          if (room.bots) {
+            room.bots = room.bots.filter(b => b.id !== targetId);
+          }
+          if (room.players[targetId]) {
+            delete room.players[targetId];
+          }
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'update-bot-team' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room) {
+          const newTeam = msg.team === 'red' ? 'red' : 'blue';
+          const newColor = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
+          if (room.bots) {
+            const b = room.bots.find(x => x.id === msg.botId);
+            if (b) {
+              b.team = newTeam;
+              b.color = newColor;
+              b.y = newTeam === 'blue' ? 380 + Math.random() * 80 : 740 + Math.random() * 80;
+            }
+          }
+          if (room.players[msg.botId]) {
+            room.players[msg.botId].team = newTeam;
+            room.players[msg.botId].color = newColor;
+            room.players[msg.botId].y = newTeam === 'blue' ? 380 + Math.random() * 80 : 740 + Math.random() * 80;
+          }
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'delete-room' && currentRoom) {
+        const roomToDel = currentRoom;
+        delete rooms[roomToDel];
+        broadcastToRoom(roomToDel, {
+          type: 'room-deleted',
+          roomCode: roomToDel,
+        });
+        currentRoom = null;
+      } else if (msg.type === 'leave-room' && currentRoom && playerId) {
+        const room = rooms[currentRoom];
+        if (room) {
+          delete room.players[playerId];
+          if (Object.keys(room.players).length === 0) {
+            delete rooms[currentRoom];
+          } else {
+            broadcastToRoom(currentRoom, {
+              type: 'player-left',
+              playerId,
+              room: sanitizeRoom(room),
+            });
+          }
+        }
+        currentRoom = null;
+      } else if (msg.type === 'end-match' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room) {
+          room.gameState = 'ended';
+          broadcastToRoom(currentRoom, {
+            type: 'match-ended',
+            room: sanitizeRoom(room),
+          });
+        }
+      }
+    } catch (err) {
+      console.error('WS Error:', err);
+    }
+  });
+
+  ws.on('close', () => {
+    if (currentRoom && playerId && rooms[currentRoom]) {
+      delete rooms[currentRoom].players[playerId];
+      if (Object.keys(rooms[currentRoom].players).length === 0) {
+        delete rooms[currentRoom];
+      } else {
+        broadcastToRoom(currentRoom, {
+          type: 'player-left',
+          playerId,
+          room: sanitizeRoom(rooms[currentRoom]),
+        });
+      }
+    }
+  });
+});
+
+function broadcastToRoom(roomCode: string, payload: any, excludePlayerId?: string) {
+  const room = rooms[roomCode];
+  if (!room) return;
+  const str = JSON.stringify(payload);
+  Object.entries(room.players).forEach(([pId, p]) => {
+    if (excludePlayerId && pId === excludePlayerId) return;
+    if (p.ws && p.ws.readyState === WebSocket.OPEN) {
+      p.ws.send(str);
+    }
+  });
+}
+
+function sanitizeRoom(room: RoomState) {
+  const sanitizedPlayers: Record<string, any> = {};
+  Object.entries(room.players).forEach(([id, p]) => {
+    sanitizedPlayers[id] = {
+      id: p.id,
+      username: p.username,
+      team: p.team || 'blue',
+      color: p.color,
+      x: p.x,
+      y: p.y,
+      angle: p.angle,
+      score: p.score,
+      hp: p.hp,
+      maxHp: p.maxHp || 100,
+      kills: p.kills || 0,
+      deaths: p.deaths || 0,
+      isReady: p.isReady,
+      isBot: p.isBot || false,
+      customization: p.customization,
+    };
+  });
+
+  if (room.bots) {
+    room.bots.forEach(bot => {
+      if (!sanitizedPlayers[bot.id]) {
+        sanitizedPlayers[bot.id] = bot;
+      }
+    });
+  }
+
+  return {
+    code: room.code,
+    players: sanitizedPlayers,
+    gameState: room.gameState,
+    blueScore: room.blueScore || 0,
+    redScore: room.redScore || 0,
+    timeLeft: room.timeLeft,
+    totalSlots: room.totalSlots || 4,
+  };
+}
+
+// REST health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', activeRooms: Object.keys(rooms).length });
+});
+
+// Setup Vite middleware in dev or static files in production
+async function startServer() {
+  const PORT = Number(process.env.PORT) || 3000;
+
+  if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
+    const vite = await createViteServer({
+      server: {
+        middlewareMode: true,
+        ws: {
+          server,
+        },
+        hmr: {
+          server,
+        },
+      },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
+    app.use(express.static(path.resolve(__dirname, 'dist')));
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    });
+  }
+
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+}
+
+startServer();

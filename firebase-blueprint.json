@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "Room": {
+      "title": "Room",
+      "description": "Multiplayer game room state",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "gameState": { "type": "string" },
+        "blueScore": { "type": "number" },
+        "redScore": { "type": "number" },
+        "totalSlots": { "type": "number" }
+      },
+      "required": ["code", "gameState"]
+    },
+    "Player": {
+      "title": "Player",
+      "description": "Player state within a room",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "team": { "type": "string" },
+        "isReady": { "type": "boolean" }
+      },
+      "required": ["username", "team"]
+    }
+  },
+  "firestore": {
+    "/rooms/{roomCode}": {
+      "schema": "Room",
+      "description": "Room data document"
+    },
+    "/rooms/{roomCode}/players/{playerId}": {
+      "schema": "Player",
+      "description": "Player data document"
+    }
+  }
+}

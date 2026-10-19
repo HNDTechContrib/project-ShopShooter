@@ -1,0 +1,298 @@
+import React, { useState } from 'react';
+import { LeaderboardEntry } from '../types';
+import { 
+  Trophy, 
+  Crown, 
+  Medal, 
+  Clock, 
+  Gift, 
+  UserCheck, 
+  Sparkles,
+  ArrowRight
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { soundEngine } from '../utils/audio';
+
+interface LeaderboardViewProps {
+  leaderboard: LeaderboardEntry[];
+  currentUserScore: number;
+  currentUsername: string;
+  onUpdateUsername: (name: string) => void;
+  onSubmitScoreToLeaderboard: (username: string) => void;
+  onNavigateToShooter: () => void;
+}
+
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
+  leaderboard,
+  currentUserScore,
+  currentUsername,
+  onUpdateUsername,
+  onSubmitScoreToLeaderboard,
+  onNavigateToShooter,
+}) => {
+  const [activeTab, setActiveTab] = useState<'ranks' | 'rewards'>('ranks');
+  const [inputName, setInputName] = useState<string>(currentUsername);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputName.trim()) return;
+    onUpdateUsername(inputName.trim());
+    onSubmitScoreToLeaderboard(inputName.trim());
+    setSubmitted(true);
+    soundEngine.playPowerUp();
+    confetti({
+      particleCount: 70,
+      spread: 60,
+      origin: { y: 0.6 },
+    });
+    setTimeout(() => setSubmitted(false), 3000);
+  };
+
+  return (
+    <div className="w-full max-w-5xl mx-auto space-y-8 pb-12">
+      {/* Header Banner */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 md:p-8 border border-slate-700 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+              <Trophy className="w-4 h-4" />
+              <span>Kompetisi Mingguan DiskonBlaster</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              Papan Peringkat Global
+            </h2>
+            <p className="text-sm text-slate-300 mt-1 max-w-lg">
+              Tembak target sebanyak-banyaknya di Arena Shooter. Raih posisi 3 besar setiap hari Minggu pukul 23:59 WIB untuk menangkan voucher belanja hingga 90%!
+            </p>
+          </div>
+
+          <div className="bg-slate-800/90 border border-slate-700/80 px-5 py-3.5 rounded-2xl flex items-center gap-4 shrink-0 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[11px] uppercase tracking-wider text-slate-400 block font-semibold">
+                Reset Peringkat Dalam
+              </span>
+              <span className="text-lg font-extrabold text-white font-mono-numbers">
+                2 Hari 14 Jam 28 Menit
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* User Submission Form Strip */}
+        <div className="mt-6 pt-6 border-t border-slate-700/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs text-slate-400">Skor Tertinggi Kamu:</span>
+              <div className="text-base font-extrabold text-white font-mono-numbers">
+                {currentUserScore} Poin Diskon
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
+              placeholder="Masukkan Nickname Kamu"
+              maxLength={20}
+              className="bg-slate-900 border border-slate-700 text-white text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-amber-400 placeholder-slate-500 w-44 sm:w-56"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md active:scale-95 whitespace-nowrap"
+            >
+              {submitted ? 'Tersimpan!' : 'Kirim Skor'}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('ranks')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${
+              activeTab === 'ranks'
+                ? 'bg-slate-900 text-white'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100'
+            }`}
+          >
+            Peringkat Teratas (Top 10)
+          </button>
+          <button
+            onClick={() => setActiveTab('rewards')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${
+              activeTab === 'rewards'
+                ? 'bg-slate-900 text-white'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100'
+            }`}
+          >
+            Daftar Hadiah Mingguan
+          </button>
+        </div>
+
+        <button
+          onClick={onNavigateToShooter}
+          className="flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors"
+        >
+          <span>Tingkatkan Skor di Arena</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Ranks Tab */}
+      {activeTab === 'ranks' && (
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-4 bg-slate-50/70 border-b border-slate-200 grid grid-cols-12 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="col-span-2 text-center">Peringkat</span>
+            <span className="col-span-4">Shooter</span>
+            <span className="col-span-3 text-right">Skor Mingguan</span>
+            <span className="col-span-3 text-right">Hadiah Berhak</span>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {leaderboard.map((entry) => {
+              const isTop1 = entry.rank === 1;
+              const isTop2 = entry.rank === 2;
+              const isTop3 = entry.rank === 3;
+
+              return (
+                <div
+                  key={`${entry.rank}-${entry.username}`}
+                  className={`grid grid-cols-12 items-center p-4 transition-colors ${
+                    entry.isCurrentUser
+                      ? 'bg-amber-50/70 border-l-4 border-amber-500'
+                      : 'hover:bg-slate-50/60'
+                  }`}
+                >
+                  {/* Rank Column */}
+                  <div className="col-span-2 flex items-center justify-center">
+                    {isTop1 ? (
+                      <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-black text-sm shadow-sm">
+                        <Crown className="w-4 h-4 fill-amber-500 text-amber-500" />
+                      </div>
+                    ) : isTop2 ? (
+                      <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm">
+                        2
+                      </div>
+                    ) : isTop3 ? (
+                      <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-800 flex items-center justify-center font-bold text-sm">
+                        3
+                      </div>
+                    ) : (
+                      <span className="font-bold text-slate-500 text-sm font-mono-numbers">
+                        #{entry.rank}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Username & Badge */}
+                  <div className="col-span-4">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900 text-sm truncate">
+                        {entry.username}
+                      </span>
+                      {entry.isCurrentUser && (
+                        <span className="text-[10px] bg-amber-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded">
+                          KAMU
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-500 block truncate">
+                      {entry.badge} · {entry.date}
+                    </span>
+                  </div>
+
+                  {/* Score */}
+                  <div className="col-span-3 text-right">
+                    <span className="font-extrabold text-slate-900 text-base font-mono-numbers">
+                      {entry.score.toLocaleString('id-ID')}
+                    </span>
+                    <span className="text-[11px] text-slate-500 block">Poin</span>
+                  </div>
+
+                  {/* Reward Tier */}
+                  <div className="col-span-3 text-right">
+                    <span className="text-xs font-semibold text-emerald-600 block truncate">
+                      {entry.rewardTier}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Rewards Tab */}
+      {activeTab === 'rewards' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-b from-amber-50 to-white border-2 border-amber-300 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center mb-4 shadow-lg shadow-amber-400/25">
+              <Crown className="w-7 h-7 fill-slate-950" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+              Juara 1 Mingguan
+            </span>
+            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+              Voucher Diskon 90%
+            </h3>
+            <p className="text-xs text-slate-600 mb-4">
+              Maksimum potongan hingga Rp 1.000.000 untuk belanja semua produk di katalog + Gelar Emas Juara Nasional.
+            </p>
+            <div className="mt-auto w-full pt-4 border-t border-amber-200 text-xs font-bold text-amber-800">
+              1 Pemenang Tiap Minggu
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-slate-50 to-white border border-slate-300 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-300 text-slate-800 flex items-center justify-center mb-4 shadow-sm">
+              <Medal className="w-7 h-7" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+              Peringkat 2 &amp; 3
+            </span>
+            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+              Voucher Diskon 70% &amp; 50%
+            </h3>
+            <p className="text-xs text-slate-600 mb-4">
+              Potongan langsung hingga Rp 500.000 dan Rp 300.000 saat checkout belanja.
+            </p>
+            <div className="mt-auto w-full pt-4 border-t border-slate-200 text-xs font-bold text-slate-700">
+              2 Pemenang Tiap Minggu
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-blue-50 to-white border border-blue-200 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-4 shadow-sm">
+              <Gift className="w-7 h-7" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+              Top 4 s/d 10 Elite
+            </span>
+            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+              Voucher 30% + 500 Koin
+            </h3>
+            <p className="text-xs text-slate-600 mb-4">
+              Tambahan modal koin diskon dan voucher hemat 30% untuk seluruh peserta sepuluh besar.
+            </p>
+            <div className="mt-auto w-full pt-4 border-t border-blue-100 text-xs font-bold text-blue-800">
+              7 Pemenang Tiap Minggu
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
