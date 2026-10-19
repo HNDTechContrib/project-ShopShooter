@@ -439,7 +439,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   );
 
   const isLocalPlayer = useCallback((id: string) => {
-    return id === myPlayerId.current || id === 'local-p1';
+    if (!id) return false;
+    const authUid = auth.currentUser?.uid;
+    return id === myPlayerId.current || (authUid && id === authUid) || id === 'local-p1' || id.startsWith('p_');
   }, []);
 
   const [isJoinedRoom, setIsJoinedRoom] = useState<boolean>(false);
@@ -453,9 +455,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   useEffect(() => {
     signInAnonymously(auth).then((cred) => {
       if (cred?.user?.uid) {
-        myPlayerId.current = cred.user.uid;
+        const oldId = myPlayerId.current;
+        const newId = cred.user.uid;
+        myPlayerId.current = newId;
+        simState.current.players.forEach(p => {
+          if (p.id === oldId) p.id = newId;
+        });
         try {
-          sessionStorage.setItem('shop_shooter_player_uid', cred.user.uid);
+          sessionStorage.setItem('shop_shooter_player_uid', newId);
         } catch (e) {}
       }
     }).catch((err) => {
@@ -737,12 +744,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       angle: botAngle,
     };
 
-    // Immediately update local roster state
-    setRoomPlayersList(prev => {
-      if (prev.some(p => p.id === botId)) return prev;
-      return [...prev, newBot];
-    });
-
     // Update in Firestore
     if (currentRoomCode) {
       try {
@@ -841,13 +842,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     p.respawnTimer = 0;
 
     const isAlly = p.team === playerTeam;
+    // Base spawns: Left side (220) for Ally, Right side (WORLD_WIDTH - 260) for Enemy
     if (isAlly) {
-      // Local player & allies always respawn on Left base facing right
       p.x = 220 + Math.random() * 80;
       p.y = 380 + Math.random() * 480;
       p.angle = 0;
     } else {
-      // Enemies always respawn on Right base facing left
       p.x = (WORLD_WIDTH - 260) - Math.random() * 80;
       p.y = 380 + Math.random() * 480;
       p.angle = Math.PI;
@@ -933,10 +933,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
     let botIdx = 0;
 
-    // Team Blue Bots (Left if ally, Right if enemy)
+    // Team Blue Bots
     const blueNeeded = playerTeam === 'blue' ? countPerTeam - 1 : countPerTeam;
     for (let i = 0; i < blueNeeded; i++) {
-      const isAlly = playerTeam === 'blue';
+      const isAlly = 'blue' === playerTeam;
       const botX = isAlly 
         ? 180 + Math.random() * 80 
         : (WORLD_WIDTH - 260) - Math.random() * 80;
@@ -975,10 +975,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       botIdx++;
     }
 
-    // Team Red Bots (Left if ally, Right if enemy)
+    // Team Red Bots
     const redNeeded = playerTeam === 'red' ? countPerTeam - 1 : countPerTeam;
     for (let i = 0; i < redNeeded; i++) {
-      const isAlly = playerTeam === 'red';
+      const isAlly = 'red' === playerTeam;
       const botX = isAlly 
         ? 180 + Math.random() * 80 
         : (WORLD_WIDTH - 260) - Math.random() * 80;
@@ -1370,13 +1370,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           } else if (data.type === 'match-started') {
             if (data.room && data.room.players) {
               const roomPlayers = Object.values(data.room.players) as any[];
-              simState.current.players = roomPlayers.map(p => {
+              simState.current.players = roomPlayers.map((p, pIdx) => {
+                const isAlly = p.team === playerTeam;
+                const spawnX = isAlly 
+                  ? 220 + Math.random() * 80 
+                  : (WORLD_WIDTH - 260) - Math.random() * 80;
+                const spawnY = 360 + (pIdx * 120);
+                const spawnAngle = isAlly ? 0 : Math.PI;
+
                 if (isLocalPlayer(p.id)) {
-                  const existing = simState.current.players.find(x => isLocalPlayer(x.id));
-                  return existing ? { ...p, id: uid, x: existing.x, y: existing.y, angle: existing.angle, hp: existing.hp } : { ...p, id: uid };
+                  return { ...p, id: myPlayerId.current, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true };
                 }
                 return {
                   ...p,
+                  name: p.name || p.username || 'Pemain',
+                  x: spawnX,
+                  y: spawnY,
+                  angle: spawnAngle,
                   isBot: p.isBot || false,
                   isShielded: p.isShielded || false,
                   isRespawning: p.isRespawning || false,
@@ -1461,8 +1471,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   const handleKickPlayer = async (targetId: string) => {
     soundEngine.playPowerUp();
-    // Instantly remove locally
-    setRoomPlayersList(prev => prev.filter(p => p.id !== targetId));
 
     if (currentRoomCode) {
       try {
@@ -3043,23 +3051,34 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             mCtx.stroke();
           }
 
-          // Base zones
-          // Blue Base (Left)
-          const blueBaseW = (320 / WORLD_WIDTH) * mw;
-          mCtx.fillStyle = 'rgba(6, 182, 212, 0.22)';
-          mCtx.fillRect(0, 0, blueBaseW, mh);
-          mCtx.fillStyle = 'rgba(6, 182, 212, 0.9)';
+          // Base zones on minimap matching player team
+          const leftTeam = playerTeam;
+          const rightTeam = playerTeam === 'blue' ? 'red' : 'blue';
+
+          const leftMinimapFill = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
+          const leftMinimapTextColor = leftTeam === 'blue' ? '#06b6d4' : '#f43f5e';
+          const leftMinimapLabel = leftTeam === 'blue' ? 'BIRU' : 'MERAH';
+
+          const rightMinimapFill = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
+          const rightMinimapTextColor = rightTeam === 'blue' ? '#06b6d4' : '#f43f5e';
+          const rightMinimapLabel = rightTeam === 'blue' ? 'BIRU' : 'MERAH';
+
+          const baseW = (320 / WORLD_WIDTH) * mw;
+
+          // Left Base
+          mCtx.fillStyle = leftMinimapFill;
+          mCtx.fillRect(0, 0, baseW, mh);
+          mCtx.fillStyle = leftMinimapTextColor;
           mCtx.font = 'bold 7px "Plus Jakarta Sans", sans-serif';
           mCtx.textAlign = 'left';
-          mCtx.fillText('BIRU', 3, mh - 3);
+          mCtx.fillText(leftMinimapLabel, 3, mh - 3);
 
-          // Red Base (Right)
-          const redBaseW = (320 / WORLD_WIDTH) * mw;
-          mCtx.fillStyle = 'rgba(244, 63, 94, 0.22)';
-          mCtx.fillRect(mw - redBaseW, 0, redBaseW, mh);
-          mCtx.fillStyle = 'rgba(244, 63, 94, 0.9)';
+          // Right Base
+          mCtx.fillStyle = rightMinimapFill;
+          mCtx.fillRect(mw - baseW, 0, baseW, mh);
+          mCtx.fillStyle = rightMinimapTextColor;
           mCtx.textAlign = 'right';
-          mCtx.fillText('MERAH', mw - 3, mh - 3);
+          mCtx.fillText(rightMinimapLabel, mw - 3, mh - 3);
 
           // Obstacles & Shelves
           mCtx.fillStyle = 'rgba(71, 85, 105, 0.5)';
@@ -3121,7 +3140,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               ? 'bold 7.5px "Plus Jakarta Sans", sans-serif'
               : 'bold 6.5px "Plus Jakarta Sans", sans-serif';
             mCtx.textAlign = 'center';
-            const shortName = p.name.length > 8 ? p.name.slice(0, 7) + '…' : p.name;
+            const name = p.name || 'Pemain';
+            const shortName = name.length > 8 ? name.slice(0, 7) + '…' : name;
             const label = isLocal ? `${shortName} (Kamu)` : shortName;
 
             const textW = mCtx.measureText(label).width;
