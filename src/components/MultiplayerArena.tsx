@@ -544,6 +544,22 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   });
   const [showCustomizerModal, setShowCustomizerModal] = useState<boolean>(false);
 
+  const getCharacterStats = (charClass?: CharacterClass) => {
+    switch (charClass) {
+      case 'tanker':
+        return { maxHp: 200, speedMultiplier: 0.78, damageMultiplier: 0.8 };
+      case 'commando':
+        return { maxHp: 80, speedMultiplier: 1.0, damageMultiplier: 1.35 };
+      case 'ninja':
+        return { maxHp: 90, speedMultiplier: 1.3, damageMultiplier: 1.0 };
+      case 'mecha':
+        return { maxHp: 150, speedMultiplier: 0.85, damageMultiplier: 1.1 };
+      case 'phantom':
+      default:
+        return { maxHp: 100, speedMultiplier: 1.1, damageMultiplier: 1.0 };
+    }
+  };
+
   // Match configurations
   const [totalPlayersConfig, setTotalPlayersConfig] = useState<2 | 4 | 6 | 8>(4);
   const [playerTeam, setPlayerTeam] = useState<TeamId>('blue');
@@ -564,7 +580,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   // Mobile Touch Controls State
   const [isMobileControlsEnabled, setIsMobileControlsEnabled] = useState<boolean>(true);
-  const [isAutoAimEnabled, setIsAutoAimEnabled] = useState<boolean>(true);
   const [virtualJoyActive, setVirtualJoyActive] = useState<boolean>(false);
   const [joyKnobPos, setJoyKnobPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -819,7 +834,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   // Respawn single player back into the arena
   const respawnSinglePlayer = (p: SimPlayer) => {
     p.isRespawning = false;
-    p.hp = p.maxHp;
+    const stats = getCharacterStats(p.customization?.characterClass);
+    p.maxHp = stats.maxHp;
+    p.hp = stats.maxHp;
     p.isShielded = true;
     p.respawnTimer = 0;
 
@@ -893,6 +910,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     // Human Player with customized traits and unique ID - Always starts on left base facing right
     const mySpawnX = 220 + Math.random() * 60;
     const mySpawnY = 560 + (Math.random() - 0.5) * 160;
+    const myStats = getCharacterStats(characterCustomization.characterClass);
     newPlayers.push({
       id: myPlayerId.current,
       name: playerName,
@@ -900,8 +918,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       x: mySpawnX,
       y: mySpawnY,
       angle: 0,
-      hp: 100,
-      maxHp: 100,
+      hp: myStats.maxHp,
+      maxHp: myStats.maxHp,
       score: 0,
       kills: 0,
       deaths: 0,
@@ -924,6 +942,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         : (WORLD_WIDTH - 260) - Math.random() * 80;
       const botY = 360 + (i * 140);
       const botAngle = isAlly ? 0 : Math.PI;
+      const botClass = botClasses[botIdx % botClasses.length];
+      const botStats = getCharacterStats(botClass);
 
       newPlayers.push({
         id: `bot-blue-${i}`,
@@ -932,8 +952,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         x: botX,
         y: botY,
         angle: botAngle,
-        hp: 100,
-        maxHp: 100,
+        hp: botStats.maxHp,
+        maxHp: botStats.maxHp,
         score: 0,
         kills: 0,
         deaths: 0,
@@ -943,7 +963,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         respawnTimer: 0,
         color: '#38bdf8',
         customization: {
-          characterClass: botClasses[botIdx % botClasses.length],
+          characterClass: botClass,
           primaryColor: '#0284c7',
           secondaryColor: '#0369a1',
           visorColor: '#38bdf8',
@@ -964,6 +984,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         : (WORLD_WIDTH - 260) - Math.random() * 80;
       const botY = 360 + (i * 140);
       const botAngle = isAlly ? 0 : Math.PI;
+      const botClass = botClasses[botIdx % botClasses.length];
+      const botStats = getCharacterStats(botClass);
 
       newPlayers.push({
         id: `bot-red-${i}`,
@@ -972,8 +994,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         x: botX,
         y: botY,
         angle: botAngle,
-        hp: 100,
-        maxHp: 100,
+        hp: botStats.maxHp,
+        maxHp: botStats.maxHp,
         score: 0,
         kills: 0,
         deaths: 0,
@@ -983,7 +1005,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         respawnTimer: 0,
         color: '#f43f5e',
         customization: {
-          characterClass: botClasses[botIdx % botClasses.length],
+          characterClass: botClass,
           primaryColor: '#e11d48',
           secondaryColor: '#be123c',
           visorColor: '#fb7185',
@@ -1855,8 +1877,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       if (myP && !myP.isRespawning) {
         let dx = 0;
         let dy = 0;
+        const myStats = getCharacterStats(myP.customization?.characterClass);
         const isSpeedSkill = myP.activeSkill?.type === 'speed';
-        const speed = isSpeedSkill ? 11.5 : 7.5;
+        const speed = (isSpeedSkill ? 11.5 : 7.5) * myStats.speedMultiplier;
 
         // Keyboard inputs
         if (keysPressed.current['w'] || keysPressed.current['arrowup']) dy -= speed;
@@ -1878,37 +1901,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         myP.x = Math.max(45, Math.min(WORLD_WIDTH - 45, myP.x + dx));
         myP.y = Math.max(45, Math.min(WORLD_HEIGHT - 45, myP.y + dy));
 
-        // Mobile Auto-Aim Assist (Locks onto nearest enemy or boss)
-        if (isAutoAimEnabled) {
-          let closestDist = 700;
-          let targetAngle = myP.angle;
-          let foundTarget = false;
 
-          sim.players.forEach((other) => {
-            if (other.team !== myP.team && !other.isRespawning) {
-              const d = Math.hypot(other.x - myP.x, other.y - myP.y);
-              if (d < closestDist) {
-                closestDist = d;
-                targetAngle = Math.atan2(other.y - myP.y, other.x - myP.x);
-                foundTarget = true;
-              }
-            }
-          });
-
-          if (sim.boss && sim.boss.hp > 0) {
-            const bDist = Math.hypot(sim.boss.x - myP.x, sim.boss.y - myP.y);
-            if (bDist < closestDist) {
-              closestDist = bDist;
-              targetAngle = Math.atan2(sim.boss.y - myP.y, sim.boss.x - myP.x);
-              foundTarget = true;
-            }
-          }
-
-          if (foundTarget && (mobileMoveVector.current.x !== 0 || mobileMoveVector.current.y !== 0 || isMouseDown.current)) {
-            // Smoothly lerp towards target
-            myP.angle = targetAngle;
-          }
-        }
 
         // Circle-to-AABB Box Collision Push-Out
         themeConfig.obstacles.forEach((obs) => {
@@ -1955,8 +1948,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         let angleTo = Math.atan2(targetY - bot.y, targetX - bot.x);
         bot.angle = angleTo;
 
+        const botStats = getCharacterStats(bot.customization?.characterClass);
         const isSpeedSkill = bot.activeSkill?.type === 'speed';
-        let moveSpeed = isSpeedSkill ? 6.5 : 4.4;
+        let moveSpeed = (isSpeedSkill ? 6.5 : 4.4) * (botStats?.speedMultiplier || 1.0);
 
         if (minDist < 260) {
           moveSpeed = -1.5; // Combat spacing
@@ -2079,8 +2073,16 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               const dist = Math.hypot(target.x - b.x, target.y - b.y);
               if (dist < 26) {
                 hitPlayer = true;
-                target.hp = Math.max(0, target.hp - b.damage);
-                addDamageText(`-${b.damage}`, target.x, target.y - 10, b.team === 'blue' ? '#22c55e' : '#f59e0b');
+                const shooter = sim.players.find((p) => p.id === b.shooterId);
+                const shooterStats = getCharacterStats(shooter?.customization?.characterClass);
+                const rawDmg = Math.floor(b.damage * (shooterStats?.damageMultiplier || 1.0));
+
+                const isTanker = target.customization?.characterClass === 'tanker';
+                const damageReduction = isTanker ? 0.6 : 1.0;
+                const finalDmg = Math.max(4, Math.round(rawDmg * damageReduction));
+
+                target.hp = Math.max(0, target.hp - finalDmg);
+                addDamageText(`-${finalDmg}`, target.x, target.y - 10, b.team === 'blue' ? '#22c55e' : '#f59e0b');
                 soundEngine.playHit(target.hp === 0);
 
                 if (target.hp === 0) {
@@ -2195,26 +2197,40 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         }
 
         // B. Base Zones
-        // Blue Base (Left)
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.08)';
+        // B. Base Zones
+        const leftTeam = playerTeam;
+        const rightTeam = playerTeam === 'blue' ? 'red' : 'blue';
+
+        const leftRgba = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(244, 63, 94, 0.08)';
+        const leftStroke = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(244, 63, 94, 0.4)';
+        const leftText = leftTeam === 'blue' ? 'BLUE BASE' : 'RED BASE';
+        const leftTextFill = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(244, 63, 94, 0.2)';
+
+        const rightRgba = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(244, 63, 94, 0.08)';
+        const rightStroke = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(244, 63, 94, 0.4)';
+        const rightText = rightTeam === 'blue' ? 'BLUE BASE' : 'RED BASE';
+        const rightTextFill = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(244, 63, 94, 0.2)';
+
+        // Left Base
+        ctx.fillStyle = leftRgba;
         ctx.fillRect(0, 0, 320, WORLD_HEIGHT);
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.strokeStyle = leftStroke;
         ctx.setLineDash([8, 8]);
         ctx.strokeRect(0, 0, 320, WORLD_HEIGHT);
         ctx.setLineDash([]);
         ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
-        ctx.fillText('BLUE BASE', 60, WORLD_HEIGHT / 2);
+        ctx.fillStyle = leftTextFill;
+        ctx.fillText(leftText, 60, WORLD_HEIGHT / 2);
 
-        // Red Base (Right)
-        ctx.fillStyle = 'rgba(244, 63, 94, 0.08)';
+        // Right Base
+        ctx.fillStyle = rightRgba;
         ctx.fillRect(WORLD_WIDTH - 320, 0, 320, WORLD_HEIGHT);
-        ctx.strokeStyle = 'rgba(244, 63, 94, 0.4)';
+        ctx.strokeStyle = rightStroke;
         ctx.setLineDash([8, 8]);
         ctx.strokeRect(WORLD_WIDTH - 320, 0, 320, WORLD_HEIGHT);
         ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
-        ctx.fillText('RED BASE', WORLD_WIDTH - 240, WORLD_HEIGHT / 2);
+        ctx.fillStyle = rightTextFill;
+        ctx.fillText(rightText, WORLD_WIDTH - 240, WORLD_HEIGHT / 2);
 
         // C. MAP THEMED DECORATIONS (Shopping Mall, Neon Rooftop, Tech Warehouse, Sky Garden)
         themeConfig.decorations.forEach((dec) => {
@@ -3134,7 +3150,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     return () => {
       if (animFrameId.current) cancelAnimationFrame(animFrameId.current);
     };
-  }, [matchStatus, finishMatch, isAutoAimEnabled]);
+  }, [matchStatus, finishMatch]);
 
   return (
     <div
@@ -3355,19 +3371,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             {/* Right: Aim Touch Pad, Shoot Button & Dash */}
             <div className="pointer-events-auto flex flex-col items-end gap-2">
               <div className="flex items-center gap-2 mb-1">
-                {/* Auto-Aim assist toggle */}
-                <button
-                  onClick={() => setIsAutoAimEnabled(!isAutoAimEnabled)}
-                  className={`px-2.5 py-1.5 rounded-xl text-[10px] font-bold border flex items-center gap-1 transition-all ${
-                    isAutoAimEnabled
-                      ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                      : 'bg-slate-900/80 border-slate-700 text-slate-400'
-                  }`}
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  <span>Auto-Aim: {isAutoAimEnabled ? 'ON' : 'OFF'}</span>
-                </button>
-
                 {/* Dash / Evade Button */}
                 <button
                   onClick={handleMobileDash}
