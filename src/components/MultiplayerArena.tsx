@@ -1379,7 +1379,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 const spawnAngle = isAlly ? 0 : Math.PI;
 
                 if (isLocalPlayer(p.id)) {
-                  return { ...p, id: myPlayerId.current, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true };
+                  return { ...p, id: myPlayerId.current, name: p.name || p.username || playerName, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true };
                 }
                 return {
                   ...p,
