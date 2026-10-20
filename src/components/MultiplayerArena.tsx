@@ -607,7 +607,20 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const joyOrigin = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const aimTouchId = useRef<number | null>(null);
 
-  // Mutable Game Simulation State (Ref for 60 FPS zero React DOM lag)
+  interface ShopParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rotation: number;
+  vRot: number;
+  type: 'receipt' | 'coin' | 'bag';
+  color: string;
+  alpha: number;
+  scale: number;
+}
+
+// Mutable Game Simulation State (Ref for 60 FPS zero React DOM lag)
   const simState = useRef<{
     players: SimPlayer[];
     bullets: SimBullet[];
@@ -615,6 +628,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     damageTexts: SimDamageText[];
     skills: CollectibleSkill[];
     ambientParticles: AmbientParticle[];
+    shoppingParticles: ShopParticle[];
     blueScore: number;
     redScore: number;
     timeLeft: number;
@@ -628,6 +642,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     damageTexts: [],
     skills: JSON.parse(JSON.stringify(INITIAL_SKILLS)),
     ambientParticles: [],
+    shoppingParticles: [],
     blueScore: 0,
     redScore: 0,
     timeLeft: 90,
@@ -2143,6 +2158,29 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   target.isRespawning = true;
                   target.respawnTimer = 3.5;
 
+                  // Spawn Shopping Explosion Particles (Receipts, Coins, Shopping Bags)
+                  soundEngine.playShoppingPop();
+                  for (let sp = 0; sp < 18; sp++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 6;
+                    const pTypes: ('receipt' | 'coin' | 'bag')[] = ['receipt', 'coin', 'bag'];
+                    const chosenType = pTypes[Math.floor(Math.random() * pTypes.length)];
+                    const pColor = chosenType === 'coin' ? '#fbbf24' : chosenType === 'bag' ? '#f43f5e' : '#f8fafc';
+
+                    sim.shoppingParticles.push({
+                      x: target.x,
+                      y: target.y,
+                      vx: Math.cos(angle) * speed,
+                      vy: Math.sin(angle) * speed - 1.5,
+                      rotation: Math.random() * Math.PI * 2,
+                      vRot: (Math.random() - 0.5) * 0.15,
+                      type: chosenType,
+                      color: pColor,
+                      alpha: 1.0,
+                      scale: 0.7 + Math.random() * 0.6,
+                    });
+                  }
+
                   const shooter = sim.players.find((p) => p.id === b.shooterId);
                   if (shooter) {
                     shooter.kills += 1;
@@ -2201,6 +2239,21 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         if (part.x < 0) part.x = WORLD_WIDTH;
         if (part.x > WORLD_WIDTH) part.x = 0;
       });
+
+      // 10b. Update Shopping Explosion Particles (Receipts, Coins, Bags)
+      for (let sp = sim.shoppingParticles.length - 1; sp >= 0; sp--) {
+        const part = sim.shoppingParticles[sp];
+        part.x += part.vx;
+        part.y += part.vy;
+        part.vy += 0.2; // gravity drop
+        part.vx *= 0.95; // friction
+        part.rotation += part.vRot;
+        part.alpha -= 0.018;
+
+        if (part.alpha <= 0) {
+          sim.shoppingParticles.splice(sp, 1);
+        }
+      }
 
       // 11. Camera Tracking (Centered on local player)
       if (canvas) {
@@ -2683,6 +2736,52 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.beginPath();
           ctx.arc(part.x, part.y, part.size, 0, Math.PI * 2);
           ctx.fill();
+          ctx.restore();
+        });
+
+        // D2. Shopping Explosion Particles (Receipts, Coins, Shopping Bags)
+        sim.shoppingParticles.forEach((part) => {
+          ctx.save();
+          ctx.globalAlpha = part.alpha;
+          ctx.translate(part.x, part.y);
+          ctx.rotate(part.rotation);
+          ctx.scale(part.scale, part.scale);
+
+          if (part.type === 'coin') {
+            // Gold coin
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#fbbf24';
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(0, 0, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fde68a';
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Rp', 0, 0);
+          } else if (part.type === 'bag') {
+            // Shopping bag
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#f43f5e';
+            ctx.fillStyle = '#e11d48';
+            ctx.fillRect(-8, -6, 16, 18);
+            ctx.strokeStyle = '#fda4af';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, -6, 5, Math.PI, Math.PI * 2);
+            ctx.stroke();
+          } else {
+            // Shopping receipt paper
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#ffffff';
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-6, -10, 12, 20);
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(-4, -6, 8, 2);
+            ctx.fillRect(-4, -2, 6, 2);
+            ctx.fillRect(-4, 2, 7, 2);
+          }
           ctx.restore();
         });
 

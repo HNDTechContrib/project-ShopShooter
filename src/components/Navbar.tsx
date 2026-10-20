@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Target } from 'lucide-react';
+import { ShoppingBag, Target, Gift } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'catalog' | 'multiplayer' | 'shooter' | 'leaderboard' | 'powerups' | 'cart';
@@ -79,8 +79,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Zone 3: 1 Primary Action (Shopping Bag with live count & points) */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Primary Actions (Daily Rewards & Cart) */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open_daily_challenge'))}
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap shrink-0 animate-pulse"
+            title="Tantangan & Hadiah Harian"
+          >
+            <Gift className="w-4 h-4 fill-slate-950" />
+            <span className="hidden sm:inline">Hadiah Harian</span>
+          </button>
+
           <button
             onClick={() => onSelectTab('cart')}
             className="flex items-center gap-2.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap shrink-0"

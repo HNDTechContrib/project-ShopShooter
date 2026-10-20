@@ -200,6 +200,27 @@ class SoundEngine {
       });
     } catch {}
   }
+
+  // Shopping particle explosion pop & coin clink
+  playShoppingPop() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [1046.5, 1318.5, 1567.98].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.035);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.035);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.035 + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.035);
+        osc.stop(now + idx * 0.035 + 0.13);
+      });
+    } catch {}
+  }
 }
 
 export const soundEngine = new SoundEngine();

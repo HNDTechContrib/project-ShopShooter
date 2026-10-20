@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Product, 
   CartItem, 
@@ -27,9 +27,17 @@ import { LeaderboardView } from './components/LeaderboardView';
 import { PowerUpStore } from './components/PowerUpStore';
 import { CartCheckoutView } from './components/CartCheckoutView';
 import { SpecialTargetNotification } from './components/SpecialTargetNotification';
+import { DailyChallengeModal } from './components/DailyChallengeModal';
 import { soundEngine } from './utils/audio';
 
 export default function App() {
+  const [isDailyModalOpen, setIsDailyModalOpen] = useState<boolean>(true); // Open on first load as daily check-in
+
+  useEffect(() => {
+    const handleOpenDaily = () => setIsDailyModalOpen(true);
+    window.addEventListener('open_daily_challenge', handleOpenDaily);
+    return () => window.removeEventListener('open_daily_challenge', handleOpenDaily);
+  }, []);
   // Navigation
   const [activeTab, setActiveTab] = useState<'catalog' | 'multiplayer' | 'shooter' | 'leaderboard' | 'powerups' | 'cart'>('multiplayer');
 
@@ -206,6 +214,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+      {/* Daily Login Challenge & Streak Modal */}
+      <DailyChallengeModal
+        isOpen={isDailyModalOpen}
+        onClose={() => setIsDailyModalOpen(false)}
+        onAddDiscountPoints={handleAddDiscountPoints}
+      />
+
       {/* Dynamic Siren & Special Notification Toast */}
       <SpecialTargetNotification
         notifications={notifications}
