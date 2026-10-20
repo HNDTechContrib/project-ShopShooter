@@ -94,6 +94,7 @@ interface SimPlayer {
   deaths: number;
   isBot: boolean;
   isShielded: boolean;
+  shieldTimer?: number;
   isRespawning: boolean;
   respawnTimer: number;
   color: string;
@@ -568,7 +569,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   };
 
   // Match configurations
-  const [totalPlayersConfig, setTotalPlayersConfig] = useState<2 | 4 | 6 | 8>(4);
+  const [totalPlayersConfig, setTotalPlayersConfig] = useState<number>(4);
   const [playerTeam, setPlayerTeam] = useState<TeamId>('blue');
   const [selectedMapTheme, setSelectedMapTheme] = useState<MapTheme>('mall');
   const [gameModeType, setGameModeType] = useState<'multiplayer' | 'bot'>('multiplayer');
@@ -839,6 +840,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     p.maxHp = stats.maxHp;
     p.hp = stats.maxHp;
     p.isShielded = true;
+    p.shieldTimer = 3.0;
     p.respawnTimer = 0;
 
     const isAlly = p.team === playerTeam;
@@ -857,13 +859,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       setHudRespawnTimer(0);
       setHudMyHp(p.maxHp);
       soundEngine.playPowerUp();
-      addDamageText('🛡️ RESPAWN! PERISAI KEBAL (3.5s)', p.x, p.y - 25, '#facc15');
+      addDamageText('🛡️ PERISAI KEBAL (3s)', p.x, p.y - 25, '#facc15');
     }
-
-    // Protective Invulnerability shield expires after 3.5s
-    setTimeout(() => {
-      p.isShielded = false;
-    }, 3500);
   };
 
   // Instant Respawn button for human player
@@ -905,7 +902,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     const botAccessories: AccessoryType[] = ['horns', 'cyber_goggles', 'halo', 'none', 'crown'];
 
     const newPlayers: SimPlayer[] = [];
-    const countPerTeam = totalPlayersConfig / 2;
+    const totalBotsNeeded = Math.max(1, totalPlayersConfig - 1);
+    const allyBotsNeeded = Math.floor(totalBotsNeeded / 2);
+    const enemyBotsNeeded = totalBotsNeeded - allyBotsNeeded;
+    const blueNeeded = playerTeam === 'blue' ? allyBotsNeeded : enemyBotsNeeded;
+    const redNeeded = playerTeam === 'red' ? allyBotsNeeded : enemyBotsNeeded;
 
     // Human Player with customized traits and unique ID - Always starts on left base facing right
     const mySpawnX = 220 + Math.random() * 60;
@@ -925,6 +926,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       deaths: 0,
       isBot: false,
       isShielded: true,
+      shieldTimer: 3.0,
       isRespawning: false,
       respawnTimer: 0,
       color: playerTeam === 'blue' ? '#38bdf8' : '#f43f5e',
@@ -934,7 +936,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     let botIdx = 0;
 
     // Team Blue Bots
-    const blueNeeded = playerTeam === 'blue' ? countPerTeam - 1 : countPerTeam;
     for (let i = 0; i < blueNeeded; i++) {
       const isAlly = 'blue' === playerTeam;
       const botX = isAlly 
@@ -959,6 +960,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         deaths: 0,
         isBot: true,
         isShielded: true,
+        shieldTimer: 3.0,
         isRespawning: false,
         respawnTimer: 0,
         color: '#38bdf8',
@@ -976,7 +978,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
 
     // Team Red Bots
-    const redNeeded = playerTeam === 'red' ? countPerTeam - 1 : countPerTeam;
     for (let i = 0; i < redNeeded; i++) {
       const isAlly = 'red' === playerTeam;
       const botX = isAlly 
@@ -1001,6 +1002,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         deaths: 0,
         isBot: true,
         isShielded: true,
+        shieldTimer: 3.0,
         isRespawning: false,
         respawnTimer: 0,
         color: '#f43f5e',
@@ -1053,13 +1055,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       maxHp: 300,
       size: 58,
     };
-
-    // Remove spawn shields after 3s
-    setTimeout(() => {
-      simState.current.players.forEach((p) => {
-        p.isShielded = false;
-      });
-    }, 3000);
   }, [totalPlayersConfig, playerTeam, selectedMapTheme, characterCustomization]);
 
   // Switch Team (Tim Biru / Tim Merah) with live sync
@@ -1100,6 +1095,31 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         });
       } catch (e) {
         console.warn("Firestore update team error:", e);
+      }
+    }
+  };
+
+  // Update total player slots live (2 to 8 players)
+  const handleUpdateTotalSlots = async (newSlots: number) => {
+    soundEngine.playPowerUp();
+    setTotalPlayersConfig(newSlots);
+
+    if (currentRoomCode && isEffectiveHost) {
+      try {
+        const roomRef = doc(db, 'rooms', currentRoomCode);
+        await updateDoc(roomRef, {
+          totalSlots: newSlots,
+          updatedAt: Date.now(),
+        });
+      } catch (e) {
+        console.warn("Firestore update totalSlots error:", e);
+      }
+
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'update-slots',
+          totalSlots: newSlots,
+        }));
       }
     }
   };
@@ -1299,6 +1319,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 hp: p.hp || 100,
                 maxHp: 100,
                 isShielded: true,
+                shieldTimer: 3.0,
                 isRespawning: false,
                 respawnTimer: 0,
               };
@@ -1309,9 +1330,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               y: p.y || spawnY,
               angle: p.angle !== undefined ? p.angle : spawnAngle,
               isBot: p.isBot || false,
-              isShielded: p.isShielded || false,
-              isRespawning: p.isRespawning || false,
-              respawnTimer: p.respawnTimer || 0,
+              isShielded: true,
+              shieldTimer: 3.0,
+              isRespawning: false,
+              respawnTimer: 0,
             };
           });
 
@@ -1367,6 +1389,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               const roomPlayers = Object.values(data.room.players) as any[];
               setRoomPlayersList(roomPlayers);
             }
+            if (data.room && data.room.totalSlots) {
+              setTotalPlayersConfig(data.room.totalSlots);
+            }
           } else if (data.type === 'match-started') {
             if (data.room && data.room.players) {
               const roomPlayers = Object.values(data.room.players) as any[];
@@ -1379,7 +1404,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 const spawnAngle = isAlly ? 0 : Math.PI;
 
                 if (isLocalPlayer(p.id)) {
-                  return { ...p, id: myPlayerId.current, name: p.name || p.username || playerName, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true };
+                  return { ...p, id: myPlayerId.current, name: p.name || p.username || playerName, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true, shieldTimer: 3.0 };
                 }
                 return {
                   ...p,
@@ -1388,9 +1413,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   y: spawnY,
                   angle: spawnAngle,
                   isBot: p.isBot || false,
-                  isShielded: p.isShielded || false,
-                  isRespawning: p.isRespawning || false,
-                  respawnTimer: p.respawnTimer || 0,
+                  isShielded: true,
+                  shieldTimer: 3.0,
+                  isRespawning: false,
+                  respawnTimer: 0,
                 };
               });
             }
@@ -1670,6 +1696,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       else soundEngine.playShoot();
     }
 
+    // Drop spawn invulnerability shield immediately when shooting
+    if (p.isShielded && (!p.activeSkill || p.activeSkill.type !== 'shield')) {
+      p.isShielded = false;
+      p.shieldTimer = 0;
+    }
+
     const speed = 23;
 
     // Helper to spawn 1 bullet
@@ -1825,6 +1857,19 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           if (p.respawnTimer <= 0) {
             respawnSinglePlayer(p);
           }
+        }
+      });
+
+      // 1b. Process Spawn Protection Shield Timer for ALL Players (Auto-expires reliably)
+      sim.players.forEach((p) => {
+        if (p.shieldTimer && p.shieldTimer > 0) {
+          p.shieldTimer -= dt;
+          if (p.shieldTimer <= 0) {
+            p.shieldTimer = 0;
+            p.isShielded = false;
+          }
+        } else if (!p.activeSkill || p.activeSkill.type !== 'shield') {
+          p.isShielded = false;
         }
       });
 
@@ -2758,19 +2803,31 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Spawn Shield / Invulnerability Dome
           if (p.isShielded || p.activeSkill?.type === 'shield') {
+            const isPowerupShield = p.activeSkill?.type === 'shield';
+            const remaining = isPowerupShield ? (p.activeSkill?.timeLeft || 0) : (p.shieldTimer || 0);
+            const fadeAlpha = remaining < 0.8 ? Math.max(0.25, remaining / 0.8) : 1;
+
             ctx.save();
-            ctx.shadowBlur = 25;
+            ctx.globalAlpha = fadeAlpha;
+            ctx.shadowBlur = 20;
             ctx.shadowColor = '#facc15';
             ctx.beginPath();
             ctx.arc(p.x, p.y, 40, 0, Math.PI * 2);
             ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 3.5;
+            ctx.lineWidth = 3;
             ctx.stroke();
+
+            // Subtle pulsing shield dome fill
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.12)';
+            ctx.fill();
 
             ctx.font = 'bold 9px monospace';
             ctx.fillStyle = '#fde047';
             ctx.textAlign = 'center';
-            ctx.fillText('SHIELDED', p.x, p.y + 48);
+            const shieldText = isPowerupShield
+              ? `SHIELD (${Math.ceil(remaining)}s)`
+              : `KEBAL (${Math.ceil(remaining)}s)`;
+            ctx.fillText(shieldText, p.x, p.y + 48);
             ctx.restore();
           }
 
@@ -3563,6 +3620,34 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   </div>
                 </div>
 
+                {/* Total Players Selection (2, 4, 6, 8 players) */}
+                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold text-slate-400">PILIH TOTAL PEMAIN:</span>
+                    <span className="text-[10px] font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/50">
+                      {totalPlayersConfig} Pemain {totalPlayersConfig === 2 ? '(1v1)' : totalPlayersConfig === 4 ? '(2v2)' : totalPlayersConfig === 6 ? '(3v3)' : '(4v4)'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[2, 4, 6, 8].map((count) => (
+                      <button
+                        key={count}
+                        onClick={() => handleUpdateTotalSlots(count)}
+                        className={`py-2 px-1 rounded-lg text-xs font-bold border transition-all flex flex-col items-center justify-center ${
+                          totalPlayersConfig === count
+                            ? 'bg-gradient-to-b from-cyan-500 to-blue-600 text-white border-cyan-300 shadow-md scale-105 ring-1 ring-cyan-400'
+                            : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
+                        }`}
+                      >
+                        <span className="text-sm font-black">{count}</span>
+                        <span className="text-[9px] font-medium opacity-85">
+                          {count === 2 ? '1v1' : count === 4 ? '2v2' : count === 6 ? '3v3' : '4v4'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* Host Section */}
                   <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
@@ -3642,6 +3727,38 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                         </div>
                       ))}
                     </div>
+
+                    {/* Capacity Setting in Waiting Room */}
+                    {isEffectiveHost ? (
+                      <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                          <span>Ubah Kapasitas Room (Host):</span>
+                          <span className="text-cyan-400 font-bold">{totalPlayersConfig} Pemain ({totalPlayersConfig === 2 ? '1v1' : totalPlayersConfig === 4 ? '2v2' : totalPlayersConfig === 6 ? '3v3' : '4v4'})</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[2, 4, 6, 8].map((count) => (
+                            <button
+                              key={count}
+                              onClick={() => handleUpdateTotalSlots(count)}
+                              className={`py-1.5 rounded text-[11px] font-bold border transition-all flex items-center justify-center gap-1 ${
+                                totalPlayersConfig === count
+                                  ? 'bg-cyan-600 text-white border-cyan-400 shadow-sm font-black'
+                                  : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white hover:border-slate-600'
+                              }`}
+                            >
+                              <span>{count}</span>
+                              <span className="text-[8.5px] opacity-80">({count === 2 ? '1v1' : count === 4 ? '2v2' : count === 6 ? '3v3' : '4v4'})</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                        <span>Kapasitas Room:</span>
+                        <span className="text-cyan-400 font-bold">{totalPlayersConfig} Pemain ({totalPlayersConfig === 2 ? '1v1' : totalPlayersConfig === 4 ? '2v2' : totalPlayersConfig === 6 ? '3v3' : '4v4'})</span>
+                      </div>
+                    )}
+
                     {isEffectiveHost && (
                       <button
                         onClick={startMatch}
@@ -3710,19 +3827,30 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 </div>
 
                 <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                  <span className="text-[10px] font-bold text-slate-400 block mb-1.5">Pilih Total Pemain:</span>
-                  <div className="grid grid-cols-4 gap-1.5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold text-slate-400">PILIH TOTAL PEMAIN:</span>
+                    <span className="text-[10px] font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800/50">
+                      {totalPlayersConfig} Pemain {totalPlayersConfig === 2 ? '(1v1)' : totalPlayersConfig === 4 ? '(2v2)' : totalPlayersConfig === 6 ? '(3v3)' : '(4v4)'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
                     {[2, 4, 6, 8].map((count) => (
                       <button
                         key={count}
-                        onClick={() => setTotalPlayersConfig(count as 2 | 4 | 6 | 8)}
-                        className={`py-1.5 px-2 rounded-lg text-xs font-bold border ${
+                        onClick={() => {
+                          soundEngine.playPowerUp();
+                          setTotalPlayersConfig(count);
+                        }}
+                        className={`py-2 px-1 rounded-lg text-xs font-bold border transition-all flex flex-col items-center justify-center ${
                           totalPlayersConfig === count
-                            ? 'bg-amber-600 text-white border-amber-500'
-                            : 'bg-slate-900 text-slate-300 border-slate-700'
+                            ? 'bg-gradient-to-b from-amber-500 to-orange-600 text-white border-amber-400 shadow-md scale-105 ring-1 ring-amber-300'
+                            : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
                         }`}
                       >
-                        {count}
+                        <span className="text-sm font-black">{count}</span>
+                        <span className="text-[9px] font-medium opacity-85">
+                          {count === 2 ? '1v1' : count === 4 ? '2v2' : count === 6 ? '3v3' : '4v4'}
+                        </span>
                       </button>
                     ))}
                   </div>

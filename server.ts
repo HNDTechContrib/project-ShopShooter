@@ -52,7 +52,7 @@ interface RoomState {
   blueScore: number;
   redScore: number;
   timeLeft: number;
-  totalSlots: 2 | 4 | 6 | 8;
+  totalSlots: number;
   bots: any[];
 }
 
@@ -210,6 +210,15 @@ wss.on('connection', (ws: WebSocket) => {
           if (room.players[targetId]) {
             delete room.players[targetId];
           }
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'update-slots' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room && msg.totalSlots) {
+          room.totalSlots = msg.totalSlots;
           broadcastToRoom(currentRoom, {
             type: 'room-updated',
             room: sanitizeRoom(room),
