@@ -152,6 +152,7 @@ export interface ArenaPlayer {
   isRespawning?: boolean;
   respawnTimeLeft?: number;
   isShielded?: boolean;
+  shieldTimer?: number;
   customization?: CharacterCustomization;
   activeSkill?: {
     type: InGameSkillType;

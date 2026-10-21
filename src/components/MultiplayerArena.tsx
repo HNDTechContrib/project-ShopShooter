@@ -875,6 +875,22 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       setHudMyHp(p.maxHp);
       soundEngine.playPowerUp();
       addDamageText('🛡️ PERISAI KEBAL (3s)', p.x, p.y - 25, '#facc15');
+
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'player-update',
+          updates: {
+            x: p.x,
+            y: p.y,
+            angle: p.angle,
+            hp: p.hp,
+            isShielded: true,
+            shieldTimer: 3.0,
+            isRespawning: false,
+            respawnTimer: 0,
+          }
+        }));
+      }
     }
   };
 
@@ -1711,12 +1727,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       else soundEngine.playShoot();
     }
 
-    // Drop spawn invulnerability shield immediately when shooting
-    if (p.isShielded && (!p.activeSkill || p.activeSkill.type !== 'shield')) {
-      p.isShielded = false;
-      p.shieldTimer = 0;
-    }
-
     const speed = 23;
 
     // Helper to spawn 1 bullet
@@ -1987,6 +1997,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               score: myP.score,
               kills: myP.kills,
               deaths: myP.deaths,
+              isShielded: myP.isShielded,
+              shieldTimer: myP.shieldTimer,
+              isRespawning: myP.isRespawning,
             }
           }));
         }
@@ -2156,7 +2169,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 if (target.hp === 0) {
                   target.deaths += 1;
                   target.isRespawning = true;
-                  target.respawnTimer = 3.5;
+                  target.respawnTimer = 3.0;
 
                   // Spawn Shopping Explosion Particles (Receipts, Coins, Shopping Bags)
                   soundEngine.playShoppingPop();
@@ -3496,7 +3509,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               <div className="w-full bg-slate-800 rounded-full h-3 mb-4 overflow-hidden border border-slate-700">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-rose-500 h-full transition-all duration-100 ease-linear"
-                  style={{ width: `${Math.max(0, 100 - (hudRespawnTimer / 3.5) * 100)}%` }}
+                  style={{ width: `${Math.max(0, 100 - (hudRespawnTimer / 3.0) * 100)}%` }}
                 />
               </div>
 
