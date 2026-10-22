@@ -20,6 +20,7 @@ interface LeaderboardViewProps {
   onUpdateUsername: (name: string) => void;
   onSubmitScoreToLeaderboard: (username: string) => void;
   onNavigateToShooter: () => void;
+  themeMode?: 'dark' | 'light';
 }
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
@@ -29,7 +30,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   onUpdateUsername,
   onSubmitScoreToLeaderboard,
   onNavigateToShooter,
+  themeMode = 'dark',
 }) => {
+  const isDark = themeMode === 'dark';
   const [activeTab, setActiveTab] = useState<'ranks' | 'rewards'>('ranks');
   const [inputName, setInputName] = useState<string>(currentUsername);
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -153,15 +156,15 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
       {/* Ranks Tab */}
       {activeTab === 'ranks' && (
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-4 bg-slate-50/70 border-b border-slate-200 grid grid-cols-12 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border rounded-2xl overflow-hidden`}>
+          <div className={`p-4 ${isDark ? 'bg-slate-950/70 border-slate-800 text-slate-400' : 'bg-slate-50/70 border-slate-200 text-slate-500'} border-b grid grid-cols-12 text-xs font-semibold uppercase tracking-wider`}>
             <span className="col-span-2 text-center">Peringkat</span>
             <span className="col-span-4">Shooter</span>
             <span className="col-span-3 text-right">Skor Mingguan</span>
             <span className="col-span-3 text-right">Hadiah Berhak</span>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-100'}`}>
             {leaderboard.map((entry) => {
               const isTop1 = entry.rank === 1;
               const isTop2 = entry.rank === 2;
@@ -172,8 +175,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   key={`${entry.rank}-${entry.username}`}
                   className={`grid grid-cols-12 items-center p-4 transition-colors ${
                     entry.isCurrentUser
-                      ? 'bg-amber-50/70 border-l-4 border-amber-500'
-                      : 'hover:bg-slate-50/60'
+                      ? isDark ? 'bg-amber-950/40 border-l-4 border-amber-500 text-amber-200' : 'bg-amber-50/70 border-l-4 border-amber-500'
+                      : isDark ? 'hover:bg-slate-800/60 text-slate-200' : 'hover:bg-slate-50/60 text-slate-800'
                   }`}
                 >
                   {/* Rank Column */}

@@ -8,6 +8,7 @@ interface PowerUpStoreProps {
   powerUpInventory: PowerUpItem[];
   onBuyPowerUp: (powerUpId: string, cost: number) => boolean;
   onNavigateToShooter: () => void;
+  themeMode?: 'dark' | 'light';
 }
 
 export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
@@ -15,7 +16,9 @@ export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
   powerUpInventory,
   onBuyPowerUp,
   onNavigateToShooter,
+  themeMode = 'dark',
 }) => {
+  const isDark = themeMode === 'dark';
   const handleBuy = (item: PowerUpItem) => {
     const success = onBuyPowerUp(item.id, item.costPoints);
     if (success) {
@@ -67,27 +70,27 @@ export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
           return (
             <div
               key={item.id}
-              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
+              className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border rounded-2xl p-6 transition-all flex flex-col justify-between`}
             >
               <div>
                 <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center text-3xl shadow-inner">
+                  <div className={`w-14 h-14 rounded-2xl ${isDark ? 'bg-slate-800 text-amber-400' : 'bg-slate-100 text-slate-900'} flex items-center justify-center text-3xl shadow-inner`}>
                     {item.icon}
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-slate-500 block">Stok Tersedia</span>
-                    <span className="text-lg font-black text-slate-900 font-mono-numbers">
+                    <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} block`}>Stok Tersedia</span>
+                    <span className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} font-mono-numbers`}>
                       {item.count} Unit
                     </span>
                   </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900 mb-1">{item.name}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'} mb-1`}>{item.name}</h3>
+                <p className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-600'} leading-relaxed mb-4`}>
                   {item.description}
                 </p>
 
-                <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 pb-4 border-b border-slate-100">
+                <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-4 pb-4 border-b ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                   <span>Durasi Efek: <strong>{item.durationSeconds} Detik</strong></span>
                   <span aria-hidden="true">·</span>
                   <span>Hotkey: <strong>[Tombol Angka]</strong></span>
