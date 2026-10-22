@@ -29,6 +29,7 @@ interface ShooterArenaProps {
   onNavigateToCart: () => void;
   onNavigateToLeaderboard: () => void;
   onTriggerSpecialNotification: (targetName: string, points: number) => void;
+  themeMode?: 'dark' | 'light';
 }
 
 export const ShooterArena: React.FC<ShooterArenaProps> = ({
@@ -39,7 +40,9 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
   onNavigateToCart,
   onNavigateToLeaderboard,
   onTriggerSpecialNotification,
+  themeMode = 'dark',
 }) => {
+  const isDark = themeMode === 'dark';
   // Game states
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -549,25 +552,25 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Top HUD Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-6 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border rounded-2xl p-4 md:p-6 shadow-xl flex flex-wrap items-center justify-between gap-4`}>
         {/* Left: Round Timer & Status */}
         <div className="flex items-center gap-6">
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Sisa Waktu</span>
-            <span className={`text-3xl font-extrabold font-mono-numbers ${roundTimeLeft <= 10 && isPlaying ? 'text-red-500 animate-pulse' : 'text-amber-400'}`}>
+            <span className={`text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'} font-semibold`}>Sisa Waktu</span>
+            <span className={`text-3xl font-extrabold font-mono-numbers ${roundTimeLeft <= 10 && isPlaying ? 'text-red-500 animate-pulse' : 'text-amber-500'}`}>
               {roundTimeLeft}s
             </span>
           </div>
 
-          <div className="h-10 w-px bg-slate-800" />
+          <div className={`h-10 w-px ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`} />
 
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Skor Ronde Ini</span>
+            <span className={`text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'} font-semibold`}>Skor Ronde Ini</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-emerald-400 font-mono-numbers">
+              <span className="text-3xl font-extrabold text-emerald-500 font-mono-numbers">
                 +{roundScore}
               </span>
-              <span className="text-xs text-slate-400">
+              <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 (≈ {formatRupiah(roundScore * POINT_TO_RUPIAH_RATIO)})
               </span>
             </div>
@@ -575,14 +578,14 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         </div>
 
         {/* Center: Combo Streak Indicator */}
-        <div className="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
-          <Flame className={`w-5 h-5 ${comboCount > 0 ? 'text-orange-500 animate-bounce' : 'text-slate-500'}`} />
+        <div className={`flex items-center gap-3 ${isDark ? 'bg-slate-800/80 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'} px-4 py-2 rounded-xl border`}>
+          <Flame className={`w-5 h-5 ${comboCount > 0 ? 'text-orange-500 animate-bounce' : 'text-slate-400'}`} />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-300 font-medium">Combo Streak:</span>
-              <span className="font-bold text-orange-400 font-mono-numbers">{comboCount} Hits</span>
+              <span className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-600'} font-medium`}>Combo Streak:</span>
+              <span className="font-bold text-orange-500 font-mono-numbers">{comboCount} Hits</span>
             </div>
-            <span className="text-xs font-semibold text-emerald-400">
+            <span className="text-xs font-semibold text-emerald-500">
               Pengali: x{comboMultiplier.toFixed(1)}
             </span>
           </div>
@@ -592,11 +595,11 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={toggleMute}
-            className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+            className={`p-2.5 rounded-lg ${isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} transition-colors`}
             title={isMuted ? 'Nyalakan Suara' : 'Bisukan Suara'}
             aria-label="Toggle Sound"
           >
-            {isMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+            {isMuted ? <VolumeX className="w-5 h-5 text-red-500" /> : <Volume2 className="w-5 h-5 text-emerald-500" />}
           </button>
 
           {!isPlaying ? (
@@ -610,7 +613,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
           ) : (
             <button
               onClick={() => setIsPaused(!isPaused)}
-              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 text-sm transition-colors"
+              className={`px-4 py-2.5 ${isDark ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white' : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'} font-medium rounded-xl border text-sm transition-colors`}
             >
               {isPaused ? 'Lanjut' : 'Jeda'}
             </button>
@@ -623,7 +626,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         ref={arenaRef}
         onClick={handleArenaClick}
         onMouseMove={handleMouseMove}
-        className={`relative w-full h-[520px] md:h-[600px] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
+        className={`relative w-full h-[520px] md:h-[600px] ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-900 border-slate-300'} rounded-2xl overflow-hidden border-2 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
           screenShake ? 'translate-x-1.5 -translate-y-1.5' : ''
         }`}
         style={{
@@ -671,46 +674,46 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
 
         {/* Welcome / Idle Screen */}
         {!isPlaying && (
-          <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+          <div className={`absolute inset-0 z-30 ${isDark ? 'bg-slate-950/85 text-white' : 'bg-slate-50/95 text-slate-900'} backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center`}>
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center mb-3 shadow-xl shadow-orange-500/20">
               <Crosshair className="w-7 h-7 text-white" />
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight">
+            <h2 className={`text-2xl md:text-3xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} mb-2 tracking-tight`}>
               Arena Latihan Target
             </h2>
-            <p className="text-xs md:text-sm text-slate-300 max-w-lg mb-6 leading-relaxed">
+            <p className={`text-xs md:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'} max-w-lg mb-6 leading-relaxed`}>
               Tembak target diskon yang bergerak di arena. Kumpulkan poin sebanyak mungkin untuk ditukarkan menjadi potongan belanja di keranjang.
             </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl w-full mb-6 text-left text-xs text-slate-300">
-              <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-sky-400 flex items-center gap-1.5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl w-full mb-6 text-left text-xs">
+              <div className={`${isDark ? 'bg-slate-900/90 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'} border p-3 rounded-xl flex flex-col gap-1`}>
+                <span className="font-bold text-sky-500 flex items-center gap-1.5">
                   <Target className="w-3.5 h-3.5" />
                   <span>Target Reguler</span>
                 </span>
-                <span className="text-[11px] text-slate-400">+25 s/d +60 Poin per hit.</span>
+                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>+25 s/d +60 Poin per hit.</span>
               </div>
-              <div className="bg-slate-900/90 border border-amber-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-amber-400 flex items-center gap-1.5">
+              <div className={`${isDark ? 'bg-slate-900/90 border-amber-500/30 text-slate-300' : 'bg-white border-amber-400/50 text-slate-700 shadow-sm'} border p-3 rounded-xl flex flex-col gap-1`}>
+                <span className="font-bold text-amber-500 flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5" />
                   <span>Target Emas</span>
                 </span>
-                <span className="text-[11px] text-slate-400">+250 Poin! Butuh 3x hit.</span>
+                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>+250 Poin! Butuh 3x hit.</span>
               </div>
-              <div className="bg-slate-900/90 border border-red-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-rose-400 flex items-center gap-1.5">
+              <div className={`${isDark ? 'bg-slate-900/90 border-red-500/30 text-slate-300' : 'bg-white border-red-400/50 text-slate-700 shadow-sm'} border p-3 rounded-xl flex flex-col gap-1`}>
+                <span className="font-bold text-rose-500 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>Bom Penalti</span>
                 </span>
-                <span className="text-[11px] text-slate-400">-60 Poin jika terkena tembak.</span>
+                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>-60 Poin jika terkena tembak.</span>
               </div>
-              <div className="bg-slate-900/90 border border-emerald-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+              <div className={`${isDark ? 'bg-slate-900/90 border-emerald-500/30 text-slate-300' : 'bg-white border-emerald-400/50 text-slate-700 shadow-sm'} border p-3 rounded-xl flex flex-col gap-1`}>
+                <span className="font-bold text-emerald-500 flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5" />
                   <span>Power-Up</span>
                 </span>
-                <span className="text-[11px] text-slate-400">Slow-mo, Multi-shot, & Magnet.</span>
+                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Slow-mo, Multi-shot, & Magnet.</span>
               </div>
             </div>
 
@@ -838,22 +841,22 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
       </div>
 
       {/* Power-Up Inventory & Quick Action Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm">
+      <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border rounded-2xl p-4 md:p-6`}>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'} flex items-center gap-2`}>
               <Zap className="w-5 h-5 text-amber-500" />
               Power-Up Eksklusif Shooter
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
               Gunakan selama permainan untuk membidik target yang cepat dan acak. Klik tombol atau tekan hotkey [1-4].
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-600">
+            <span className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Total Poin Kamu:{' '}
-              <strong className="text-slate-900 font-bold">{userDiscountPoints} Poin</strong> (≈{' '}
+              <strong className={`${isDark ? 'text-white' : 'text-slate-900'} font-bold`}>{userDiscountPoints} Poin</strong> (≈{' '}
               {formatRupiah(userDiscountPoints * POINT_TO_RUPIAH_RATIO)})
             </span>
             <button
@@ -879,19 +882,21 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
                 onClick={() => triggerPowerUp(item.id)}
                 className={`flex flex-col text-left p-3.5 rounded-xl border transition-all ${
                   hasStock && isPlaying
-                    ? 'border-slate-300 hover:border-amber-500 hover:shadow-md bg-slate-50 hover:bg-amber-50/40 active:scale-95'
-                    : 'border-slate-200 bg-slate-50/60 opacity-60 cursor-not-allowed'
+                    ? isDark 
+                      ? 'border-slate-700 bg-slate-950 hover:border-amber-500 text-white shadow-md' 
+                      : 'border-slate-300 bg-slate-50 hover:border-amber-500 text-slate-900 shadow-sm'
+                    : isDark ? 'border-slate-800 bg-slate-950/60 text-slate-600 opacity-60 cursor-not-allowed' : 'border-slate-200 bg-slate-100/60 text-slate-400 opacity-60 cursor-not-allowed'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl">{item.icon}</span>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono font-bold">
+                    <span className={`text-[10px] ${isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'} px-1.5 py-0.5 rounded font-mono font-bold`}>
                       [{hotkey}]
                     </span>
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                        hasStock ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'
+                        hasStock ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : isDark ? 'bg-slate-800 text-slate-500' : 'bg-slate-200 text-slate-600'
                       }`}
                     >
                       x{item.count}
@@ -899,14 +904,14 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
                   </div>
                 </div>
 
-                <span className="text-sm font-bold text-slate-900 mb-1">{item.name}</span>
-                <p className="text-[11px] text-slate-500 leading-tight mb-2 line-clamp-2">
+                <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'} mb-1`}>{item.name}</span>
+                <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'} leading-tight mb-2 line-clamp-2`}>
                   {item.description}
                 </p>
 
-                <div className="mt-auto pt-2 border-t border-slate-200 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500">Durasi: {item.durationSeconds}s</span>
-                  <span className="font-semibold text-amber-600">{hasStock ? 'Siap Pakai' : 'Habis'}</span>
+                <div className={`mt-auto pt-2 border-t ${isDark ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-600'} flex items-center justify-between text-[11px]`}>
+                  <span>Durasi: {item.durationSeconds}s</span>
+                  <span className="font-semibold text-amber-500">{hasStock ? 'Siap Pakai' : 'Habis'}</span>
                 </div>
               </button>
             );

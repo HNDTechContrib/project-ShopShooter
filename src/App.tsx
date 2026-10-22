@@ -20,41 +20,45 @@ import {
   formatRupiah 
 } from './data/mockData';
 import { Navbar } from './components/Navbar';
-import { ProductCatalog } from './components/ProductCatalog';
 import { ShooterArena } from './components/ShooterArena';
 import { MultiplayerArena } from './components/MultiplayerArena';
 import { LeaderboardView } from './components/LeaderboardView';
 import { PowerUpStore } from './components/PowerUpStore';
-import { CartCheckoutView } from './components/CartCheckoutView';
 import { SpecialTargetNotification } from './components/SpecialTargetNotification';
 import { DailyChallengeModal } from './components/DailyChallengeModal';
 import { soundEngine } from './utils/audio';
 
 export default function App() {
-  const [isDailyModalOpen, setIsDailyModalOpen] = useState<boolean>(true); // Open on first load as daily check-in
+  const [isDailyModalOpen, setIsDailyModalOpen] = useState<boolean>(false);
+  
+  // Theme Mode: 'dark' (default) or 'light' (white)
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('tank_arena_theme') as 'dark' | 'light') || 'dark';
+  });
+
+  const toggleTheme = () => {
+    setThemeMode((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('tank_arena_theme', next);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleOpenDaily = () => setIsDailyModalOpen(true);
     window.addEventListener('open_daily_challenge', handleOpenDaily);
     return () => window.removeEventListener('open_daily_challenge', handleOpenDaily);
   }, []);
-  // Navigation
-  const [activeTab, setActiveTab] = useState<'catalog' | 'multiplayer' | 'shooter' | 'leaderboard' | 'powerups' | 'cart'>('multiplayer');
 
-  // Products
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  // Navigation: Pure Game Tabs
+  const [activeTab, setActiveTab] = useState<'multiplayer' | 'shooter' | 'leaderboard' | 'powerups'>('multiplayer');
 
-  // Cart: Preload with 1 item so user can immediately experiment with redemption!
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { product: INITIAL_PRODUCTS[0], quantity: 1 },
-  ]);
-
-  // Points & Power-ups
-  const [userDiscountPoints, setUserDiscountPoints] = useState<number>(350); // Starter bonus
+  // Combat XP Points & Power-ups
+  const [userDiscountPoints, setUserDiscountPoints] = useState<number>(500); // Combat XP Credits
   const [powerUpInventory, setPowerUpInventory] = useState<PowerUpItem[]>(INITIAL_POWER_UPS);
 
   // Leaderboard
-  const [currentUsername, setCurrentUsername] = useState<string>('Bintang_ShooterID');
+  const [currentUsername, setCurrentUsername] = useState<string>('Commander_Ace');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(INITIAL_LEADERBOARD);
 
   // Notifications
@@ -105,58 +109,6 @@ export default function App() {
   // Deduct points on checkout
   const handleDeductPoints = (points: number) => {
     setUserDiscountPoints((prev) => Math.max(0, prev - points));
-  };
-
-  // Cart operations
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-
-    addNotification(
-      'info',
-      'Masuk ke Keranjang',
-      `${product.name} telah ditambahkan ke keranjang belanja.`
-    );
-  };
-
-  const handleUpdateCartQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveCartItem(productId);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleRemoveCartItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
-
-  // Direct challenge from product card
-  const handleDirectShoot = (product: Product) => {
-    setActiveTab('shooter');
-    addNotification(
-      'special_target',
-      `Misi Target: ${product.name}`,
-      `Bidik target produk ini di arena untuk raih bonus +${product.shooterBonusPoints} Poin Diskon!`,
-      5000
-    );
   };
 
   // Power-up consumption
@@ -210,10 +162,10 @@ export default function App() {
     setLeaderboard(updated);
   };
 
-  const totalCartCount = cartItems.reduce((acc, it) => acc + it.quantity, 0);
-
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${
+      themeMode === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-100 text-slate-900'
+    }`}>
       {/* Daily Login Challenge & Streak Modal */}
       <DailyChallengeModal
         isOpen={isDailyModalOpen}
@@ -227,33 +179,25 @@ export default function App() {
         onDismiss={handleDismissNotification}
       />
 
-      {/* Strict Top Bar Contract Navigation */}
+      {/* Top Bar Navigation with Dark/White Switcher */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
-        cartItemCount={totalCartCount}
         userPoints={userDiscountPoints}
+        themeMode={themeMode}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-6 pt-6 md:pt-8">
-        {activeTab === 'catalog' && (
-          <ProductCatalog
-            products={products}
-            userDiscountPoints={userDiscountPoints}
-            onAddToCart={handleAddToCart}
-            onDirectShoot={handleDirectShoot}
-            onNavigateToShooter={() => setActiveTab('multiplayer')}
-          />
-        )}
-
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 md:px-6 pt-4 md:pt-6 pb-8">
         {activeTab === 'multiplayer' && (
           <MultiplayerArena
             userDiscountPoints={userDiscountPoints}
             onAddDiscountPoints={handleAddDiscountPoints}
-            onNavigateToCart={() => setActiveTab('cart')}
+            onNavigateToCart={() => setActiveTab('powerups')}
             onNavigateToLeaderboard={() => setActiveTab('leaderboard')}
             onTriggerSpecialNotification={handleTriggerSpecialNotification}
+            themeMode={themeMode}
           />
         )}
 
@@ -263,9 +207,10 @@ export default function App() {
             onAddDiscountPoints={handleAddDiscountPoints}
             powerUpInventory={powerUpInventory}
             onUsePowerUpItem={handleUsePowerUpItem}
-            onNavigateToCart={() => setActiveTab('cart')}
+            onNavigateToCart={() => setActiveTab('powerups')}
             onNavigateToLeaderboard={() => setActiveTab('leaderboard')}
             onTriggerSpecialNotification={handleTriggerSpecialNotification}
+            themeMode={themeMode}
           />
         )}
 
@@ -276,7 +221,8 @@ export default function App() {
             currentUsername={currentUsername}
             onUpdateUsername={setCurrentUsername}
             onSubmitScoreToLeaderboard={handleSubmitScoreToLeaderboard}
-            onNavigateToShooter={() => setActiveTab('shooter')}
+            onNavigateToShooter={() => setActiveTab('multiplayer')}
+            themeMode={themeMode}
           />
         )}
 
@@ -285,37 +231,29 @@ export default function App() {
             userPoints={userDiscountPoints}
             powerUpInventory={powerUpInventory}
             onBuyPowerUp={handleBuyPowerUp}
-            onNavigateToShooter={() => setActiveTab('shooter')}
-          />
-        )}
-
-        {activeTab === 'cart' && (
-          <CartCheckoutView
-            cartItems={cartItems}
-            userDiscountPoints={userDiscountPoints}
-            onUpdateQuantity={handleUpdateCartQuantity}
-            onRemoveItem={handleRemoveCartItem}
-            onClearCart={handleClearCart}
-            onDeductPoints={handleDeductPoints}
-            onNavigateToCatalog={() => setActiveTab('catalog')}
-            onNavigateToShooter={() => setActiveTab('shooter')}
+            onNavigateToShooter={() => setActiveTab('multiplayer')}
+            themeMode={themeMode}
           />
         )}
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 bg-white py-8 px-6 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-900">DiskonBlaster</span>
+      <footer className={`mt-auto border-t py-6 px-6 text-xs transition-colors duration-200 ${
+        themeMode === 'dark' 
+          ? 'border-slate-800 bg-slate-950 text-slate-500' 
+          : 'border-slate-200 bg-white text-slate-500 shadow-inner'
+      }`}>
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div className="flex items-center gap-2 font-bold">
+            <span className={themeMode === 'dark' ? 'text-white' : 'text-slate-900'}>TANK ARENA: SKY CLASH</span>
             <span>·</span>
-            <span>Platform E-Commerce Game Shooter Interaktif</span>
+            <span className="text-cyan-500">Real-Time Tactical Tank Combat Arena</span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <span>1 Poin = Rp 100 Potongan Belanja</span>
+          <div className="flex items-center gap-4 text-[11px] opacity-80">
+            <span>Mode: 1v1 · 2v2 · 3v3 · 4v4 TDM</span>
             <span>·</span>
-            <span>Kompetisi Reset Mingguan Setiap Hari Minggu 23:59 WIB</span>
+            <span>Reset Peringkat Mingguan Setiap Minggu 23:59 WIB</span>
           </div>
         </div>
       </footer>

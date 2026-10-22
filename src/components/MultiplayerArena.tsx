@@ -74,6 +74,7 @@ interface MultiplayerArenaProps {
   onNavigateToCart: () => void;
   onNavigateToLeaderboard: () => void;
   onTriggerSpecialNotification: (targetName: string, points: number) => void;
+  themeMode?: 'dark' | 'light';
 }
 
 // World Map Dimensions
@@ -214,179 +215,166 @@ const MAP_THEMES_CONFIG: Record<
   }
 > = {
   mall: {
-    name: 'Shopping Mall (Pusat Elektronik & Komputer)',
-    description: 'Arena di dalam pusat perbelanjaan futuristik dengan lorong belanja, etalase laptop & PC gaming, area tengah terbuka, serta papan promosi diskon.',
-    bgColor: '#080d1a',
-    gridColor: 'rgba(56, 189, 248, 0.08)',
+    name: 'Supermall Megastore (Arena Belanja Putih)',
+    description: 'Arena pusat perbelanjaan berlantai marmer putih cerah dengan lorong belanja modern, etalase gadget & PC, area pameran terbuka, dan promosi diskon.',
+    bgColor: '#ffffff',
+    gridColor: 'rgba(203, 213, 225, 0.65)',
     particleColor: 'rgba(56, 189, 248, 0.45)',
     obstacles: [
-      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#0c1527', borderColor: '#06b6d4' },
-      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#0c1527', borderColor: '#38bdf8' },
-      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#0c1527', borderColor: '#f59e0b' },
-      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#0c1527', borderColor: '#ec4899' },
-      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#111c33', borderColor: '#3b82f6' },
-      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMARTPHONE HUB', color: '#111c33', borderColor: '#f43f5e' },
+      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: SMARTPHONE HUB', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: GAMING GEAR PRO', color: '#ffffff', borderColor: '#d97706' },
+      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR EXP', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#f8fafc', borderColor: '#2563eb' },
+      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMART GADGETS', color: '#f8fafc', borderColor: '#e11d48' },
     ],
     decorations: [
       // PC & Gadget Showcases
-      { id: 'sc-1', type: 'showcase', x: 680, y: 240, size: 28, color: '#06b6d4', secondaryColor: '#38bdf8', label: 'LAPTOP RTX 5090' },
-      { id: 'sc-2', type: 'showcase', x: 1520, y: 240, size: 28, color: '#f59e0b', secondaryColor: '#fbbf24', label: 'RGB KEYBOARD' },
-      { id: 'sc-3', type: 'showcase', x: 680, y: 1040, size: 28, color: '#ec4899', secondaryColor: '#f472b6', label: 'VR HEADSET OMNI' },
-      { id: 'sc-4', type: 'showcase', x: 1520, y: 1040, size: 28, color: '#10b981', secondaryColor: '#34d399', label: 'CYBER WATCH' },
+      { id: 'sc-1', type: 'showcase', x: 680, y: 240, size: 28, color: '#0284c7', secondaryColor: '#38bdf8', label: 'LAPTOP RTX 5090' },
+      { id: 'sc-2', type: 'showcase', x: 1520, y: 240, size: 28, color: '#d97706', secondaryColor: '#f59e0b', label: 'RGB KEYBOARD' },
+      { id: 'sc-3', type: 'showcase', x: 680, y: 1040, size: 28, color: '#e11d48', secondaryColor: '#f43f5e', label: 'VR HEADSET OMNI' },
+      { id: 'sc-4', type: 'showcase', x: 1520, y: 1040, size: 28, color: '#059669', secondaryColor: '#10b981', label: 'CYBER WATCH' },
       // Central Atrium Expo Stands
-      { id: 'sc-mid-1', type: 'showcase', x: 920, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO RIG' },
-      { id: 'sc-mid-2', type: 'showcase', x: 1280, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO MONITOR' },
+      { id: 'sc-mid-1', type: 'showcase', x: 920, y: 550, size: 24, color: '#0284c7', secondaryColor: '#e0f2fe', label: 'EXPO RIG' },
+      { id: 'sc-mid-2', type: 'showcase', x: 1280, y: 550, size: 24, color: '#0284c7', secondaryColor: '#e0f2fe', label: 'EXPO MONITOR' },
       // Promotional Neon Billboards
-      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#f59e0b', label: '⚡ FLASH DEAL 70% ⚡' },
-      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#ec4899', label: '🎁 CASHBACK 50% VOUCHER' },
-      { id: 'pb-3', type: 'promo_billboard', x: 380, y: 640, size: 35, color: '#06b6d4', label: 'CYBER MALL MEGA STORE' },
-      { id: 'pb-4', type: 'promo_billboard', x: 1820, y: 640, size: 35, color: '#f43f5e', label: 'SALE DISKON 80%' },
+      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#d97706', label: '⚡ FLASH DEAL 70% ⚡' },
+      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#e11d48', label: '🎁 CASHBACK 50% VOUCHER' },
+      { id: 'pb-3', type: 'promo_billboard', x: 380, y: 640, size: 35, color: '#0284c7', label: 'MEGA STORE ATRIUM' },
+      { id: 'pb-4', type: 'promo_billboard', x: 1820, y: 640, size: 35, color: '#e11d48', label: 'SALE DISKON 80%' },
       // Escalators
       { id: 'esc-1', type: 'escalator', x: 920, y: 760, size: 40, color: '#0284c7', label: 'LANTAI 2 ↗' },
       { id: 'esc-2', type: 'escalator', x: 1280, y: 760, size: 40, color: '#0284c7', label: 'LANTAI 2 ↗' },
       // Mall Directory Kiosks
-      { id: 'kiosk-1', type: 'kiosk', x: 740, y: 640, size: 22, color: '#38bdf8', label: 'DIREKTORI' },
-      { id: 'kiosk-2', type: 'kiosk', x: 1460, y: 640, size: 22, color: '#38bdf8', label: 'DIREKTORI' },
+      { id: 'kiosk-1', type: 'kiosk', x: 740, y: 640, size: 22, color: '#0284c7', label: 'DIREKTORI' },
+      { id: 'kiosk-2', type: 'kiosk', x: 1460, y: 640, size: 22, color: '#0284c7', label: 'DIREKTORI' },
     ],
   },
   rooftop: {
-    name: 'Neon Rooftop (Atap Mall & Helipad)',
-    description: 'Arena atap gedung dengan lampu neon malam hari, helipad terbuka untuk duel cepat, platform bertingkat, dan lorong sempit.',
-    bgColor: '#0a0614',
-    gridColor: 'rgba(244, 63, 94, 0.08)',
-    particleColor: 'rgba(244, 63, 94, 0.55)',
+    name: 'Sky Plaza (Atap Plaza Putih & Helipad)',
+    description: 'Arena atap mall modern berlantai granit putih bersih dengan helipad terbuka, skywalk kaca, dan lampu navigasi penerbangan.',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(226, 232, 240, 0.85)',
+    particleColor: 'rgba(244, 63, 94, 0.45)',
     obstacles: [
-      { x: 920, y: 280, w: 200, h: 120, label: 'HVAC CHILLER TOWER 01', color: '#18181b', borderColor: '#f43f5e' },
-      { x: 1080, y: 900, w: 200, h: 120, label: 'ENERGY GENERATOR B', color: '#18181b', borderColor: '#fb7185' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS WEST', color: '#111827', borderColor: '#06b6d4' },
-      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS EAST', color: '#111827', borderColor: '#a855f7' },
-      { x: 800, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT A', color: '#1f1326', borderColor: '#ec4899' },
-      { x: 1300, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT B', color: '#1f1326', borderColor: '#ec4899' },
+      { x: 920, y: 280, w: 200, h: 120, label: 'HVAC CHILLER TOWER 01', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 1080, y: 900, w: 200, h: 120, label: 'ENERGY GENERATOR B', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS WEST', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS EAST', color: '#ffffff', borderColor: '#7c3aed' },
+      { x: 800, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT A', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 1300, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT B', color: '#ffffff', borderColor: '#e11d48' },
     ],
     decorations: [
-      // Central Helipad
-      { id: 'heli-1', type: 'helipad', x: 1100, y: 640, size: 70, color: '#f43f5e', secondaryColor: '#facc15', label: 'HELIPAD 01' },
-      // Rooftop Neon Edge Signs
-      { id: 'ns-1', type: 'neon_sign', x: 1100, y: 130, size: 60, color: '#f43f5e', label: 'CYBER MALL ROOFTOP SKYBAR' },
-      { id: 'ns-2', type: 'neon_sign', x: 1100, y: 1170, size: 60, color: '#38bdf8', label: 'NEON AIR TAXI SERVICE' },
-      // Antenna Towers with flashing hazard light
-      { id: 'ant-1', type: 'antenna_tower', x: 380, y: 240, size: 26, color: '#ef4444', label: 'MAST WEST' },
-      { id: 'ant-2', type: 'antenna_tower', x: 1820, y: 240, size: 26, color: '#ef4444', label: 'MAST EAST' },
-      { id: 'ant-3', type: 'antenna_tower', x: 1100, y: 420, size: 26, color: '#eab308' },
-      // Chiller Fans
-      { id: 'fan-1', type: 'chiller_fan', x: 970, y: 340, size: 20, color: '#06b6d4' },
-      { id: 'fan-2', type: 'chiller_fan', x: 1130, y: 960, size: 20, color: '#06b6d4' },
-      // Skyline Skybeam searchlights
-      { id: 'sky-1', type: 'skyline_light', x: 620, y: 150, size: 80, color: '#a855f7' },
-      { id: 'sky-2', type: 'skyline_light', x: 1580, y: 150, size: 80, color: '#06b6d4' },
+      { id: 'heli-1', type: 'helipad', x: 1100, y: 640, size: 70, color: '#e11d48', secondaryColor: '#d97706', label: 'HELIPAD 01' },
+      { id: 'ns-1', type: 'neon_sign', x: 1100, y: 130, size: 60, color: '#e11d48', label: 'SKY PLAZA ROOFTOP' },
+      { id: 'ns-2', type: 'neon_sign', x: 1100, y: 1170, size: 60, color: '#0284c7', label: 'AIR TAXI STATION' },
+      { id: 'ant-1', type: 'antenna_tower', x: 380, y: 240, size: 26, color: '#dc2626', label: 'MAST WEST' },
+      { id: 'ant-2', type: 'antenna_tower', x: 1820, y: 240, size: 26, color: '#dc2626', label: 'MAST EAST' },
+      { id: 'ant-3', type: 'antenna_tower', x: 1100, y: 420, size: 26, color: '#d97706' },
+      { id: 'fan-1', type: 'chiller_fan', x: 970, y: 340, size: 20, color: '#0284c7' },
+      { id: 'fan-2', type: 'chiller_fan', x: 1130, y: 960, size: 20, color: '#0284c7' },
+      { id: 'sky-1', type: 'skyline_light', x: 620, y: 150, size: 80, color: '#7c3aed' },
+      { id: 'sky-2', type: 'skyline_light', x: 1580, y: 150, size: 80, color: '#0284c7' },
     ],
   },
   warehouse: {
-    name: 'Tech Warehouse (Gudang Logistik E-Commerce)',
-    description: 'Gudang logistik belanja otomatis dengan rak kargo bertingkat, peti kemas dekoratif berlindung, dan variasi lorong strategis untuk tim.',
-    bgColor: '#0f1217',
-    gridColor: 'rgba(245, 158, 11, 0.08)',
-    particleColor: 'rgba(245, 158, 11, 0.5)',
+    name: 'Smart Logistics Hub (Gudang Belanja Putih)',
+    description: 'Gudang logistik belanja otomatis dengan lantai epoxy putih bersih, rak kargo bertingkat, dan peti kemas modern.',
+    bgColor: '#f1f5f9',
+    gridColor: 'rgba(203, 213, 225, 0.7)',
+    particleColor: 'rgba(217, 119, 6, 0.45)',
     obstacles: [
-      { x: 860, y: 240, w: 220, h: 120, label: 'RAK KARGO A1: GADGETS', color: '#1c1917', borderColor: '#f59e0b' },
-      { x: 1120, y: 240, w: 220, h: 120, label: 'RAK KARGO A2: KOMPONEN', color: '#1c1917', borderColor: '#f59e0b' },
-      { x: 860, y: 940, w: 220, h: 120, label: 'RAK KARGO B1: DRONE PACK', color: '#1c1917', borderColor: '#eab308' },
-      { x: 1120, y: 940, w: 220, h: 120, label: 'RAK KARGO B2: BATTERY CELL', color: '#1c1917', borderColor: '#eab308' },
-      { x: 500, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #03', color: '#27272a', borderColor: '#38bdf8' },
-      { x: 1570, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #08', color: '#27272a', borderColor: '#f43f5e' },
+      { x: 860, y: 240, w: 220, h: 120, label: 'RAK KARGO A1: GADGETS', color: '#ffffff', borderColor: '#d97706' },
+      { x: 1120, y: 240, w: 220, h: 120, label: 'RAK KARGO A2: KOMPONEN', color: '#ffffff', borderColor: '#d97706' },
+      { x: 860, y: 940, w: 220, h: 120, label: 'RAK KARGO B1: DRONE PACK', color: '#ffffff', borderColor: '#d97706' },
+      { x: 1120, y: 940, w: 220, h: 120, label: 'RAK KARGO B2: BATTERY CELL', color: '#ffffff', borderColor: '#d97706' },
+      { x: 500, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #03', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 1570, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #08', color: '#ffffff', borderColor: '#e11d48' },
     ],
     decorations: [
-      // Pallet Crate Stacks
-      { id: 'crate-1', type: 'crate_stack', x: 740, y: 240, size: 28, color: '#f59e0b', secondaryColor: '#fbbf24', label: 'PACK A-12' },
-      { id: 'crate-2', type: 'crate_stack', x: 1460, y: 240, size: 30, color: '#f59e0b', secondaryColor: '#fbbf24', label: 'PACK B-09' },
-      { id: 'crate-3', type: 'crate_stack', x: 740, y: 1040, size: 30, color: '#eab308', secondaryColor: '#fde047', label: 'EXP SHIP' },
-      { id: 'crate-4', type: 'crate_stack', x: 1460, y: 1040, size: 28, color: '#eab308', secondaryColor: '#fde047', label: 'FRAGILE' },
-      // Automated Logistics Conveyor Belts
-      { id: 'conv-1', type: 'conveyor', x: 1100, y: 450, size: 55, color: '#f59e0b', label: 'CONVEYOR TRACK 01' },
-      { id: 'conv-2', type: 'conveyor', x: 1100, y: 830, size: 55, color: '#f59e0b', label: 'CONVEYOR TRACK 02' },
-      // Sorting Robot Docks
-      { id: 'dock-1', type: 'forklift_dock', x: 380, y: 260, size: 35, color: '#38bdf8', label: 'AGV DOCK 1' },
-      { id: 'dock-2', type: 'forklift_dock', x: 1820, y: 260, size: 35, color: '#f43f5e', label: 'AGV DOCK 2' },
-      // Laser Barcode Scanner Beam
-      { id: 'scan-1', type: 'barcode_scanner', x: 800, y: 640, size: 45, color: '#ef4444', label: 'SCANNER 1' },
-      { id: 'scan-2', type: 'barcode_scanner', x: 1400, y: 640, size: 45, color: '#ef4444', label: 'SCANNER 2' },
+      { id: 'crate-1', type: 'crate_stack', x: 740, y: 240, size: 28, color: '#d97706', secondaryColor: '#fbbf24', label: 'PACK A-12' },
+      { id: 'crate-2', type: 'crate_stack', x: 1460, y: 240, size: 30, color: '#d97706', secondaryColor: '#fbbf24', label: 'PACK B-09' },
+      { id: 'crate-3', type: 'crate_stack', x: 740, y: 1040, size: 30, color: '#d97706', secondaryColor: '#fbbf24', label: 'EXP SHIP' },
+      { id: 'crate-4', type: 'crate_stack', x: 1460, y: 1040, size: 28, color: '#d97706', secondaryColor: '#fbbf24', label: 'FRAGILE' },
+      { id: 'conv-1', type: 'conveyor', x: 1100, y: 450, size: 55, color: '#d97706', label: 'CONVEYOR TRACK 01' },
+      { id: 'conv-2', type: 'conveyor', x: 1100, y: 830, size: 55, color: '#d97706', label: 'CONVEYOR TRACK 02' },
+      { id: 'dock-1', type: 'forklift_dock', x: 380, y: 260, size: 35, color: '#0284c7', label: 'AGV DOCK 1' },
+      { id: 'dock-2', type: 'forklift_dock', x: 1820, y: 260, size: 35, color: '#e11d48', label: 'AGV DOCK 2' },
+      { id: 'scan-1', type: 'barcode_scanner', x: 800, y: 640, size: 45, color: '#dc2626', label: 'SCANNER 1' },
+      { id: 'scan-2', type: 'barcode_scanner', x: 1400, y: 640, size: 45, color: '#dc2626', label: 'SCANNER 2' },
     ],
   },
   garden: {
-    name: 'Sky Garden (Taman Atrium Futuristik)',
-    description: 'Taman atap futuristik mall dengan jembatan layang kaca, air mancur cyber lotus, tanaman bercahaya, dan platform melingkar santai.',
-    bgColor: '#051410',
-    gridColor: 'rgba(16, 185, 129, 0.08)',
-    particleColor: 'rgba(52, 211, 153, 0.55)',
+    name: 'Botanical Atrium (Taman Belanja Putih)',
+    description: 'Atrium mall bernuansa botanical dengan lantai marmer putih bersih, jembatan layang kaca, dan air mancur cyber lotus.',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(167, 243, 208, 0.45)',
+    particleColor: 'rgba(16, 185, 129, 0.45)',
     obstacles: [
-      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#06281e', borderColor: '#10b981' },
-      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#06281e', borderColor: '#10b981' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#082f3a', borderColor: '#06b6d4' },
-      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#291224', borderColor: '#f43f5e' },
-      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#0a3628', borderColor: '#34d399' },
-      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#0a3628', borderColor: '#34d399' },
+      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#ffffff', borderColor: '#059669' },
+      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#ffffff', borderColor: '#059669' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#ffffff', borderColor: '#10b981' },
+      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#ffffff', borderColor: '#10b981' },
     ],
     decorations: [
-      // Central Cyber Lotus Fountain
-      { id: 'fount-1', type: 'cyber_fountain', x: 1100, y: 640, size: 65, color: '#06b6d4', secondaryColor: '#34d399', label: 'CYBER LOTUS' },
-      // Luminous Hydroponic Trees
-      { id: 'tree-1', type: 'biophilic_tree', x: 740, y: 240, size: 45, color: '#10b981', secondaryColor: '#6ee7b7' },
-      { id: 'tree-2', type: 'biophilic_tree', x: 1460, y: 240, size: 45, color: '#10b981', secondaryColor: '#6ee7b7' },
+      { id: 'fount-1', type: 'cyber_fountain', x: 1100, y: 640, size: 65, color: '#0284c7', secondaryColor: '#10b981', label: 'CYBER LOTUS' },
+      { id: 'tree-1', type: 'biophilic_tree', x: 740, y: 240, size: 45, color: '#059669', secondaryColor: '#34d399' },
+      { id: 'tree-2', type: 'biophilic_tree', x: 1460, y: 240, size: 45, color: '#059669', secondaryColor: '#34d399' },
       { id: 'tree-3', type: 'biophilic_tree', x: 740, y: 1040, size: 45, color: '#059669', secondaryColor: '#34d399' },
       { id: 'tree-4', type: 'biophilic_tree', x: 1460, y: 1040, size: 45, color: '#059669', secondaryColor: '#34d399' },
-      // Modern Planter Boxes with Neon Flowers
-      { id: 'plant-1', type: 'planter_box', x: 1100, y: 440, size: 30, color: '#10b981', secondaryColor: '#f43f5e' },
-      { id: 'plant-2', type: 'planter_box', x: 1100, y: 840, size: 30, color: '#10b981', secondaryColor: '#a855f7' },
-      // Glass Skywalks
-      { id: 'gw-1', type: 'glass_skywalk', x: 380, y: 260, size: 40, color: '#38bdf8' },
-      { id: 'gw-2', type: 'glass_skywalk', x: 1820, y: 260, size: 40, color: '#38bdf8' },
+      { id: 'plant-1', type: 'planter_box', x: 1100, y: 440, size: 30, color: '#059669', secondaryColor: '#e11d48' },
+      { id: 'plant-2', type: 'planter_box', x: 1100, y: 840, size: 30, color: '#059669', secondaryColor: '#7c3aed' },
+      { id: 'gw-1', type: 'glass_skywalk', x: 380, y: 260, size: 40, color: '#0284c7' },
+      { id: 'gw-2', type: 'glass_skywalk', x: 1820, y: 260, size: 40, color: '#0284c7' },
     ],
   },
   cavern: {
-    name: 'Gua Batuan Kristal (Rocky Cavern)',
-    description: 'Medan batuan basalt terjal dengan pilar kristal bercahaya, celah lava pijar, dan fosil purba.',
-    bgColor: '#090d16',
-    gridColor: 'rgba(245, 158, 11, 0.06)',
-    particleColor: 'rgba(245, 158, 11, 0.45)',
+    name: 'Crystal Plaza (Boutique Kristal Putih)',
+    description: 'Plaza pameran mewah berlantai putih cemerlang dengan instalasi kristal emas dan pilar arsitektur modern.',
+    bgColor: '#fafaf9',
+    gridColor: 'rgba(231, 229, 228, 0.85)',
+    particleColor: 'rgba(217, 119, 6, 0.45)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 120, label: 'PILAR KRISTAL EMAS', color: '#1e1b18', borderColor: '#d97706' },
-      { x: 950, y: 880, w: 220, h: 120, label: 'BATUAN BASALT MAGMA', color: '#1e1b18', borderColor: '#dc2626' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'TEBING BATUAN BARAT', color: '#181b24', borderColor: '#0284c7' },
-      { x: 500, y: 800, w: 120, h: 240, label: 'FORMASI STALAGMIT', color: '#181b24', borderColor: '#0284c7' },
-      { x: 1550, y: 450, w: 120, h: 240, label: 'TEBING BATUAN TIMUR', color: '#241a1c', borderColor: '#e11d48' },
-      { x: 1550, y: 800, w: 120, h: 240, label: 'BONGKAHAN GRANIT', color: '#241a1c', borderColor: '#e11d48' },
+      { x: 950, y: 280, w: 220, h: 120, label: 'PILAR KRISTAL EMAS', color: '#ffffff', borderColor: '#d97706' },
+      { x: 950, y: 880, w: 220, h: 120, label: 'MONUMEN GRANIT PUTIH', color: '#ffffff', borderColor: '#dc2626' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'PAVILIUN MARMER BARAT', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 500, y: 800, w: 120, h: 240, label: 'INSTALASI KRISTAL BIRU', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 1550, y: 450, w: 120, h: 240, label: 'PAVILIUN MARMER TIMUR', color: '#ffffff', borderColor: '#e11d48' },
+      { x: 1550, y: 800, w: 120, h: 240, label: 'INSTALASI KRISTAL MERAH', color: '#ffffff', borderColor: '#e11d48' },
     ],
     decorations: [
-      { id: 'crys-1', type: 'crystal', x: 740, y: 220, size: 28, color: '#f59e0b', secondaryColor: '#fbbf24', rotation: 0.2 },
+      { id: 'crys-1', type: 'crystal', x: 740, y: 220, size: 28, color: '#d97706', secondaryColor: '#fbbf24', rotation: 0.2 },
       { id: 'lava-1', type: 'lava_pool', x: 1100, y: 800, size: 65, color: '#ef4444', secondaryColor: '#f97316' },
     ],
   },
   lab: {
-    name: 'Laboratorium Sci-Fi (Quantum Lab)',
-    description: 'Pusat riset militer futuristik dengan reaktor kuantum, tabung spesimen kimia neon, dan konsol holografik.',
-    bgColor: '#060a12',
-    gridColor: 'rgba(56, 189, 248, 0.08)',
-    particleColor: 'rgba(56, 189, 248, 0.45)',
+    name: 'Tech Innovation Lab (Pusat Riset Putih)',
+    description: 'Pusat riset teknologi belanja modern berlantai putih bersih dengan stand produk holografik.',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(224, 242, 254, 0.85)',
+    particleColor: 'rgba(2, 132, 199, 0.45)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 110, label: 'QUANTUM CORE REACTOR', color: '#0f172a', borderColor: '#38bdf8' },
-      { x: 500, y: 460, w: 110, h: 230, label: 'ENERGY CONDUIT A', color: '#0c1e30', borderColor: '#0ea5e9' },
+      { x: 950, y: 280, w: 220, h: 110, label: 'INNOVATION CORE RIG', color: '#ffffff', borderColor: '#0284c7' },
+      { x: 500, y: 460, w: 110, h: 230, label: 'SERVER RACK A', color: '#ffffff', borderColor: '#0284c7' },
     ],
     decorations: [
-      { id: 'tube-1', type: 'lab_tube', x: 740, y: 240, size: 26, color: '#06b6d4', secondaryColor: '#38bdf8', label: 'BIO-SERUM 01' },
+      { id: 'tube-1', type: 'lab_tube', x: 740, y: 240, size: 26, color: '#0284c7', secondaryColor: '#38bdf8', label: 'PROTOTYPE 01' },
     ],
   },
   forest: {
-    name: 'Hutan Neon Alien (Bioluminescent Forest)',
-    description: 'Hutan lebat misterius dengan pohon purba bercahaya, koloni jamur fluoresen, dan semak kamuflase.',
-    bgColor: '#05110d',
-    gridColor: 'rgba(16, 185, 129, 0.07)',
-    particleColor: 'rgba(52, 211, 153, 0.55)',
+    name: 'Eco Garden Mall (Plaza Hijau Modern)',
+    description: 'Plaza belanja terbuka dengan tanaman hijau, kanopi modern, dan lantai putih elegan.',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(209, 250, 229, 0.75)',
+    particleColor: 'rgba(5, 150, 105, 0.45)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 130, label: 'POHON PURBA BIOLUMINESCENT', color: '#092119', borderColor: '#10b981' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'RUMPUN AKAR KELAM', color: '#061c24', borderColor: '#06b6d4' },
+      { x: 950, y: 280, w: 220, h: 130, label: 'POHON KANOPI MODERN', color: '#ffffff', borderColor: '#059669' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'TAMAN VERTICAL BARAT', color: '#ffffff', borderColor: '#0284c7' },
     ],
     decorations: [
-      { id: 'mush-1', type: 'mushroom', x: 740, y: 230, size: 36, color: '#a855f7', secondaryColor: '#d8b4fe' },
+      { id: 'mush-1', type: 'mushroom', x: 740, y: 230, size: 36, color: '#7c3aed', secondaryColor: '#c084fc' },
     ],
   },
 };
@@ -406,7 +394,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   onNavigateToCart,
   onNavigateToLeaderboard,
   onTriggerSpecialNotification,
+  themeMode = 'dark',
 }) => {
+  const isDark = themeMode === 'dark';
   // Lobby and match state
   const [inLobby, setInLobby] = useState<boolean>(true);
   const [roomCodeInput, setRoomCodeInput] = useState<string>('');
@@ -423,17 +413,18 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
   const firestoreUnsubRef = useRef<(() => void) | null>(null);
+  const matchStartedRef = useRef<boolean>(false);
 
   // Globally unique player ID per client / tab (persisted in session)
   const myPlayerId = useRef<string>(
     (() => {
       try {
-        const saved = sessionStorage.getItem('shop_shooter_player_uid');
+        const saved = sessionStorage.getItem('shop_shooter_unique_client_id');
         if (saved) return saved;
       } catch (e) {}
-      const newId = 'p_' + Math.random().toString(36).substring(2, 9);
+      const newId = 'player_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
       try {
-        sessionStorage.setItem('shop_shooter_player_uid', newId);
+        sessionStorage.setItem('shop_shooter_unique_client_id', newId);
       } catch (e) {}
       return newId;
     })()
@@ -441,32 +432,24 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   const isLocalPlayer = useCallback((id: string) => {
     if (!id) return false;
-    const authUid = auth.currentUser?.uid;
-    return id === myPlayerId.current || (authUid && id === authUid) || id === 'local-p1' || id.startsWith('p_');
+    if (myPlayerId.current && id === myPlayerId.current) return true;
+    if (id === 'local-p1') return true;
+    return false;
   }, []);
 
   const [isJoinedRoom, setIsJoinedRoom] = useState<boolean>(false);
   const [roomPlayersList, setRoomPlayersList] = useState<any[]>([]);
   const [roomHostId, setRoomHostId] = useState<string | null>(null);
-  const [isRoomHost, setIsRoomHost] = useState<boolean>(false);
+  const [joinedAsHost, setJoinedAsHost] = useState<boolean>(false);
 
-  const isEffectiveHost = isRoomHost || (roomHostId !== null && (roomHostId === myPlayerId.current || isLocalPlayer(roomHostId)));
+  // Host status: ONLY true if user explicitly opened the room as Host AND matches room host ID
+  const isEffectiveHost = Boolean(
+    isJoinedRoom && joinedAsHost && (roomHostId === null || roomHostId === myPlayerId.current)
+  );
 
-  // Authenticate anonymously with Firebase on startup
+  // Authenticate anonymously with Firebase in background for Firestore security rules
   useEffect(() => {
-    signInAnonymously(auth).then((cred) => {
-      if (cred?.user?.uid) {
-        const oldId = myPlayerId.current;
-        const newId = cred.user.uid;
-        myPlayerId.current = newId;
-        simState.current.players.forEach(p => {
-          if (p.id === oldId) p.id = newId;
-        });
-        try {
-          sessionStorage.setItem('shop_shooter_player_uid', newId);
-        } catch (e) {}
-      }
-    }).catch((err) => {
+    signInAnonymously(auth).catch((err) => {
       console.warn("Firebase Auth fallback to local UID:", err);
     });
 
@@ -737,15 +720,16 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     const redCount = roomPlayersList.filter(p => p.team === 'red').length;
     const team = blueCount <= redCount ? 'blue' : 'red';
 
-    const isAlly = team === playerTeam;
-    const botSpawnX = isAlly 
+    const botSpawnX = team === 'blue' 
       ? 220 + Math.random() * 80 
       : (WORLD_WIDTH - 260) - Math.random() * 80;
-    const botAngle = isAlly ? 0 : Math.PI;
+    const botAngle = team === 'blue' ? 0 : Math.PI;
 
+    const botDisplayName = `${botNames[currentCount % botNames.length]} (BOT)`;
     const newBot = {
       id: botId,
-      username: `${botNames[currentCount % botNames.length]} (BOT)`,
+      name: botDisplayName,
+      username: botDisplayName,
       team,
       color: team === 'blue' ? '#38bdf8' : '#f43f5e',
       isReady: true,
@@ -760,6 +744,20 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       angle: botAngle,
     };
 
+    // Update locally immediately
+    setRoomPlayersList(prev => {
+      if (prev.length >= totalPlayersConfig || prev.some(p => p.id === botId)) return prev;
+      return [...prev, newBot];
+    });
+
+    // Send the SAME bot to WebSocket server
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ 
+        type: 'add-bot',
+        bot: newBot,
+      }));
+    }
+
     // Update in Firestore
     if (currentRoomCode) {
       try {
@@ -772,34 +770,77 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         console.warn("Firestore add bot error:", e);
       }
     }
-
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'add-bot' }));
-    }
   };
 
-  // Leave Match / Return to Lobby
+  // Leave Match / Return to Clean Lobby & Reset for New Match
   const handleLeaveMatch = async () => {
     soundEngine.playPowerUp();
+
+    // 1. Clean up Multiplayer room (Firestore & WebSocket)
     if (currentRoomCode && isJoinedRoom) {
       try {
         const roomRef = doc(db, 'rooms', currentRoomCode);
-        await updateDoc(roomRef, {
-          [`players.${myPlayerId.current}`]: deleteField(),
-          updatedAt: Date.now(),
-        });
-      } catch (e) {}
+        if (joinedAsHost) {
+          await deleteDoc(roomRef);
+        } else {
+          await updateDoc(roomRef, {
+            [`players.${myPlayerId.current}`]: deleteField(),
+            updatedAt: Date.now(),
+          });
+        }
+      } catch (e) {
+        console.warn("Firestore leave match error:", e);
+      }
     }
+
+    if (wsRef.current) {
+      try {
+        if (wsRef.current.readyState === WebSocket.OPEN) {
+          if (joinedAsHost) {
+            wsRef.current.send(JSON.stringify({ type: 'delete-room' }));
+          } else {
+            wsRef.current.send(JSON.stringify({ type: 'leave-room' }));
+          }
+        }
+        wsRef.current.close();
+      } catch (e) {}
+      wsRef.current = null;
+    }
+
     if (firestoreUnsubRef.current) {
       firestoreUnsubRef.current();
       firestoreUnsubRef.current = null;
     }
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
+
+    // 2. Completely reset match simulation state
+    matchStartedRef.current = false;
+    simState.current.players = [];
+    simState.current.bullets = [];
+    simState.current.damageTexts = [];
+    simState.current.blueScore = 0;
+    simState.current.redScore = 0;
+    simState.current.timeLeft = 90;
+    simState.current.skills = JSON.parse(JSON.stringify(INITIAL_SKILLS));
+
+    // 3. Reset all HUD indicators to fresh values
+    setHudBlueScore(0);
+    setHudRedScore(0);
+    setHudTimeLeft(90);
+    setHudMyHp(100);
+    setHudMyKills(0);
+    setHudKillFeed([]);
+    setHudActiveSkill(null);
+    setHudRespawnTimer(0);
+
+    // 4. Reset Room & Lobby state completely
     setIsJoinedRoom(false);
+    setJoinedAsHost(false);
+    setRoomHostId(null);
     setRoomPlayersList([]);
+    setRoomCodeInput('');
+    setCurrentRoomCode(generateRandomRoomCode());
+
+    // 5. Return to clean lobby
     setMatchStatus('lobby');
     setInLobby(true);
   };
@@ -858,9 +899,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     p.shieldTimer = 3.0;
     p.respawnTimer = 0;
 
-    const isAlly = p.team === playerTeam;
-    // Base spawns: Left side (220) for Ally, Right side (WORLD_WIDTH - 260) for Enemy
-    if (isAlly) {
+    // Base spawns: Left side (220) for Team Blue, Right side (WORLD_WIDTH - 260) for Team Red
+    if (p.team === 'blue') {
       p.x = 220 + Math.random() * 80;
       p.y = 380 + Math.random() * 480;
       p.angle = 0;
@@ -917,7 +957,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     const botAccessories: AccessoryType[] = ['horns', 'cyber_goggles', 'halo', 'none', 'crown'];
 
     const newPlayers: SimPlayer[] = [];
-    const totalBotsNeeded = Math.max(1, totalPlayersConfig - 1);
+    // If in multiplayer mode, bots should NEVER be automatically spawned by initRoster!
+    // In multiplayer, bots are only added deliberately by the host.
+    const isMultiplayer = gameModeType === 'multiplayer';
+    const totalBotsNeeded = isMultiplayer ? 0 : Math.max(1, totalPlayersConfig - 1);
+    
     const allyBotsNeeded = Math.floor(totalBotsNeeded / 2);
     const enemyBotsNeeded = totalBotsNeeded - allyBotsNeeded;
     const blueNeeded = playerTeam === 'blue' ? allyBotsNeeded : enemyBotsNeeded;
@@ -952,12 +996,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
     // Team Blue Bots
     for (let i = 0; i < blueNeeded; i++) {
-      const isAlly = 'blue' === playerTeam;
-      const botX = isAlly 
-        ? 180 + Math.random() * 80 
-        : (WORLD_WIDTH - 260) - Math.random() * 80;
+      const botX = 180 + Math.random() * 80;
       const botY = 360 + (i * 140);
-      const botAngle = isAlly ? 0 : Math.PI;
+      const botAngle = 0;
       const botClass = botClasses[botIdx % botClasses.length];
       const botStats = getCharacterStats(botClass);
 
@@ -994,12 +1035,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
     // Team Red Bots
     for (let i = 0; i < redNeeded; i++) {
-      const isAlly = 'red' === playerTeam;
-      const botX = isAlly 
-        ? 180 + Math.random() * 80 
-        : (WORLD_WIDTH - 260) - Math.random() * 80;
+      const botX = (WORLD_WIDTH - 260) - Math.random() * 80;
       const botY = 360 + (i * 140);
-      const botAngle = isAlly ? 0 : Math.PI;
+      const botAngle = Math.PI;
       const botClass = botClasses[botIdx % botClasses.length];
       const botStats = getCharacterStats(botClass);
 
@@ -1077,16 +1115,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     setPlayerTeam(newTeam);
     soundEngine.playPowerUp();
 
+    const newSpawnX = newTeam === 'blue' 
+      ? 220 + Math.random() * 60 
+      : (WORLD_WIDTH - 260) - Math.random() * 80;
+    const newSpawnAngle = newTeam === 'blue' ? 0 : Math.PI;
+
     const myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (myP) {
       myP.team = newTeam;
       myP.color = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
-      myP.x = 220 + Math.random() * 60;
-      myP.y = newTeam === 'blue' ? 440 : 760;
-      myP.angle = 0;
+      myP.x = newSpawnX;
+      myP.y = 440 + Math.random() * 200;
+      myP.angle = newSpawnAngle;
     }
 
-    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, team: newTeam, color: newTeam === 'blue' ? '#38bdf8' : '#f43f5e' } : p));
+    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { 
+      ...p, 
+      team: newTeam, 
+      color: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+      x: newSpawnX,
+      angle: newSpawnAngle,
+    } : p));
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && currentRoomCode) {
       wsRef.current.send(JSON.stringify({
@@ -1104,9 +1153,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         await updateDoc(roomRef, {
           [`players.${uid}.team`]: newTeam,
           [`players.${uid}.color`]: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-          [`players.${uid}.x`]: 220 + Math.random() * 60,
-          [`players.${uid}.y`]: newTeam === 'blue' ? 440 : 760,
-          [`players.${uid}.angle`]: 0,
+          [`players.${uid}.x`]: newSpawnX,
+          [`players.${uid}.y`]: 440 + Math.random() * 200,
+          [`players.${uid}.angle`]: newSpawnAngle,
         });
       } catch (e) {
         console.warn("Firestore update team error:", e);
@@ -1144,50 +1193,41 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     soundEngine.playPowerUp();
     const codeToUse = (targetCode || roomCodeInput.trim() || currentRoomCode).toUpperCase();
     if (!codeToUse) return;
+
+    const myId = myPlayerId.current;
     setCurrentRoomCode(codeToUse);
-    setIsJoinedRoom(true);
+    setJoinedAsHost(asHost);
 
-    // Ensure Anonymous Auth for Firestore rules
-    let uid = auth.currentUser?.uid || myPlayerId.current;
-    if (!auth.currentUser) {
-      try {
-        const cred = await signInAnonymously(auth);
-        uid = cred.user.uid;
-        myPlayerId.current = uid;
-        try {
-          sessionStorage.setItem('shop_shooter_player_uid', uid);
-        } catch (e) {}
-      } catch (e) {
-        console.warn("Auth fallback to local UID:", e);
-      }
+    const safeName = playerName.trim() || 'Pemain';
+
+    // Set local player in simulation with unique client ID
+    if (gameModeType === 'multiplayer') {
+      simState.current.players = [];
     }
-
-    if (asHost) {
-      setIsRoomHost(true);
-      setRoomHostId(uid);
-    } else {
-      setIsRoomHost(false);
-    }
-
-    // Set local player in simulation with unique UID
     let myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (!myP) {
       initRoster();
       myP = simState.current.players.find(p => isLocalPlayer(p.id));
     }
+    const initialSpawnX = playerTeam === 'blue'
+      ? 220 + Math.random() * 60
+      : (WORLD_WIDTH - 260) - Math.random() * 80;
+    const initialSpawnAngle = playerTeam === 'blue' ? 0 : Math.PI;
+
     if (myP) {
-      myP.id = uid;
-      myP.name = playerName;
+      myP.id = myId;
+      myP.name = safeName;
       myP.team = playerTeam;
       myP.color = playerTeam === 'blue' ? '#38bdf8' : '#f43f5e';
-      myP.x = 220 + Math.random() * 60;
-      myP.y = playerTeam === 'blue' ? 440 : 760;
-      myP.angle = 0;
+      myP.x = initialSpawnX;
+      myP.y = 440 + Math.random() * 200;
+      myP.angle = initialSpawnAngle;
     }
 
     const myPlayerData = {
-      id: uid,
-      username: playerName,
+      id: myId,
+      name: safeName,
+      username: safeName,
       team: playerTeam,
       color: playerTeam === 'blue' ? '#38bdf8' : '#f43f5e',
       score: 0,
@@ -1195,19 +1235,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       deaths: 0,
       hp: 100,
       maxHp: 100,
-      x: 220 + Math.random() * 60,
-      y: playerTeam === 'blue' ? 440 : 760,
-      angle: 0,
+      x: initialSpawnX,
+      y: 440 + Math.random() * 200,
+      angle: initialSpawnAngle,
       isReady: true,
       isBot: false,
       customization: characterCustomization,
     };
 
-    // Always stay in lobby/waiting room when opening or joining a room
     setMatchStatus('lobby');
     setInLobby(true);
-
-    // Immediately show self in room list
+    setIsJoinedRoom(true);
     setRoomPlayersList([myPlayerData]);
 
     // 1. FIRESTORE REALTIME SYNC (Master cloud state for rooms and player roster across devices)
@@ -1220,8 +1258,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
       const snap = await getDoc(roomRef);
       if (!snap.exists()) {
-        setIsRoomHost(true);
-        setRoomHostId(uid);
+        if (!asHost) {
+          alert(`Room "${codeToUse}" belum aktif. Pastikan Host telah membuka room.`);
+          setIsJoinedRoom(false);
+          setJoinedAsHost(false);
+          setRoomPlayersList([]);
+          return;
+        }
+        setJoinedAsHost(true);
+        setRoomHostId(myId);
         await setDoc(roomRef, {
           code: codeToUse,
           gameState: 'waiting',
@@ -1230,38 +1275,36 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           blueScore: 0,
           redScore: 0,
           timeLeft: 90,
-          hostId: uid,
+          hostId: myId,
           updatedAt: Date.now(),
           players: {
-            [uid]: myPlayerData,
+            [myId]: myPlayerData,
           },
         });
       } else {
         const existingData = snap.data();
         if (asHost) {
-          setIsRoomHost(true);
-          setRoomHostId(uid);
+          setJoinedAsHost(true);
+          setRoomHostId(myId);
           await updateDoc(roomRef, {
             gameState: 'waiting',
-            hostId: uid,
+            hostId: myId,
             totalSlots: totalPlayersConfig,
             blueScore: 0,
             redScore: 0,
             timeLeft: 90,
             players: {
-              [uid]: myPlayerData,
+              [myId]: myPlayerData,
             },
             updatedAt: Date.now(),
           });
         } else {
+          setJoinedAsHost(false);
           if (existingData?.hostId) {
             setRoomHostId(existingData.hostId);
-            if (existingData.hostId === uid || isLocalPlayer(existingData.hostId)) {
-              setIsRoomHost(true);
-            }
           }
           await updateDoc(roomRef, {
-            [`players.${uid}`]: myPlayerData,
+            [`players.${myId}`]: myPlayerData,
             updatedAt: Date.now(),
           });
         }
@@ -1272,7 +1315,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         if (!docSnap.exists()) {
           // Room was deleted by host
           setIsJoinedRoom(false);
-          setIsRoomHost(false);
+          setJoinedAsHost(false);
           setRoomHostId(null);
           setRoomPlayersList([]);
           return;
@@ -1284,18 +1327,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         if (data.hostId) {
           setRoomHostId(data.hostId);
-          if (data.hostId === uid || isLocalPlayer(data.hostId)) {
-            setIsRoomHost(true);
-          }
-        } else if (asHost) {
-          setRoomHostId(uid);
-          setIsRoomHost(true);
         }
 
         // If player was kicked or removed from room
-        if (!asHost && playersMap && !playersMap[uid] && playersList.length > 0) {
+        if (!asHost && playersMap && !playersMap[myId] && playersList.length > 0) {
           setIsJoinedRoom(false);
-          setIsRoomHost(false);
+          setJoinedAsHost(false);
           setRoomHostId(null);
           setRoomPlayersList([]);
           return;
@@ -1305,29 +1342,35 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         if (data.totalSlots) setTotalPlayersConfig(data.totalSlots);
 
         // Update local team if synced from room
-        if (playersMap[uid]) {
-          setPlayerTeam(playersMap[uid].team);
+        if (playersMap[myId]) {
+          setPlayerTeam(playersMap[myId].team);
           if (myP) {
-            myP.team = playersMap[uid].team;
-            myP.color = playersMap[uid].team === 'blue' ? '#38bdf8' : '#f43f5e';
+            myP.team = playersMap[myId].team;
+            myP.color = playersMap[myId].team === 'blue' ? '#38bdf8' : '#f43f5e';
           }
+          setPlayerTeam(playersMap[myId].team);
         }
 
         // When host starts match!
-        if (data.gameState === 'playing' && matchStatus !== 'playing') {
-          const myTeam = playersMap[uid]?.team || playerTeam;
+        if (data.gameState === 'playing' && !matchStartedRef.current) {
+          matchStartedRef.current = true;
+          const myTeam = playersMap[myId]?.team || playerTeam;
           simState.current.players = playersList.map((p, pIdx) => {
-            const isAlly = p.team === myTeam;
-            const spawnX = isAlly 
+            const isLocal = isLocalPlayer(p.id);
+            const spawnX = p.team === 'blue'
               ? 220 + Math.random() * 80 
               : (WORLD_WIDTH - 260) - Math.random() * 80;
             const spawnY = 360 + (pIdx * 120);
-            const spawnAngle = isAlly ? 0 : Math.PI;
+            const spawnAngle = p.team === 'blue' ? 0 : Math.PI;
 
-            if (isLocalPlayer(p.id)) {
+            const displayName = (p.name || p.username || (isLocal ? safeName : 'Striker')).trim();
+
+            if (isLocal) {
               return { 
                 ...p, 
-                id: uid, 
+                id: myId, 
+                name: displayName,
+                username: displayName,
                 x: spawnX, 
                 y: spawnY, 
                 angle: spawnAngle, 
@@ -1341,6 +1384,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             }
             return {
               ...p,
+              id: p.id,
+              name: displayName,
+              username: displayName,
               x: p.x || spawnX,
               y: p.y || spawnY,
               angle: p.angle !== undefined ? p.angle : spawnAngle,
@@ -1354,12 +1400,29 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           if (data.blueScore !== undefined) simState.current.blueScore = data.blueScore;
           if (data.redScore !== undefined) simState.current.redScore = data.redScore;
-          if (data.timeLeft !== undefined) simState.current.timeLeft = data.timeLeft;
+          if (data.timeLeft !== undefined) {
+            simState.current.timeLeft = data.timeLeft;
+            setHudTimeLeft(Math.max(0, Math.floor(data.timeLeft)));
+          }
 
           setInLobby(false);
           setMatchStatus('playing');
           soundEngine.playPowerUp();
           onTriggerSpecialNotification('Mega Golden Deal Box', 300);
+        } else if (data.gameState === 'playing' && matchStatus === 'playing') {
+          // Fallback positional sync from Firestore
+          playersList.forEach((remoteP) => {
+            if (!isLocalPlayer(remoteP.id)) {
+              const localSimP = simState.current.players.find(p => p.id === remoteP.id);
+              if (localSimP && remoteP.x !== undefined && remoteP.y !== undefined) {
+                if (Math.abs(localSimP.x - remoteP.x) > 40 || Math.abs(localSimP.y - remoteP.y) > 40) {
+                  localSimP.x = remoteP.x;
+                  localSimP.y = remoteP.y;
+                  if (remoteP.angle !== undefined) localSimP.angle = remoteP.angle;
+                }
+              }
+            }
+          });
         } else if (data.gameState === 'ended' && matchStatus === 'playing') {
           finishMatch();
         }
@@ -1368,7 +1431,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       console.warn("Firestore sync warning:", err);
     }
 
-    // 2. WEBSOCKET FAST REALTIME PROTOCOL (Using unique player UID)
+    // 2. WEBSOCKET FAST REALTIME PROTOCOL (Using unique player client ID)
     try {
       if (wsRef.current) wsRef.current.close();
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -1408,22 +1471,41 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               setTotalPlayersConfig(data.room.totalSlots);
             }
           } else if (data.type === 'match-started') {
-            if (data.room && data.room.players) {
+            if (!matchStartedRef.current && data.room && data.room.players) {
+              matchStartedRef.current = true;
               const roomPlayers = Object.values(data.room.players) as any[];
               simState.current.players = roomPlayers.map((p, pIdx) => {
-                const isAlly = p.team === playerTeam;
-                const spawnX = isAlly 
+                const isLocal = isLocalPlayer(p.id);
+                const spawnX = p.team === 'blue'
                   ? 220 + Math.random() * 80 
                   : (WORLD_WIDTH - 260) - Math.random() * 80;
                 const spawnY = 360 + (pIdx * 120);
-                const spawnAngle = isAlly ? 0 : Math.PI;
+                const spawnAngle = p.team === 'blue' ? 0 : Math.PI;
 
-                if (isLocalPlayer(p.id)) {
-                  return { ...p, id: myPlayerId.current, name: p.name || p.username || playerName, x: spawnX, y: spawnY, angle: spawnAngle, hp: p.hp || 100, maxHp: 100, isShielded: true, shieldTimer: 3.0 };
+                const displayName = (p.name || p.username || (isLocal ? safeName : 'Striker')).trim();
+
+                if (isLocal) {
+                  return { 
+                    ...p, 
+                    id: myId, 
+                    name: displayName, 
+                    username: displayName, 
+                    x: spawnX, 
+                    y: spawnY, 
+                    angle: spawnAngle, 
+                    hp: p.hp || 100, 
+                    maxHp: 100, 
+                    isShielded: true, 
+                    shieldTimer: 3.0,
+                    isRespawning: false,
+                    respawnTimer: 0,
+                  };
                 }
                 return {
                   ...p,
-                  name: p.name || p.username || 'Pemain',
+                  id: p.id,
+                  name: displayName,
+                  username: displayName,
                   x: spawnX,
                   y: spawnY,
                   angle: spawnAngle,
@@ -1444,19 +1526,25 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             soundEngine.playPowerUp();
             onTriggerSpecialNotification('Mega Golden Deal Box', 300);
           } else if (data.type === 'player-moved') {
-            if (!isLocalPlayer(data.playerId)) {
+            if (data.playerId && data.playerId !== myPlayerId.current) {
               const p = simState.current.players.find(item => item.id === data.playerId);
               if (p) {
-                Object.assign(p, data.updates);
+                if (data.updates.x !== undefined) p.x = data.updates.x;
+                if (data.updates.y !== undefined) p.y = data.updates.y;
+                if (data.updates.angle !== undefined) p.angle = data.updates.angle;
+                if (data.updates.hp !== undefined) p.hp = data.updates.hp;
+                if (data.updates.score !== undefined) p.score = data.updates.score;
+                if (data.updates.kills !== undefined) p.kills = data.updates.kills;
+                if (data.updates.deaths !== undefined) p.deaths = data.updates.deaths;
               }
             }
           } else if (data.type === 'bullet-fired') {
-            if (!isLocalPlayer(data.playerId)) {
+            if (data.playerId && data.playerId !== myPlayerId.current && data.bullet) {
               simState.current.bullets.push(data.bullet);
             }
           } else if (data.type === 'room-deleted') {
             setIsJoinedRoom(false);
-            setIsRoomHost(false);
+            setJoinedAsHost(false);
             setRoomHostId(null);
             setRoomPlayersList([]);
             if (firestoreUnsubRef.current) {
@@ -1465,7 +1553,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             }
           } else if (data.type === 'player-left') {
             if (data.room && data.room.players) {
-              setRoomPlayersList(Object.values(data.room.players));
+              const roomPlayers = Object.values(data.room.players) as any[];
+              setRoomPlayersList(roomPlayers);
             } else if (data.playerId) {
               setRoomPlayersList(prev => prev.filter(p => p.id !== data.playerId));
             }
@@ -1484,19 +1573,34 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   // Trigger Start Match (Bot or Multiplayer)
   const startMatch = async () => {
     if (gameModeType === 'bot') {
+      matchStartedRef.current = true;
+      // Reset all HUD indicators for fresh match!
+      setHudBlueScore(0);
+      setHudRedScore(0);
+      setHudTimeLeft(90);
+      setHudMyHp(100);
+      setHudMyKills(0);
+      setHudKillFeed([]);
+      setHudActiveSkill(null);
+      setHudRespawnTimer(0);
+
+      initRoster();
       setInLobby(false);
       setMatchStatus('playing');
-      initRoster();
       soundEngine.playPowerUp();
       onTriggerSpecialNotification('Mega Golden Deal Box', 300);
     } else {
+      matchStartedRef.current = false;
       soundEngine.playPowerUp();
-      // Start match in Firestore
+      // Start match in Firestore with fresh score & timer
       if (currentRoomCode) {
         try {
           const roomRef = doc(db, 'rooms', currentRoomCode);
           await updateDoc(roomRef, {
             gameState: 'playing',
+            blueScore: 0,
+            redScore: 0,
+            timeLeft: 90,
             updatedAt: Date.now(),
           });
         } catch (e) {
@@ -1513,6 +1617,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const handleKickPlayer = async (targetId: string) => {
     soundEngine.playPowerUp();
 
+    // 1. Immediately remove from local state so UI is instantly responsive and accurate
+    setRoomPlayersList(prev => prev.filter(p => p.id !== targetId));
+
+    // 2. Remove in Firestore
     if (currentRoomCode) {
       try {
         const roomRef = doc(db, 'rooms', currentRoomCode);
@@ -1525,6 +1633,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }
     }
 
+    // 3. Remove in WebSocket
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'kick-player',
@@ -1537,11 +1646,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     if (!currentRoomCode) return;
     soundEngine.playPowerUp();
 
-    const isAlly = newTeam === playerTeam;
-    const newX = isAlly 
+    const newX = newTeam === 'blue' 
       ? 220 + Math.random() * 80 
       : (WORLD_WIDTH - 260) - Math.random() * 80;
-    const newAngle = isAlly ? 0 : Math.PI;
+    const newAngle = newTeam === 'blue' ? 0 : Math.PI;
 
     // 1. Instantly update local state
     setRoomPlayersList(prev => prev.map(p => {
@@ -1605,8 +1713,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       firestoreUnsubRef.current();
       firestoreUnsubRef.current = null;
     }
+    matchStartedRef.current = false;
     setIsJoinedRoom(false);
-    setIsRoomHost(false);
+    setJoinedAsHost(false);
     setRoomHostId(null);
     setRoomPlayersList([]);
     const freshCode = generateRandomRoomCode();
@@ -1640,8 +1749,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       firestoreUnsubRef.current();
       firestoreUnsubRef.current = null;
     }
+    matchStartedRef.current = false;
     setIsJoinedRoom(false);
-    setIsRoomHost(false);
+    setJoinedAsHost(false);
     setRoomHostId(null);
     setRoomPlayersList([]);
     setRoomCodeInput('');
@@ -1649,6 +1759,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   // Finish Match
   const finishMatch = useCallback(() => {
+    matchStartedRef.current = false;
     setMatchStatus('ended');
     const myPlayer = simState.current.players.find((p) => !p.isBot);
     const blueWon = simState.current.blueScore >= simState.current.redScore;
@@ -2304,18 +2415,16 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         // B. Base Zones
         // B. Base Zones
-        const leftTeam = playerTeam;
-        const rightTeam = playerTeam === 'blue' ? 'red' : 'blue';
+        // Base Zones - Fixed to Blue (Left) and Red (Right)
+        const leftRgba = 'rgba(6, 182, 212, 0.08)';
+        const leftStroke = 'rgba(6, 182, 212, 0.4)';
+        const leftText = 'BLUE BASE';
+        const leftTextFill = 'rgba(6, 182, 212, 0.2)';
 
-        const leftRgba = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(244, 63, 94, 0.08)';
-        const leftStroke = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(244, 63, 94, 0.4)';
-        const leftText = leftTeam === 'blue' ? 'BLUE BASE' : 'RED BASE';
-        const leftTextFill = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(244, 63, 94, 0.2)';
-
-        const rightRgba = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(244, 63, 94, 0.08)';
-        const rightStroke = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(244, 63, 94, 0.4)';
-        const rightText = rightTeam === 'blue' ? 'BLUE BASE' : 'RED BASE';
-        const rightTextFill = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(244, 63, 94, 0.2)';
+        const rightRgba = 'rgba(244, 63, 94, 0.08)';
+        const rightStroke = 'rgba(244, 63, 94, 0.4)';
+        const rightText = 'RED BASE';
+        const rightTextFill = 'rgba(244, 63, 94, 0.2)';
 
         // Left Base
         ctx.fillStyle = leftRgba;
@@ -3207,34 +3316,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             mCtx.stroke();
           }
 
-          // Base zones on minimap matching player team
-          const leftTeam = playerTeam;
-          const rightTeam = playerTeam === 'blue' ? 'red' : 'blue';
-
-          const leftMinimapFill = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
-          const leftMinimapTextColor = leftTeam === 'blue' ? '#06b6d4' : '#f43f5e';
-          const leftMinimapLabel = leftTeam === 'blue' ? 'BIRU' : 'MERAH';
-
-          const rightMinimapFill = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
-          const rightMinimapTextColor = rightTeam === 'blue' ? '#06b6d4' : '#f43f5e';
-          const rightMinimapLabel = rightTeam === 'blue' ? 'BIRU' : 'MERAH';
-
+          // Base zones on minimap
           const baseW = (320 / WORLD_WIDTH) * mw;
 
-          // Left Base
-          mCtx.fillStyle = leftMinimapFill;
+          // Left Base (Always Blue)
+          mCtx.fillStyle = 'rgba(6, 182, 212, 0.22)';
           mCtx.fillRect(0, 0, baseW, mh);
-          mCtx.fillStyle = leftMinimapTextColor;
+          mCtx.fillStyle = '#06b6d4';
           mCtx.font = 'bold 7px "Plus Jakarta Sans", sans-serif';
           mCtx.textAlign = 'left';
-          mCtx.fillText(leftMinimapLabel, 3, mh - 3);
+          mCtx.fillText('BIRU', 3, mh - 3);
 
-          // Right Base
-          mCtx.fillStyle = rightMinimapFill;
+          // Right Base (Always Red)
+          mCtx.fillStyle = 'rgba(244, 63, 94, 0.22)';
           mCtx.fillRect(mw - baseW, 0, baseW, mh);
-          mCtx.fillStyle = rightMinimapTextColor;
+          mCtx.fillStyle = '#f43f5e';
           mCtx.textAlign = 'right';
-          mCtx.fillText(rightMinimapLabel, mw - 3, mh - 3);
+          mCtx.fillText('MERAH', mw - 3, mh - 3);
 
           // Obstacles & Shelves
           mCtx.fillStyle = 'rgba(71, 85, 105, 0.5)';
@@ -3278,13 +3376,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             const py = (p.y / WORLD_HEIGHT) * mh;
             const isLocal = isLocalPlayer(p.id);
 
-            // Draw player position dot
+            // Draw player position dot matching team color
+            const teamDotColor = p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+            const teamBadgeBorder = p.team === 'blue' ? '#38bdf8' : '#fb7185';
+            const teamTextColor = isLocal ? '#ffffff' : (p.team === 'blue' ? '#7dd3fc' : '#fda4af');
+
             mCtx.beginPath();
             mCtx.arc(px, py, isLocal ? 3.5 : 2.5, 0, Math.PI * 2);
-            mCtx.fillStyle = isLocal ? '#38bdf8' : p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+            mCtx.fillStyle = teamDotColor;
             mCtx.fill();
 
-            // Local player highlight ring
+            // Local player highlight ring (white)
             if (isLocal) {
               mCtx.strokeStyle = '#ffffff';
               mCtx.lineWidth = 1.5;
@@ -3296,7 +3398,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               ? 'bold 7.5px "Plus Jakarta Sans", sans-serif'
               : 'bold 6.5px "Plus Jakarta Sans", sans-serif';
             mCtx.textAlign = 'center';
-            const name = p.name || 'Pemain';
+            const name = p.name || 'Striker';
             const shortName = name.length > 8 ? name.slice(0, 7) + '…' : name;
             const label = isLocal ? `${shortName} (Kamu)` : shortName;
 
@@ -3309,11 +3411,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             // Background badge for extreme contrast
             mCtx.fillStyle = 'rgba(2, 6, 23, 0.88)';
             mCtx.fillRect(labelX - badgeW / 2, labelY - 7, badgeW, badgeH);
-            mCtx.strokeStyle = isLocal ? '#38bdf8' : p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+            mCtx.strokeStyle = isLocal ? '#ffffff' : teamBadgeBorder;
             mCtx.lineWidth = 0.8;
             mCtx.strokeRect(labelX - badgeW / 2, labelY - 7, badgeW, badgeH);
 
-            mCtx.fillStyle = isLocal ? '#ffffff' : p.team === 'blue' ? '#7dd3fc' : '#fda4af';
+            mCtx.fillStyle = teamTextColor;
             mCtx.fillText(label, labelX, labelY - 0.5);
           }
         }
@@ -3338,7 +3440,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }`}
     >
       {/* Top TDM Scoreboard Header (Compact on Fullscreen/Mobile for Wider Field of View) */}
-      <div className={`bg-slate-950 border-2 border-slate-800 rounded-xl md:rounded-2xl ${isFullscreen ? 'p-1.5 md:p-3' : 'p-2.5 md:p-3'} text-white shadow-2xl flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
+      <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border-2 rounded-xl md:rounded-2xl ${isFullscreen ? 'p-1.5 md:p-3' : 'p-2.5 md:p-3'} shadow-2xl flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
         {/* Team Blue Score */}
         <div className="flex items-center gap-1.5 md:gap-3">
           <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-cyan-950 border-2 border-cyan-400 flex flex-col items-center justify-center font-black text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
@@ -3430,7 +3532,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       <div
         className={`relative w-full ${
           isFullscreen ? 'flex-1 h-0 min-h-0' : 'h-[500px] md:h-[640px]'
-        } bg-[#060a12] rounded-xl md:rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl select-none touch-none`}
+        } ${isDark ? 'bg-[#060a12] border-slate-800' : 'bg-slate-100 border-slate-300'} rounded-xl md:rounded-2xl overflow-hidden border-2 shadow-2xl select-none touch-none`}
       >
         {/* Hardware-Accelerated 60 FPS HTML5 Canvas */}
         <canvas
@@ -3598,15 +3700,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* Lobby Overlay */}
         {inLobby && (
-          <div className="absolute inset-0 z-40 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-6 text-center overflow-y-auto">
+          <div className={`absolute inset-0 z-40 ${isDark ? 'bg-slate-950/92 text-white' : 'bg-slate-50/95 text-slate-900'} backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-6 text-center overflow-y-auto`}>
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-amber-500 to-rose-600 flex items-center justify-center mb-2 md:mb-3 shadow-xl shrink-0">
               <Swords className="w-6 h-6 md:w-7 md:h-7 text-white" />
             </div>
 
-            <h2 className="text-xl md:text-3xl font-black text-white mb-1">
+            <h2 className={`text-xl md:text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mb-1`}>
               Shop Shooter Arena: Team Deathmatch
             </h2>
-            <p className="text-xs md:text-sm text-slate-300 max-w-lg mb-3 leading-relaxed">
+            <p className={`text-xs md:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'} max-w-lg mb-3 leading-relaxed`}>
               2 Tim saling bertarung! Main di PC atau HP dengan joystick layar sentuh. Ambil skill &amp; kustomisasi karaktermu.
             </p>
 
@@ -3617,7 +3719,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
                   gameModeType === 'multiplayer'
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-300 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -3634,23 +3736,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
                   gameModeType === 'bot'
                     ? 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-300 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
                   <Bot className="w-4 h-4 text-amber-300" />
-                  <span>Main vs Bot (Solo)</span>
+                  <span>Main vs Komputer (Solo)</span>
                 </div>
                 <span className="text-[9px] font-normal opacity-85">
-                  Latihan Solo vs Bot AI
+                  Latihan Solo (Tembak Target)
                 </span>
               </button>
             </div>
 
             {/* Player Name Change Bar */}
-            <div className="max-w-lg w-full mb-3 bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3 text-left shadow-lg">
+            <div className={`max-w-lg w-full mb-3 ${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'} border rounded-xl p-3 flex items-center justify-between gap-3 text-left`}>
               <div className="flex-1 flex flex-col gap-1">
-                <span className="text-[9px] uppercase text-cyan-400 font-bold flex items-center gap-1">
+                <span className="text-[9px] uppercase text-cyan-500 font-bold flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Ubah Nama Pemain Kamu:
                 </span>
@@ -3659,11 +3761,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   value={playerName}
                   onChange={(e) => handlePlayerNameChange(e.target.value)}
                   placeholder="Ketik Nama Kamu..."
-                  className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-cyan-400"
+                  className={`${isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} border rounded-lg px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:border-cyan-400`}
                   maxLength={20}
                 />
               </div>
-              <span className="text-[9px] text-emerald-400 font-mono self-end pb-1.5">
+              <span className="text-[9px] text-emerald-500 font-mono self-end pb-1.5">
                 ✓ Tersimpan
               </span>
             </div>
@@ -3692,27 +3794,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             {/* CONDITIONAL SECTION BASED ON MODE */}
             {gameModeType === 'multiplayer' ? (
               /* MULTIPLAYER / MAIN BARENG ROOM CODE */
-              <div className="bg-slate-900 border border-cyan-500/30 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-lg">
+              <div className={`${isDark ? 'bg-slate-900 border-cyan-500/30 text-white' : 'bg-white border-cyan-400/50 text-slate-900 shadow-xl'} border rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-cyan-500 flex items-center gap-1.5">
                     <Users className="w-4 h-4" />
                     <span>LOBBY MULTIPLAYER</span>
                   </span>
                 </div>
 
                 {/* Team Selection */}
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 block mb-1.5">PILIH TIM:</span>
+                <div className={`${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'} p-3 rounded-lg border`}>
+                  <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'} block mb-1.5`}>PILIH TIM:</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setPlayerTeam('blue')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : isDark ? 'bg-slate-900 text-slate-300 border-slate-700' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Biru
                     </button>
                     <button
                       onClick={() => setPlayerTeam('red')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : isDark ? 'bg-slate-900 text-slate-300 border-slate-700' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Merah
                     </button>
@@ -3720,10 +3822,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 </div>
 
                 {/* Total Players Selection (2, 4, 6, 8 players) */}
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <div className={`${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'} p-3 rounded-lg border`}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-bold text-slate-400">PILIH TOTAL PEMAIN:</span>
-                    <span className="text-[10px] font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/50">
+                    <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>PILIH TOTAL PEMAIN:</span>
+                    <span className="text-[10px] font-bold text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30">
                       {totalPlayersConfig} Pemain {totalPlayersConfig === 2 ? '(1v1)' : totalPlayersConfig === 4 ? '(2v2)' : totalPlayersConfig === 6 ? '(3v3)' : '(4v4)'}
                     </span>
                   </div>
@@ -3735,7 +3837,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                         className={`py-2 px-1 rounded-lg text-xs font-bold border transition-all flex flex-col items-center justify-center ${
                           totalPlayersConfig === count
                             ? 'bg-gradient-to-b from-cyan-500 to-blue-600 text-white border-cyan-300 shadow-md scale-105 ring-1 ring-cyan-400'
-                            : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
+                            : isDark ? 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                         }`}
                       >
                         <span className="text-sm font-black">{count}</span>
@@ -3749,11 +3851,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* Host Section */}
-                  <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-400 mb-2">Host Room:</p>
-                    <div className="bg-slate-900 rounded p-2 mb-2 flex items-center justify-between">
-                      <span className="text-sm font-mono font-bold text-cyan-300">{currentRoomCode}</span>
-                      <button onClick={handleCopyRoomCode} className="text-[10px] text-slate-400">Salin</button>
+                  <div className={`${isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg p-3`}>
+                    <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-2`}>Host Room:</p>
+                    <div className={`${isDark ? 'bg-slate-900' : 'bg-white border border-slate-200'} rounded p-2 mb-2 flex items-center justify-between`}>
+                      <span className="text-sm font-mono font-bold text-cyan-500">{currentRoomCode}</span>
+                      <button onClick={handleCopyRoomCode} className={`text-[10px] ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}>Salin</button>
                     </div>
                     <button onClick={() => handleJoinMultiplayerRoom(currentRoomCode, true)} className="w-full py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5" />
@@ -3762,22 +3864,39 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   </div>
 
                   {/* Join Section */}
-                  <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-400 mb-2">Gabung Room:</p>
+                  <div className={`${isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg p-3`}>
+                    <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-2`}>Gabung Room:</p>
                     <input
                       type="text"
                       value={roomCodeInput}
                       onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
                       placeholder="Ketik Kode..."
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-cyan-300 mb-2 font-mono font-bold"
+                      className={`w-full ${isDark ? 'bg-slate-900 border-slate-700 text-cyan-300' : 'bg-white border-slate-300 text-slate-900'} border rounded px-2 py-1.5 text-xs mb-2 font-mono font-bold`}
                     />
-                    <button
-                      onClick={() => handleJoinMultiplayerRoom(roomCodeInput, false)}
-                      className="w-full py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5"
-                    >
-                      <LogIn className="w-3.5 h-3.5" />
-                      <span>{isJoinedRoom && !isEffectiveHost ? 'Terhubung (Pemain)' : 'Gabung'}</span>
-                    </button>
+                    {isJoinedRoom && !isEffectiveHost ? (
+                      <div className="flex gap-2">
+                        <div className="flex-1 py-1.5 bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 rounded text-xs font-bold shadow flex items-center justify-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                          <span>Terhubung (Tamu)</span>
+                        </div>
+                        <button
+                          onClick={handleLeaveRoom}
+                          className="py-1.5 px-3 bg-rose-600 hover:bg-rose-500 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1 transition-all"
+                          title="Tinggalkan Room"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Keluar</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleJoinMultiplayerRoom(roomCodeInput, false)}
+                        className="w-full py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5"
+                      >
+                        <LogIn className="w-3.5 h-3.5" />
+                        <span>Gabung</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -3786,45 +3905,61 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   <div className="bg-slate-950 border border-slate-800 rounded-lg p-3 space-y-2">
                     <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
                       <span>DAFTAR PEMAIN ({roomPlayersList.length}/{totalPlayersConfig})</span>
-                      <span className="text-emerald-400 font-mono text-[10px] flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-                        <span>Terhubung {isEffectiveHost ? '(Host)' : ''}</span>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400 font-mono text-[10px] flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                          <span>{isEffectiveHost ? 'Host Room' : 'Tamu (Kode)'}</span>
+                        </span>
+                        {!isEffectiveHost && (
+                          <button
+                            onClick={handleLeaveRoom}
+                            className="bg-rose-950/80 hover:bg-rose-600 text-rose-300 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold border border-rose-500/40 flex items-center gap-1 transition-all"
+                            title="Tinggalkan Room"
+                          >
+                            <LogOut className="w-3 h-3" />
+                            <span>Tinggalkan Room</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="max-h-36 overflow-y-auto space-y-1">
-                      {roomPlayersList.map((p, idx) => (
-                        <div key={p.id || idx} className="flex items-center justify-between bg-slate-900 p-1.5 rounded text-[10px] border border-slate-800">
-                          <span className="text-white flex items-center gap-1.5 font-bold">
-                             {p.isBot ? <Bot className="w-3.5 h-3.5 text-amber-400" /> : <Users className="w-3.5 h-3.5 text-cyan-400" />}
-                             {p.username} {isLocalPlayer(p.id) ? '(Kamu)' : ''}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            <span 
-                              onClick={() => {
-                                if (isLocalPlayer(p.id)) {
-                                  handleSelectTeam(p.team === 'blue' ? 'red' : 'blue');
-                                } else if (p.isBot && isEffectiveHost) {
-                                  handleUpdateBotTeam(p.id, p.team === 'blue' ? 'red' : 'blue');
-                                }
-                              }}
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold select-none ${(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:scale-105 active:scale-95 transition-all' : ''} ${p.team === 'blue' ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40' : 'bg-rose-950 text-rose-300 border border-rose-500/40'}`}
-                              title={(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? "Klik untuk ganti tim" : undefined}
-                            >
-                              Tim {p.team === 'blue' ? 'Biru' : 'Merah'} {(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) && '(Ubah)'}
+                      {roomPlayersList.map((p, idx) => {
+                        const isLocal = isLocalPlayer(p.id);
+                        const cleanName = (p.username || p.name || (isLocal ? playerName : 'Striker')).trim();
+                        return (
+                          <div key={p.id || idx} className="flex items-center justify-between bg-slate-900 p-1.5 rounded text-[10px] border border-slate-800">
+                            <span className="text-white flex items-center gap-1.5 font-bold">
+                               {p.isBot ? <Bot className="w-3.5 h-3.5 text-amber-400" /> : <Users className="w-3.5 h-3.5 text-cyan-400" />}
+                               {cleanName} {isLocal ? '(Kamu)' : ''}
                             </span>
-                            {isEffectiveHost && !isLocalPlayer(p.id) && (
-                              <button
-                                onClick={() => handleKickPlayer(p.id)}
-                                className="bg-rose-950/80 hover:bg-rose-600 text-rose-300 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold transition-all border border-rose-500/40 flex items-center gap-1"
-                                title={p.isBot ? "Keluarkan Bot" : "Keluarkan Pemain"}
+                            <div className="flex items-center gap-1.5">
+                              <span 
+                                onClick={() => {
+                                  if (isLocal) {
+                                    handleSelectTeam(p.team === 'blue' ? 'red' : 'blue');
+                                  } else if (p.isBot && isEffectiveHost) {
+                                    handleUpdateBotTeam(p.id, p.team === 'blue' ? 'red' : 'blue');
+                                  }
+                                }}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-bold select-none ${(isLocal || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:scale-105 active:scale-95 transition-all' : ''} ${p.team === 'blue' ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40' : 'bg-rose-950 text-rose-300 border border-rose-500/40'}`}
+                                title={(isLocal || (p.isBot && isEffectiveHost)) ? "Klik untuk ganti tim" : undefined}
                               >
-                                <X className="w-2.5 h-2.5" />
-                                <span>Kick</span>
-                              </button>
-                            )}
+                                Tim {p.team === 'blue' ? 'Biru' : 'Merah'} {(isLocal || (p.isBot && isEffectiveHost)) && '(Ubah)'}
+                              </span>
+                              {isEffectiveHost && !isLocal && (
+                                <button
+                                  onClick={() => handleKickPlayer(p.id)}
+                                  className="bg-rose-950/80 hover:bg-rose-600 text-rose-300 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold transition-all border border-rose-500/40 flex items-center gap-1"
+                                  title={p.isBot ? "Keluarkan Bot" : "Keluarkan Pemain"}
+                                >
+                                  <X className="w-2.5 h-2.5" />
+                                  <span>Kick</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {/* Capacity Setting in Waiting Room */}
@@ -3879,17 +4014,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {isEffectiveHost ? (
                       <button
                         onClick={handleDeleteRoom}
-                        className="w-full py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2 bg-rose-950/60 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>Hapus Room (Host)</span>
+                        <span>Hapus / Bubarkan Room (Host)</span>
                       </button>
                     ) : (
                       <button
                         onClick={handleLeaveRoom}
-                        className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-600 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white border border-rose-500 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg"
                       >
-                        <LogOut className="w-3.5 h-3.5" />
+                        <LogOut className="w-4 h-4" />
                         <span>Tinggalkan Room</span>
                       </button>
                     )}
@@ -3897,12 +4032,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 )}
               </div>
             ) : (
-              /* BOT PRACTICE / MAIN VS BOT */
+              /* SOLO / PRACTICE VS KOMPUTER */
               <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                     <Bot className="w-4 h-4" />
-                    <span>LOBBY SOLO (VS BOT)</span>
+                    <span>LOBBY SOLO (VS KOMPUTER)</span>
                   </span>
                 </div>
 
@@ -4109,15 +4244,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 Gunakan Hadiah Diskon di Keranjang Belanja
               </button>
 
+              {gameModeType === 'bot' ? (
+                <button
+                  onClick={async () => {
+                    await handleLeaveMatch();
+                    setTimeout(() => {
+                      startMatch();
+                    }, 80);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition-colors shadow-md"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Main Lagi Sekarang (Match Baru vs Bot)
+                </button>
+              ) : null}
+
               <button
-                onClick={() => {
-                  setMatchStatus('lobby');
-                  setInLobby(true);
-                }}
+                onClick={handleLeaveMatch}
                 className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-xs transition-colors"
               >
-                <RotateCcw className="w-4 h-4" />
-                Tanding Ulang TDM (Rematch)
+                <LogOut className="w-4 h-4" />
+                Tinggalkan Match & Kembali ke Lobi
               </button>
 
               <button
