@@ -20,6 +20,7 @@ import {
   renderThemedObstacle 
 } from '../utils/arenaRenderer';
 import { incrementDailyQuestProgress } from '../utils/dailyChallenge';
+import { useInputDevice } from '../utils/useInputDevice';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, deleteField } from 'firebase/firestore';
@@ -53,7 +54,6 @@ import {
   Trees,
   Flame,
   Heart,
-  Smartphone,
   Compass,
   Target,
   Skull,
@@ -589,8 +589,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const [hudKillFeed, setHudKillFeed] = useState<{ id: string; text: string; team: TeamId }[]>([]);
   const [hudRespawnTimer, setHudRespawnTimer] = useState<number>(0);
 
-  // Mobile Touch Controls State
-  const [isMobileControlsEnabled, setIsMobileControlsEnabled] = useState<boolean>(true);
+  // Intelligent Device Input Detection (Mobile Touch vs Desktop Keyboard/Mouse)
+  const inputDevice = useInputDevice();
+  const showVirtualControls = inputDevice.showVirtualControls;
+  const lastDashTime = useRef<number>(0);
+  const [hudDashCooldown, setHudDashCooldown] = useState<number>(0);
   const [virtualJoyActive, setVirtualJoyActive] = useState<boolean>(false);
   const [joyKnobPos, setJoyKnobPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isSelectingPlayers, setIsSelectingPlayers] = useState<boolean>(false);
@@ -969,18 +972,31 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
   };
 
-  // Mobile Dash sprint burst
-  const handleMobileDash = () => {
+  // Unified Dash ability for both Mobile (DASH button) and Desktop (Space / Shift)
+  const triggerDash = useCallback(() => {
     const myP = simState.current.players.find((p) => isLocalPlayer(p.id));
-    if (myP && !myP.isRespawning) {
-      myP.activeSkill = {
-        type: 'speed',
-        timeLeft: 3.5,
-      };
-      soundEngine.playPowerUp();
-      addDamageText('💨 DASH EVASIVE!', myP.x, myP.y - 20, '#10b981');
+    if (!myP || myP.isRespawning) return;
+
+    const now = Date.now();
+    const cooldownMs = 3500;
+    const timeSinceLast = now - lastDashTime.current;
+
+    if (timeSinceLast < cooldownMs) {
+      const remainingSec = Math.ceil((cooldownMs - timeSinceLast) / 1000);
+      addDamageText(`⏳ DASH CD (${remainingSec}s)`, myP.x, myP.y - 20, '#94a3b8');
+      return;
     }
-  };
+
+    lastDashTime.current = now;
+    setHudDashCooldown(3.5);
+
+    myP.activeSkill = {
+      type: 'speed',
+      timeLeft: 3.5,
+    };
+    soundEngine.playPowerUp();
+    addDamageText('💨 DASH EVASIVE!', myP.x, myP.y - 20, '#10b981');
+  }, [isLocalPlayer]);
 
   // Initialize Roster, Skills & Particles
   const initRoster = useCallback(() => {
@@ -1878,28 +1894,118 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
   }, [onAddDiscountPoints]);
 
-  // Keyboard Event Handlers
+  // Unified Aim Angle Calculation from Client Coordinates (Accounts for Canvas Scaling & Offsets)
+  const updateAimAngleFromClientCoords = useCallback((clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (clientX - rect.left) * scaleX;
+    const mouseY = (clientY - rect.top) * scaleY;
+
+    const worldX = mouseX + simState.current.cameraX;
+    const worldY = mouseY + simState.current.cameraY;
+
+    mouseWorldPos.current = { x: worldX, y: worldY };
+
+    const myP = simState.current.players.find((p) => isLocalPlayer(p.id));
+    if (myP && !myP.isRespawning) {
+      myP.angle = Math.atan2(worldY - myP.y, worldX - myP.x);
+    }
+  }, [isLocalPlayer]);
+
+  // Reset all input states to prevent stuck keys/touches on blur, tab switch, or cancel
+  const resetAllInputs = useCallback(() => {
+    keysPressed.current = {};
+    isMouseDown.current = false;
+    mobileMoveVector.current = { x: 0, y: 0 };
+    joyTouchId.current = null;
+    aimTouchId.current = null;
+    setVirtualJoyActive(false);
+    setJoyKnobPos({ x: 0, y: 0 });
+  }, []);
+
+  // Keyboard Event Handlers & Window Focus/Blur Guards
   useEffect(() => {
     const handleDown = (e: KeyboardEvent) => {
-      keysPressed.current[e.key.toLowerCase()] = true;
-      if (e.key === ' ' || e.code === 'Space') {
-        shootLaser(myPlayerId.current);
+      // Prevent accidental page scrolling when playing
+      if (['space', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.code.toLowerCase()) || e.key === ' ') {
+        if (matchStatus === 'playing') {
+          e.preventDefault();
+        }
       }
+
+      const keyLower = e.key.toLowerCase();
+      const codeLower = e.code.toLowerCase();
+      keysPressed.current[keyLower] = true;
+      keysPressed.current[codeLower] = true;
+
+      // Space or Shift for Dash ability
+      if (e.code === 'Space' || e.key === ' ' || e.key === 'Shift') {
+        triggerDash();
+      }
+
       if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
       }
     };
+
     const handleUp = (e: KeyboardEvent) => {
-      keysPressed.current[e.key.toLowerCase()] = false;
+      const keyLower = e.key.toLowerCase();
+      const codeLower = e.code.toLowerCase();
+      keysPressed.current[keyLower] = false;
+      keysPressed.current[codeLower] = false;
+    };
+
+    const handleWindowBlur = () => {
+      resetAllInputs();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        resetAllInputs();
+      }
+    };
+
+    const handlePointerCancel = () => {
+      resetAllInputs();
+    };
+
+    const handleGlobalMouseUp = () => {
+      isMouseDown.current = false;
+    };
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (matchStatus === 'playing' && isMouseDown.current) {
+        updateAimAngleFromClientCoords(e.clientX, e.clientY);
+      }
     };
 
     window.addEventListener('keydown', handleDown);
     window.addEventListener('keyup', handleUp);
+    window.addEventListener('blur', handleWindowBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pointercancel', handlePointerCancel);
+    window.addEventListener('touchcancel', handlePointerCancel);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    window.addEventListener('pointerup', handleGlobalMouseUp);
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+
     return () => {
       window.removeEventListener('keydown', handleDown);
       window.removeEventListener('keyup', handleUp);
+      window.removeEventListener('blur', handleWindowBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+      window.removeEventListener('touchcancel', handlePointerCancel);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('pointerup', handleGlobalMouseUp);
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
     };
-  }, []);
+  }, [matchStatus, triggerDash, resetAllInputs, updateAimAngleFromClientCoords]);
 
   // Shoot Weapon Function (Supports Triple Shot & Rapid Fire skills!)
   const shootLaser = (playerId: string) => {
@@ -1956,34 +2062,40 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   // Mouse Move on Canvas
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const worldX = mouseX + simState.current.cameraX;
-    const worldY = mouseY + simState.current.cameraY;
-
-    mouseWorldPos.current = { x: worldX, y: worldY };
-
-    const myP = simState.current.players.find((p) => isLocalPlayer(p.id));
-    if (myP && !myP.isRespawning) {
-      myP.angle = Math.atan2(worldY - myP.y, worldX - myP.x);
-    }
+    updateAimAngleFromClientCoords(e.clientX, e.clientY);
   };
 
-  const handleCanvasMouseDown = () => {
-    isMouseDown.current = true;
-    shootLaser(myPlayerId.current);
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === 0) {
+      isMouseDown.current = true;
+      updateAimAngleFromClientCoords(e.clientX, e.clientY);
+      shootLaser(myPlayerId.current);
+    }
   };
 
   const handleCanvasMouseUp = () => {
     isMouseDown.current = false;
   };
 
+  // Direct canvas touch support for mobile aiming
+  const handleCanvasTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    inputDevice.notifyTouchEvent();
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      updateAimAngleFromClientCoords(touch.clientX, touch.clientY);
+    }
+  };
+
+  const handleCanvasTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      updateAimAngleFromClientCoords(touch.clientX, touch.clientY);
+    }
+  };
+
   // Mobile Virtual Joystick Touch Handlers (Smooth 360° Movement on Phone)
   const handleJoyTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    inputDevice.notifyTouchEvent();
     const touch = e.changedTouches[0];
     joyTouchId.current = touch.identifier;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -2031,18 +2143,41 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
   };
 
-  // Mobile Touch Aim & Shoot Pad Handlers
-  const handleAimTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+  // Mobile Touch Aim Wheel Handlers
+  const handleAimTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    inputDevice.notifyTouchEvent();
     const touch = e.changedTouches[0];
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const worldX = touch.clientX - rect.left + simState.current.cameraX;
-    const worldY = touch.clientY - rect.top + simState.current.cameraY;
+    aimTouchId.current = touch.identifier;
+    handleAimTouchMove(e);
+  };
 
-    const myP = simState.current.players.find((p) => isLocalPlayer(p.id));
-    if (myP && !myP.isRespawning) {
-      myP.angle = Math.atan2(worldY - myP.y, worldX - myP.x);
+  const handleAimTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const touch = e.changedTouches[i];
+      if (aimTouchId.current === null || touch.identifier === aimTouchId.current) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = touch.clientX - centerX;
+        const dy = touch.clientY - centerY;
+        if (Math.hypot(dx, dy) > 8) {
+          const aimAngle = Math.atan2(dy, dx);
+          const myP = simState.current.players.find((p) => isLocalPlayer(p.id));
+          if (myP && !myP.isRespawning) {
+            myP.angle = aimAngle;
+          }
+        }
+        break;
+      }
+    }
+  };
+
+  const handleAimTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === aimTouchId.current) {
+        aimTouchId.current = null;
+        break;
+      }
     }
   };
 
@@ -2098,6 +2233,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         setHudBlueScore(sim.blueScore);
         setHudRedScore(sim.redScore);
 
+        const cdRemaining = Math.max(0, 3.5 - (Date.now() - lastDashTime.current) / 1000);
+        setHudDashCooldown(cdRemaining > 0.05 ? cdRemaining : 0);
+
         const myP = sim.players.find((p) => isLocalPlayer(p.id));
         if (myP) {
           setHudMyHp(myP.hp);
@@ -2142,31 +2280,48 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         }
       });
 
-      // 4. Move Local Player (WASD Keyboard + Mobile Virtual Joystick)
+      // 4. Move Local Player (WASD/Arrows Keyboard + Mobile Virtual Joystick)
       const myP = sim.players.find((p) => isLocalPlayer(p.id));
       if (myP && !myP.isRespawning) {
-        let dx = 0;
-        let dy = 0;
         const myStats = getCharacterStats(myP.customization?.characterClass);
         const isSpeedSkill = myP.activeSkill?.type === 'speed';
         const speed = (isSpeedSkill ? 11.5 : 7.5) * myStats.speedMultiplier;
 
-        // Keyboard inputs
-        if (keysPressed.current['w'] || keysPressed.current['arrowup']) dy -= speed;
-        if (keysPressed.current['s'] || keysPressed.current['arrowdown']) dy += speed;
-        if (keysPressed.current['a'] || keysPressed.current['arrowleft']) dx -= speed;
-        if (keysPressed.current['d'] || keysPressed.current['arrowright']) dx += speed;
+        // Keyboard axis calculation (WASD & Arrows, case-insensitive)
+        const isUp = keysPressed.current['w'] || keysPressed.current['keyw'] || keysPressed.current['arrowup'];
+        const isDown = keysPressed.current['s'] || keysPressed.current['keys'] || keysPressed.current['arrowdown'];
+        const isLeft = keysPressed.current['a'] || keysPressed.current['keya'] || keysPressed.current['arrowleft'];
+        const isRight = keysPressed.current['d'] || keysPressed.current['keyd'] || keysPressed.current['arrowright'];
 
-        if (dx !== 0 && dy !== 0) {
-          dx *= 0.7071;
-          dy *= 0.7071;
+        let kx = 0;
+        let ky = 0;
+        if (isUp) ky -= 1;
+        if (isDown) ky += 1;
+        if (isLeft) kx -= 1;
+        if (isRight) kx += 1;
+
+        // Diagonal normalization: magnitude is strictly 1.0 (1/√2 for both x and y)
+        const kLen = Math.hypot(kx, ky);
+        if (kLen > 0) {
+          kx /= kLen;
+          ky /= kLen;
         }
 
-        // Add mobile virtual joystick inputs
-        if (mobileMoveVector.current.x !== 0 || mobileMoveVector.current.y !== 0) {
-          dx += mobileMoveVector.current.x * speed;
-          dy += mobileMoveVector.current.y * speed;
+        // Mobile virtual joystick input vector (-1 to 1)
+        const jx = mobileMoveVector.current.x;
+        const jy = mobileMoveVector.current.y;
+
+        // Seamless combination of keyboard + joystick (hybrid device support)
+        let moveX = kx + jx;
+        let moveY = ky + jy;
+        const totalLen = Math.hypot(moveX, moveY);
+        if (totalLen > 1.0) {
+          moveX /= totalLen;
+          moveY /= totalLen;
         }
+
+        const dx = moveX * speed;
+        const dy = moveY * speed;
 
         myP.x = Math.max(45, Math.min(WORLD_WIDTH - 45, myP.x + dx));
         myP.y = Math.max(45, Math.min(WORLD_HEIGHT - 45, myP.y + dy));
@@ -3568,7 +3723,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-500">MERAH</span>
             <span className="text-base md:text-xl leading-none font-mono-numbers">{hudRedScore}</span>
           </div>
-
           {/* Customizer Button in Header */}
           <button
             onClick={() => setShowCustomizerModal(true)}
@@ -3615,6 +3769,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           onMouseMove={handleCanvasMouseMove}
           onMouseDown={handleCanvasMouseDown}
           onMouseUp={handleCanvasMouseUp}
+          onTouchStart={handleCanvasTouchStart}
+          onTouchMove={handleCanvasTouchMove}
           className="w-full h-full block cursor-crosshair touch-none"
         />
 
@@ -3693,65 +3849,112 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           </div>
         )}
 
-        {/* MOBILE ON-SCREEN TOUCH CONTROLS (HP FRIENDLY) */}
-        {isMobileControlsEnabled && matchStatus === 'playing' && hudRespawnTimer === 0 && (
-          <div className="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-3 md:p-6 select-none">
+        {/* DESKTOP KEYBOARD & MOUSE CONTROLS HELPER BAR (Clean, non-intrusive HUD at bottom of arena) */}
+        {!showVirtualControls && matchStatus === 'playing' && hudRespawnTimer === 0 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none max-w-[95%]">
+            <div className={`flex items-center flex-wrap justify-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md text-[10px] md:text-xs font-semibold shadow-lg border transition-all ${
+              isDark 
+                ? 'bg-slate-950/85 border-slate-700/60 text-slate-300 shadow-black/40' 
+                : 'bg-white/95 border-slate-200/90 text-slate-700 shadow-slate-300/40'
+            }`}>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">W A S D</kbd>
+                <span>/</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Panah</kbd>
+                <span className="text-slate-400">Gerak</span>
+              </span>
+              <span className="text-slate-500">•</span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Klik Kiri</kbd>
+                <span className="text-slate-400">Bidik &amp; Tembak</span>
+              </span>
+              <span className="text-slate-500">•</span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Spasi / Shift</kbd>
+                <span className="text-slate-400">Dash</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* MOBILE ON-SCREEN TOUCH CONTROLS (ONLY ON TOUCH-CAPABLE DEVICES / TOUCH MODE) */}
+        {showVirtualControls && matchStatus === 'playing' && hudRespawnTimer === 0 && (
+          <div className="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-2.5 sm:p-4 md:p-6 select-none touch-none">
             {/* Left: Virtual Movement Joystick */}
             <div className="pointer-events-auto flex flex-col items-center">
               <div
                 onTouchStart={handleJoyTouchStart}
                 onTouchMove={handleJoyTouchMove}
                 onTouchEnd={handleJoyTouchEnd}
-                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-slate-900/70 backdrop-blur-md border-2 border-slate-700 flex items-center justify-center touch-none shadow-xl active:border-cyan-400"
+                onTouchCancel={handleJoyTouchEnd}
+                className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-34 md:h-34 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700/80 flex items-center justify-center touch-none shadow-2xl active:border-cyan-400"
               >
                 {/* Center crosshair mark */}
-                <div className="w-2 h-2 rounded-full bg-slate-600" />
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
                 {/* Floating Knob */}
                 <div
-                  className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
+                  className="absolute w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
                   style={{
                     transform: `translate(${joyKnobPos.x}px, ${joyKnobPos.y}px)`,
                   }}
                 >
-                  <Compass className="w-5 h-5 text-white/90" />
+                  <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-white/90" />
                 </div>
               </div>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 bg-slate-950/70 px-2 py-0.5 rounded-full border border-slate-800">
+              <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 bg-slate-950/80 px-2 py-0.5 rounded-full border border-slate-800">
                 🕹️ Gerak 360°
               </span>
             </div>
 
             {/* Right: Aim Touch Pad, Shoot Button & Dash */}
-            <div className="pointer-events-auto flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2 mb-1">
+            <div className="pointer-events-auto flex flex-col items-end gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-2 mb-0.5">
                 {/* Dash / Evade Button */}
                 <button
-                  onClick={handleMobileDash}
-                  className="px-3 py-1.5 rounded-xl text-[10px] font-bold bg-emerald-500/20 border border-emerald-400 text-emerald-300 active:scale-90 transition-transform flex items-center gap-1"
+                  onClick={triggerDash}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    triggerDash();
+                  }}
+                  disabled={hudDashCooldown > 0}
+                  className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[9px] sm:text-[10px] font-bold border transition-all flex items-center gap-1.5 shadow-md ${
+                    hudDashCooldown > 0
+                      ? 'bg-slate-800/80 border-slate-700 text-slate-400 opacity-70'
+                      : 'bg-emerald-500/25 border-emerald-400 text-emerald-300 hover:bg-emerald-500/35 active:scale-90'
+                  }`}
                 >
                   <Wind className="w-3.5 h-3.5" />
-                  <span>DASH</span>
+                  <span>{hudDashCooldown > 0 ? `${hudDashCooldown.toFixed(1)}s` : 'DASH'}</span>
                 </button>
               </div>
 
               {/* Aim Touch Pad and Big Shoot Button */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {/* Touch Aim Wheel */}
                 <div
+                  onTouchStart={handleAimTouchStart}
                   onTouchMove={handleAimTouchMove}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900/70 backdrop-blur-md border-2 border-slate-700 flex items-center justify-center touch-none text-slate-400 active:border-rose-400"
+                  onTouchEnd={handleAimTouchEnd}
+                  onTouchCancel={handleAimTouchEnd}
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700 flex flex-col items-center justify-center touch-none text-slate-400 active:border-rose-400 shadow-xl"
                 >
-                  <Crosshair className="w-6 h-6 text-slate-400" />
+                  <Crosshair className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
+                  <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">BIDIK</span>
                 </div>
 
                 {/* Big Ergonomic FIRE Button */}
                 <button
                   onTouchStart={(e) => {
                     e.preventDefault();
+                    inputDevice.notifyTouchEvent();
                     isMouseDown.current = true;
                     shootLaser(myPlayerId.current);
                   }}
                   onTouchEnd={(e) => {
+                    e.preventDefault();
+                    isMouseDown.current = false;
+                  }}
+                  onTouchCancel={(e) => {
                     e.preventDefault();
                     isMouseDown.current = false;
                   }}
@@ -3762,10 +3965,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onMouseUp={() => {
                     isMouseDown.current = false;
                   }}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-3 sm:border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
                 >
-                  <Flame className="w-6 h-6 fill-white" />
-                  <span className="text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
+                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+                  <span className="text-[8px] sm:text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
                 </button>
               </div>
             </div>
