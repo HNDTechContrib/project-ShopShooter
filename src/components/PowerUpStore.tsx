@@ -29,7 +29,7 @@ export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8 pb-12">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-3xl p-6 md:p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className={`${isDark ? 'bg-gradient-to-r from-slate-900 to-indigo-950 text-white border-slate-800' : 'bg-gradient-to-r from-indigo-50 to-white text-slate-900 border-slate-200'} rounded-3xl p-6 md:p-8 border shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
         <div>
           <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
             <Zap className="w-4 h-4" />
@@ -38,17 +38,17 @@ export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
           <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
             Toko Power-Up Eksklusif
           </h2>
-          <p className="text-sm text-slate-300 mt-1 max-w-lg">
+          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'} mt-1 max-w-lg`}>
             Persiapkan dirimu untuk menghadapi target yang bergerak acak dan berkecepatan tinggi di Arena Shooter.
           </p>
         </div>
 
-        <div className="bg-slate-800/90 border border-slate-700 px-5 py-3.5 rounded-2xl flex items-center gap-4 shrink-0 shadow-inner">
+        <div className={`${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'} px-5 py-3.5 rounded-2xl flex items-center gap-4 shrink-0 shadow-inner border`}>
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-slate-400 block font-semibold">
+            <span className={`text-[11px] uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'} block font-semibold`}>
               Koin Poin Kamu
             </span>
-            <span className="text-xl font-extrabold text-amber-400 font-mono-numbers">
+            <span className={`text-xl font-extrabold ${isDark ? 'text-white' : 'text-amber-600'} font-mono-numbers`}>
               {userPoints} Pts
             </span>
           </div>
@@ -99,7 +99,7 @@ export const PowerUpStore: React.FC<PowerUpStoreProps> = ({
 
               <div className="flex items-center justify-between pt-2">
                 <div>
-                  <span className="text-[11px] text-slate-400 block uppercase font-medium">Harga Beli</span>
+                  <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} block uppercase font-medium`}>Harga Beli</span>
                   <span className="text-base font-extrabold text-amber-600 font-mono-numbers">
                     {item.costPoints} Poin
                   </span>

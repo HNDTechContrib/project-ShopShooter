@@ -382,7 +382,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 1. Pilih Tipe / Kelas Karakter:
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex overflow-x-auto gap-2 pb-2 snap-x">
                 {CLASS_OPTIONS.map((c) => (
                   <button
                     key={c.id}
@@ -390,7 +390,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                       soundEngine.playPowerUp();
                       onChange({ ...customization, characterClass: c.id });
                     }}
-                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 ${
+                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 min-w-[160px] snap-start ${
                       customization.characterClass === c.id
                         ? 'border-amber-400 bg-amber-500/15 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
                         : 'border-slate-800 bg-slate-800/60 hover:bg-slate-800'
@@ -401,9 +401,6 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                       <div className="text-xs font-bold text-white truncate">{c.name}</div>
                       <div className="text-[10px] text-slate-400 truncate">{c.role}</div>
                     </div>
-                    {customization.characterClass === c.id && (
-                      <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                    )}
                   </button>
                 ))}
               </div>
@@ -450,7 +447,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                 <Crosshair className="w-3.5 h-3.5 text-rose-400" />
                 3. Tipe Senjata / Laras Blaster:
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex overflow-x-auto gap-2 pb-2 snap-x">
                 {WEAPON_OPTIONS.map((w) => (
                   <button
                     key={w.id}
@@ -458,7 +455,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                       soundEngine.playShoot();
                       onChange({ ...customization, weaponSkin: w.id });
                     }}
-                    className={`p-2 rounded-xl border text-left transition-all flex items-center gap-2 ${
+                    className={`p-2 rounded-xl border text-left transition-all flex items-center gap-2 min-w-[140px] snap-start ${
                       customization.weaponSkin === w.id
                         ? 'border-rose-400 bg-rose-500/15'
                         : 'border-slate-800 bg-slate-800/60 hover:bg-slate-800'
@@ -480,7 +477,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                 <Crown className="w-3.5 h-3.5 text-amber-400" />
                 4. Aksesoris Kepala / Topi:
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="flex overflow-x-auto gap-2 pb-2 snap-x">
                 {ACCESSORY_OPTIONS.map((a) => (
                   <button
                     key={a.id}
@@ -488,7 +485,7 @@ export const CharacterCustomizerModal: React.FC<CharacterCustomizerModalProps> =
                       soundEngine.playPowerUp();
                       onChange({ ...customization, accessory: a.id });
                     }}
-                    className={`p-2 rounded-xl border text-center transition-all ${
+                    className={`p-2 rounded-xl border text-center transition-all min-w-[80px] snap-start ${
                       customization.accessory === a.id
                         ? 'border-amber-400 bg-amber-500/15'
                         : 'border-slate-800 bg-slate-800/60 hover:bg-slate-800'

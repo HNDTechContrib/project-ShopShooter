@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Target, Swords, Trophy, Wrench, Sun, Moon, Gift } from 'lucide-react';
+import { getUnclaimedRewardsSummary } from '../utils/dailyChallenge';
 
 interface NavbarProps {
   activeTab: 'multiplayer' | 'shooter' | 'leaderboard' | 'powerups';
@@ -17,12 +18,24 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleTheme,
 }) => {
   const isDark = themeMode === 'dark';
+  const [unclaimedCount, setUnclaimedCount] = useState<number>(() => {
+    return getUnclaimedRewardsSummary().unclaimedCount;
+  });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setUnclaimedCount(getUnclaimedRewardsSummary().unclaimedCount);
+    };
+
+    window.addEventListener('daily_challenge_updated', handleUpdate);
+    return () => window.removeEventListener('daily_challenge_updated', handleUpdate);
+  }, []);
 
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-200 ${
       isDark 
-        ? 'bg-slate-950/95 border-slate-800 text-slate-100 shadow-lg shadow-black/40' 
-        : 'bg-white/95 border-slate-200 text-slate-900 shadow-sm'
+        ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-slate-800 text-slate-100 shadow-lg shadow-black/40' 
+        : 'bg-gradient-to-b from-white to-slate-50 border-slate-200 text-slate-900 shadow-sm'
     }`}>
       <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4 md:gap-8">
         {/* Zone 1: Tank Arena Brand Wordmark */}
@@ -122,14 +135,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* Daily Gift Button */}
+          {/* Daily Gift Button with Unclaimed Badge */}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open_daily_challenge'))}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap shrink-0"
+            className="relative flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap shrink-0"
             title="Hadiah Harian & Bonus Login"
           >
             <Gift className="w-4 h-4 fill-slate-950" />
             <span className="hidden sm:inline">Bonus</span>
+            {unclaimedCount > 0 && (
+              <span className="bg-rose-600 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-bounce flex items-center justify-center">
+                {unclaimedCount}
+              </span>
+            )}
           </button>
 
           {/* Combat Points Badge */}

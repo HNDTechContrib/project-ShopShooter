@@ -22,8 +22,22 @@ export const STREAK_REWARDS: DailyStreakReward[] = [
   { day: 7, points: 350, bonusTitle: 'MEGA JACKPOT 50%', bonusDetail: 'Voucher Sultan Rp 35.000', badge: 'JACKPOT', isJackpot: true },
 ];
 
+export type QuestCategory = 'login' | 'match' | 'win' | 'kill' | 'score' | 'shooter' | 'target_hit';
+
+export interface QuestTemplate {
+  templateId: string;
+  title: string;
+  description: string;
+  targetCount: number;
+  rewardPoints: number;
+  icon: string;
+  category: QuestCategory;
+  badgeLabel?: string;
+}
+
 export interface DailyQuest {
   id: string;
+  templateId: string;
   title: string;
   description: string;
   targetCount: number;
@@ -31,7 +45,8 @@ export interface DailyQuest {
   rewardPoints: number;
   isClaimed: boolean;
   icon: string;
-  type: 'login' | 'match' | 'kill' | 'score';
+  category: QuestCategory;
+  badgeLabel?: string;
 }
 
 export interface DailyChallengeState {
@@ -42,116 +57,268 @@ export interface DailyChallengeState {
   quests: DailyQuest[];
 }
 
-const STORAGE_KEY = 'diskon_blaster_daily_challenges_v1';
+export interface UnclaimedRewardSummary {
+  streakRewardClaimable: boolean;
+  streakDay: number;
+  streakReward: DailyStreakReward;
+  unclaimedQuests: DailyQuest[];
+  unclaimedCount: number;
+  totalClaimablePoints: number;
+}
 
-export const INITIAL_QUESTS: DailyQuest[] = [
+const STORAGE_KEY = 'diskon_blaster_daily_challenges_v2';
+export const USER_POINTS_KEY = 'diskon_blaster_user_points';
+
+// Comprehensive pool of varied quests for daily rotation
+const QUEST_POOL: QuestTemplate[] = [
   {
-    id: 'quest_login',
-    title: 'Check-in Belanja Harian',
-    description: 'Buka game & cek promosi diskon hari ini',
-    targetCount: 1,
-    currentCount: 1, // Automatically 1 on visiting
-    rewardPoints: 50,
-    isClaimed: false,
-    icon: '📅',
-    type: 'login',
-  },
-  {
-    id: 'quest_match',
+    templateId: 'tpl_match_1',
     title: 'Duel Arena Belanja',
-    description: 'Mainkan 1 pertandingan di Arena Multiplayer atau vs Bot',
+    description: 'Selesaikan 1 pertandingan di Arena TDM (vs Bot atau Multiplayer)',
     targetCount: 1,
-    currentCount: 0,
     rewardPoints: 75,
-    isClaimed: false,
     icon: '⚔️',
-    type: 'match',
+    category: 'match',
+    badgeLabel: 'ARENA',
   },
   {
-    id: 'quest_kill',
+    templateId: 'tpl_match_2',
+    title: 'Tempur Taktis Bertubi',
+    description: 'Selesaikan 2 pertempuran TDM hingga tuntas',
+    targetCount: 2,
+    rewardPoints: 125,
+    icon: '🛡️',
+    category: 'match',
+    badgeLabel: 'TDM',
+  },
+  {
+    templateId: 'tpl_win_1',
+    title: 'Supremasi Kemenangan',
+    description: 'Bawa tim kamu meraih kemenangan pada pertandingan Arena TDM',
+    targetCount: 1,
+    rewardPoints: 100,
+    icon: '🏆',
+    category: 'win',
+    badgeLabel: 'VICTORY',
+  },
+  {
+    templateId: 'tpl_kill_3',
     title: 'Diskon Hunter Jitu',
-    description: 'Tembak dan eliminasi 3 musuh di Arena',
+    description: 'Tembak dan eliminasi 3 musuh di Arena TDM',
     targetCount: 3,
-    currentCount: 0,
     rewardPoints: 100,
-    isClaimed: false,
     icon: '🎯',
-    type: 'kill',
+    category: 'kill',
+    badgeLabel: 'COMBAT',
   },
   {
-    id: 'quest_score',
-    title: 'Kolektor Poin Sultan',
-    description: 'Kumpulkan total 200 poin diskon dari pertandingan',
+    templateId: 'tpl_kill_5',
+    title: 'Pembasmi Tank Musuh',
+    description: 'Eliminasi total 5 tank musuh di Arena pertempuran',
+    targetCount: 5,
+    rewardPoints: 150,
+    icon: '💥',
+    category: 'kill',
+    badgeLabel: 'ASSAULT',
+  },
+  {
+    templateId: 'tpl_score_200',
+    title: 'Kolektor Skor Tempur',
+    description: 'Kumpulkan total 200 skor dari eliminasi dan pertempuran',
     targetCount: 200,
-    currentCount: 0,
-    rewardPoints: 100,
-    isClaimed: false,
+    rewardPoints: 80,
+    icon: '⭐',
+    category: 'score',
+    badgeLabel: 'SCORE',
+  },
+  {
+    templateId: 'tpl_score_400',
+    title: 'Sultan Poin Pertempuran',
+    description: 'Kumpulkan total 400 skor tempur dari pertandingan',
+    targetCount: 400,
+    rewardPoints: 140,
     icon: '🛍️',
-    type: 'score',
+    category: 'score',
+    badgeLabel: 'SCORE',
+  },
+  {
+    templateId: 'tpl_shooter_1',
+    title: 'Sesi Latihan Tembak',
+    description: 'Selesaikan 1 sesi latihan tembak di Latihan Target',
+    targetCount: 1,
+    rewardPoints: 75,
+    icon: '🎪',
+    category: 'shooter',
+    badgeLabel: 'TARGET',
+  },
+  {
+    templateId: 'tpl_target_15',
+    title: 'Penembak Jitu Target',
+    description: 'Tembak jatuh 15 target diskon pada mode Latihan',
+    targetCount: 15,
+    rewardPoints: 90,
+    icon: '🎖️',
+    category: 'target_hit',
+    badgeLabel: 'PRECISION',
   },
 ];
 
-function getTodayString(): string {
+export function getLocalTodayString(): string {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
-function getYesterdayString(): string {
-  const d = new Date(Date.now() - 86400000);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+export function getDaysDifference(fromDateStr: string, toDateStr: string): number {
+  try {
+    const [y1, m1, d1] = fromDateStr.split('-').map(Number);
+    const [y2, m2, d2] = toDateStr.split('-').map(Number);
+    const date1 = new Date(y1, m1 - 1, d1);
+    const date2 = new Date(y2, m2 - 1, d2);
+    const diffTime = date2.getTime() - date1.getTime();
+    return Math.round(diffTime / (1000 * 3600 * 24));
+  } catch {
+    return 0;
+  }
+}
+
+// Generate daily quests deterministically based on date string
+export function generateDailyQuests(dateStr: string): DailyQuest[] {
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    hash = (hash << 5) - hash + dateStr.charCodeAt(i);
+    hash |= 0;
+  }
+  const seed = Math.abs(hash);
+
+  // 1. Guaranteed daily login check-in quest
+  const checkinQuest: DailyQuest = {
+    id: `quest_login_${dateStr}`,
+    templateId: 'tpl_login',
+    title: 'Check-in Belanja Harian',
+    description: 'Buka game & cek promosi diskon hari ini',
+    targetCount: 1,
+    currentCount: 1, // Auto-completed when visiting on this day
+    rewardPoints: 50,
+    isClaimed: false,
+    icon: '📅',
+    category: 'login',
+    badgeLabel: 'HARIAN',
+  };
+
+  // 2. Deterministically select 3 distinct quests from the pool with no duplicate categories
+  const poolCopy = [...QUEST_POOL];
+  // Deterministic shuffle
+  for (let i = poolCopy.length - 1; i > 0; i--) {
+    const j = (seed + i * 17) % (i + 1);
+    const temp = poolCopy[i];
+    poolCopy[i] = poolCopy[j];
+    poolCopy[j] = temp;
+  }
+
+  const selectedTemplates: QuestTemplate[] = [];
+  const usedCategories = new Set<string>();
+
+  for (const tpl of poolCopy) {
+    if (!usedCategories.has(tpl.category)) {
+      selectedTemplates.push(tpl);
+      usedCategories.add(tpl.category);
+      if (selectedTemplates.length >= 3) break;
+    }
+  }
+
+  // Fallback if needed to reach 3
+  if (selectedTemplates.length < 3) {
+    for (const tpl of poolCopy) {
+      if (!selectedTemplates.some((st) => st.templateId === tpl.templateId)) {
+        selectedTemplates.push(tpl);
+        if (selectedTemplates.length >= 3) break;
+      }
+    }
+  }
+
+  const selectedQuests: DailyQuest[] = selectedTemplates.map((tpl, idx) => ({
+    id: `quest_${tpl.templateId}_${dateStr}_${idx}`,
+    templateId: tpl.templateId,
+    title: tpl.title,
+    description: tpl.description,
+    targetCount: tpl.targetCount,
+    currentCount: 0,
+    rewardPoints: tpl.rewardPoints,
+    isClaimed: false,
+    icon: tpl.icon,
+    category: tpl.category,
+    badgeLabel: tpl.badgeLabel,
+  }));
+
+  return [checkinQuest, ...selectedQuests];
 }
 
 export function loadDailyChallengeState(): DailyChallengeState {
-  const today = getTodayString();
-  const yesterday = getYesterdayString();
+  const today = getLocalTodayString();
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed: DailyChallengeState = JSON.parse(raw);
+      const diff = getDaysDifference(parsed.lastLoginDate, today);
 
-      if (parsed.lastLoginDate === today) {
-        // Same day, return current state
+      if (diff === 0) {
+        // Same day: preserve all state and ensure check-in is at least 1/1
+        let updated = false;
+        parsed.quests = parsed.quests.map((q) => {
+          if (q.category === 'login' && q.currentCount < q.targetCount) {
+            updated = true;
+            return { ...q, currentCount: q.targetCount };
+          }
+          return q;
+        });
+        if (updated) saveDailyChallengeState(parsed);
         return parsed;
-      } else if (parsed.lastLoginDate === yesterday) {
-        // Consecutive day! If user claimed yesterday, advance streak pointer or preserve
+      } else if (diff === 1) {
+        // Consecutive day: advance streak if yesterday was claimed
         const nextStreak = parsed.todayStreakClaimed
           ? (parsed.streakDays >= 7 ? 1 : parsed.streakDays + 1)
           : parsed.streakDays;
 
         const refreshed: DailyChallengeState = {
           lastLoginDate: today,
-          streakDays: nextStreak,
+          streakDays: Math.min(7, Math.max(1, nextStreak)),
           todayStreakClaimed: false,
-          totalLoginDays: parsed.totalLoginDays + 1,
-          quests: INITIAL_QUESTS.map((q) => ({ ...q, isClaimed: false, currentCount: q.type === 'login' ? 1 : 0 })),
+          totalLoginDays: (parsed.totalLoginDays || 0) + 1,
+          quests: generateDailyQuests(today),
         };
         saveDailyChallengeState(refreshed);
         return refreshed;
-      } else {
-        // Streak broken (missed more than 1 day) -> Reset streak to 1
+      } else if (diff > 1) {
+        // Streak broken: reset to Day 1
         const refreshed: DailyChallengeState = {
           lastLoginDate: today,
           streakDays: 1,
           todayStreakClaimed: false,
           totalLoginDays: (parsed.totalLoginDays || 0) + 1,
-          quests: INITIAL_QUESTS.map((q) => ({ ...q, isClaimed: false, currentCount: q.type === 'login' ? 1 : 0 })),
+          quests: generateDailyQuests(today),
         };
         saveDailyChallengeState(refreshed);
         return refreshed;
+      } else {
+        // Clock skew backwards: return as-is
+        return parsed;
       }
     }
   } catch (err) {
     console.warn('Error reading daily challenge state:', err);
   }
 
-  // First time ever
+  // First time initialization
   const initial: DailyChallengeState = {
     lastLoginDate: today,
     streakDays: 1,
     todayStreakClaimed: false,
     totalLoginDays: 1,
-    quests: INITIAL_QUESTS.map((q) => ({ ...q })),
+    quests: generateDailyQuests(today),
   };
   saveDailyChallengeState(initial);
   return initial;
@@ -164,6 +331,29 @@ export function saveDailyChallengeState(state: DailyChallengeState) {
   } catch (err) {
     console.warn('Error saving daily challenge state:', err);
   }
+}
+
+export function getUnclaimedRewardsSummary(customState?: DailyChallengeState): UnclaimedRewardSummary {
+  const state = customState || loadDailyChallengeState();
+  const currentStreakDay = Math.min(7, Math.max(1, state.streakDays));
+  const streakReward = STREAK_REWARDS.find((r) => r.day === currentStreakDay) || STREAK_REWARDS[0];
+  const streakRewardClaimable = !state.todayStreakClaimed;
+
+  const unclaimedQuests = state.quests.filter(
+    (q) => !q.isClaimed && q.currentCount >= q.targetCount
+  );
+
+  const questPoints = unclaimedQuests.reduce((sum, q) => sum + q.rewardPoints, 0);
+  const streakPoints = streakRewardClaimable ? streakReward.points : 0;
+
+  return {
+    streakRewardClaimable,
+    streakDay: currentStreakDay,
+    streakReward,
+    unclaimedQuests,
+    unclaimedCount: (streakRewardClaimable ? 1 : 0) + unclaimedQuests.length,
+    totalClaimablePoints: streakPoints + questPoints,
+  };
 }
 
 export function claimDailyStreakReward(): { reward: DailyStreakReward; nextStreak: number } | null {
@@ -182,26 +372,6 @@ export function claimDailyStreakReward(): { reward: DailyStreakReward; nextStrea
   };
 }
 
-export function incrementDailyQuestProgress(type: 'login' | 'match' | 'kill' | 'score', amount: number = 1) {
-  const state = loadDailyChallengeState();
-  let changed = false;
-
-  state.quests = state.quests.map((q) => {
-    if (q.type === type && !q.isClaimed) {
-      const newCount = Math.min(q.targetCount, q.currentCount + amount);
-      if (newCount !== q.currentCount) {
-        changed = true;
-        return { ...q, currentCount: newCount };
-      }
-    }
-    return q;
-  });
-
-  if (changed) {
-    saveDailyChallengeState(state);
-  }
-}
-
 export function claimDailyQuestReward(questId: string): number | null {
   const state = loadDailyChallengeState();
   const quest = state.quests.find((q) => q.id === questId);
@@ -215,10 +385,78 @@ export function claimDailyQuestReward(questId: string): number | null {
   return quest.rewardPoints;
 }
 
-export function hasUnclaimedDailyRewards(state?: DailyChallengeState): boolean {
-  const current = state || loadDailyChallengeState();
-  if (!current.todayStreakClaimed) return true;
-  return current.quests.some((q) => !q.isClaimed && q.currentCount >= q.targetCount);
+export function claimAllUnclaimedRewards(): {
+  totalPoints: number;
+  claimedStreak: boolean;
+  claimedQuestsCount: number;
+  streakReward?: DailyStreakReward;
+} | null {
+  const state = loadDailyChallengeState();
+  let totalPoints = 0;
+  let claimedStreak = false;
+  let streakReward: DailyStreakReward | undefined;
+
+  // 1. Claim streak if available
+  if (!state.todayStreakClaimed) {
+    const currentStreakDay = Math.min(7, Math.max(1, state.streakDays));
+    streakReward = STREAK_REWARDS.find((r) => r.day === currentStreakDay) || STREAK_REWARDS[0];
+    state.todayStreakClaimed = true;
+    totalPoints += streakReward.points;
+    claimedStreak = true;
+  }
+
+  // 2. Claim all eligible quests
+  let claimedQuestsCount = 0;
+  state.quests = state.quests.map((q) => {
+    if (!q.isClaimed && q.currentCount >= q.targetCount) {
+      q.isClaimed = true;
+      totalPoints += q.rewardPoints;
+      claimedQuestsCount++;
+    }
+    return q;
+  });
+
+  if (totalPoints > 0) {
+    saveDailyChallengeState(state);
+    return {
+      totalPoints,
+      claimedStreak,
+      claimedQuestsCount,
+      streakReward,
+    };
+  }
+
+  return null;
+}
+
+export function incrementDailyQuestProgress(
+  category: QuestCategory,
+  amount: number = 1
+): boolean {
+  if (amount <= 0) return false;
+  const state = loadDailyChallengeState();
+  let changed = false;
+
+  state.quests = state.quests.map((q) => {
+    if (q.category === category && !q.isClaimed) {
+      const newCount = Math.min(q.targetCount, q.currentCount + amount);
+      if (newCount !== q.currentCount) {
+        changed = true;
+        return { ...q, currentCount: newCount };
+      }
+    }
+    return q;
+  });
+
+  if (changed) {
+    saveDailyChallengeState(state);
+  }
+  return changed;
+}
+
+export function hasUnclaimedDailyRewards(customState?: DailyChallengeState): boolean {
+  const summary = getUnclaimedRewardsSummary(customState);
+  return summary.unclaimedCount > 0;
 }
 
 export function getSecondsUntilMidnight(): number {
