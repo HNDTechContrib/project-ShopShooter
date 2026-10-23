@@ -54,7 +54,23 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'multiplayer' | 'shooter' | 'leaderboard' | 'powerups'>('multiplayer');
 
   // Combat XP Points & Power-ups
-  const [userDiscountPoints, setUserDiscountPoints] = useState<number>(500); // Combat XP Credits
+  const [userDiscountPoints, setUserDiscountPoints] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('diskon_blaster_user_points');
+      if (saved !== null) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val)) return val;
+      }
+    } catch {}
+    return 500;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('diskon_blaster_user_points', String(userDiscountPoints));
+    } catch {}
+  }, [userDiscountPoints]);
+
   const [powerUpInventory, setPowerUpInventory] = useState<PowerUpItem[]>(INITIAL_POWER_UPS);
 
   // Leaderboard
@@ -171,6 +187,7 @@ export default function App() {
         isOpen={isDailyModalOpen}
         onClose={() => setIsDailyModalOpen(false)}
         onAddDiscountPoints={handleAddDiscountPoints}
+        themeMode={themeMode}
       />
 
       {/* Dynamic Siren & Special Notification Toast */}

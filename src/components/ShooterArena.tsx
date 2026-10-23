@@ -20,6 +20,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { incrementDailyQuestProgress } from '../utils/dailyChallenge';
 
 interface ShooterArenaProps {
   userDiscountPoints: number;
@@ -125,6 +126,10 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
       maxCombo: statsTrackerRef.current.maxCombo,
     });
     onAddDiscountPoints(roundScore);
+
+    // Progress daily quests on genuine shooter round completion
+    incrementDailyQuestProgress('shooter', 1);
+    incrementDailyQuestProgress('score', roundScore);
 
     if (roundScore > 400) {
       soundEngine.playCheckoutSuccess();
@@ -486,6 +491,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
             } else {
               // Destroyed completely!
               statsTrackerRef.current.hits += 1;
+              incrementDailyQuestProgress('target_hit', 1);
               if (target.type === 'special_gold') {
                 statsTrackerRef.current.specialHits += 1;
               }
@@ -922,42 +928,42 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
       {/* Round Summary Modal */}
       {showSummaryModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+          <div className={`${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} rounded-2xl max-w-md w-full p-6 shadow-2xl border animate-in fade-in zoom-in-95 duration-200`}>
             <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-600">
               <Sparkles className="w-7 h-7" />
             </div>
 
-            <h3 className="text-xl font-bold text-center text-slate-900 mb-1">
+            <h3 className={`text-xl font-bold text-center ${isDark ? 'text-white' : 'text-slate-900'} mb-1`}>
               Ronde Selesai!
             </h3>
-            <p className="text-xs text-center text-slate-500 mb-6">
+            <p className={`text-xs text-center ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-6`}>
               Hasil bidikan tembakan produk diskon kamu telah tersimpan.
             </p>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 space-y-3">
+            <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} rounded-xl p-4 mb-6 space-y-3`}>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Poin Berhasil Didapat:</span>
-                <span className="font-extrabold text-emerald-600 font-mono-numbers text-lg">
+                <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Poin Berhasil Didapat:</span>
+                <span className="font-extrabold text-emerald-500 font-mono-numbers text-lg">
                   +{lastRoundStats.score} Poin
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Nilai Potongan Belanja:</span>
-                <span className="font-bold text-slate-900">
+                <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Nilai Potongan Belanja:</span>
+                <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {formatRupiah(lastRoundStats.score * POINT_TO_RUPIAH_RATIO)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Target Berhasil Ditembak:</span>
-                <span className="font-semibold text-slate-800">{lastRoundStats.hits} Target</span>
+                <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Berhasil Ditembak:</span>
+                <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{lastRoundStats.hits} Target</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Target Spesial Tertembak:</span>
-                <span className="font-semibold text-amber-600">{lastRoundStats.specialHits} Emas</span>
+                <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Spesial Tertembak:</span>
+                <span className="font-semibold text-amber-500">{lastRoundStats.specialHits} Emas</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">Streak Combo Tertinggi:</span>
-                <span className="font-semibold text-orange-600">{lastRoundStats.maxCombo}x Hit</span>
+                <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Streak Combo Tertinggi:</span>
+                <span className="font-semibold text-orange-500">{lastRoundStats.maxCombo}x Hit</span>
               </div>
             </div>
 

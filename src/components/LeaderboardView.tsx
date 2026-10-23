@@ -55,7 +55,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8 pb-12">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 md:p-8 border border-slate-700 shadow-2xl relative overflow-hidden">
+      <div className={`${isDark ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white border-slate-700' : 'bg-gradient-to-br from-white via-indigo-50 to-indigo-100 text-slate-900 border-indigo-200'} rounded-3xl p-6 md:p-8 border shadow-2xl relative overflow-hidden`}>
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -64,23 +64,23 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               <Trophy className="w-4 h-4" />
               <span>Kompetisi Mingguan DiskonBlaster</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+            <h2 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Papan Peringkat Global
             </h2>
-            <p className="text-sm text-slate-300 mt-1 max-w-lg">
+            <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'} mt-1 max-w-lg`}>
               Tembak target sebanyak-banyaknya di Arena Shooter. Raih posisi 3 besar setiap hari Minggu pukul 23:59 WIB untuk menangkan voucher belanja hingga 90%!
             </p>
           </div>
 
-          <div className="bg-slate-800/90 border border-slate-700/80 px-5 py-3.5 rounded-2xl flex items-center gap-4 shrink-0 shadow-inner">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <div className={`${isDark ? 'bg-slate-800/90 border-slate-700/80' : 'bg-white/80 border-slate-200'} px-5 py-3.5 rounded-2xl flex items-center gap-4 shrink-0 shadow-inner border`}>
+            <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'} border border-amber-500/30 flex items-center justify-center`}>
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] uppercase tracking-wider text-slate-400 block font-semibold">
+              <span className={`text-[11px] uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'} block font-semibold`}>
                 Reset Peringkat Dalam
               </span>
-              <span className="text-lg font-extrabold text-white font-mono-numbers">
+              <span className={`text-lg font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} font-mono-numbers`}>
                 2 Hari 14 Jam 28 Menit
               </span>
             </div>
@@ -88,14 +88,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         </div>
 
         {/* User Submission Form Strip */}
-        <div className="mt-6 pt-6 border-t border-slate-700/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className={`mt-6 pt-6 border-t ${isDark ? 'border-slate-700/60' : 'border-slate-200'} flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4`}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+            <div className={`w-9 h-9 rounded-xl ${isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'} flex items-center justify-center font-bold`}>
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xs text-slate-400">Skor Tertinggi Kamu:</span>
-              <div className="text-base font-extrabold text-white font-mono-numbers">
+              <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Skor Tertinggi Kamu:</span>
+              <div className={`text-base font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} font-mono-numbers`}>
                 {currentUserScore} Poin Diskon
               </div>
             </div>
@@ -108,7 +108,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               onChange={(e) => setInputName(e.target.value)}
               placeholder="Masukkan Nickname Kamu"
               maxLength={20}
-              className="bg-slate-900 border border-slate-700 text-white text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-amber-400 placeholder-slate-500 w-44 sm:w-56"
+              className={`${isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'} border text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-amber-500 w-44 sm:w-56`}
             />
             <button
               type="submit"
@@ -203,7 +203,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   {/* Username & Badge */}
                   <div className="col-span-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm truncate">
+                      <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-sm truncate`}>
                         {entry.username}
                       </span>
                       {entry.isCurrentUser && (
@@ -212,17 +212,17 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-slate-500 block truncate">
+                    <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} block truncate`}>
                       {entry.badge} · {entry.date}
                     </span>
                   </div>
 
                   {/* Score */}
                   <div className="col-span-3 text-right">
-                    <span className="font-extrabold text-slate-900 text-base font-mono-numbers">
+                    <span className={`font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} text-base font-mono-numbers`}>
                       {entry.score.toLocaleString('id-ID')}
                     </span>
-                    <span className="text-[11px] text-slate-500 block">Poin</span>
+                    <span className={`text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-500'} block`}>Poin</span>
                   </div>
 
                   {/* Reward Tier */}
@@ -241,56 +241,56 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       {/* Rewards Tab */}
       {activeTab === 'rewards' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-b from-amber-50 to-white border-2 border-amber-300 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center mb-4 shadow-lg shadow-amber-400/25">
-              <Crown className="w-7 h-7 fill-slate-950" />
+          <div className={`${isDark ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-amber-900' : 'bg-gradient-to-b from-amber-50 to-white border-amber-300'} border-2 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center`}>
+            <div className={`w-14 h-14 rounded-2xl ${isDark ? 'bg-amber-900 text-amber-500' : 'bg-amber-400 text-slate-950'} flex items-center justify-center mb-4 shadow-lg`}>
+              <Crown className="w-7 h-7 fill-current" />
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-500">
               Juara 1 Mingguan
             </span>
-            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+            <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
               Voucher Diskon 90%
             </h3>
-            <p className="text-xs text-slate-600 mb-4">
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
               Maksimum potongan hingga Rp 1.000.000 untuk belanja semua produk di katalog + Gelar Emas Juara Nasional.
             </p>
-            <div className="mt-auto w-full pt-4 border-t border-amber-200 text-xs font-bold text-amber-800">
+            <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-amber-900' : 'border-amber-200'} text-xs font-bold text-amber-500`}>
               1 Pemenang Tiap Minggu
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-slate-50 to-white border border-slate-300 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-300 text-slate-800 flex items-center justify-center mb-4 shadow-sm">
+          <div className={`${isDark ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-slate-700' : 'bg-gradient-to-b from-slate-50 to-white border-slate-300'} border rounded-2xl p-6 shadow-sm flex flex-col items-center text-center`}>
+            <div className={`w-14 h-14 rounded-2xl ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-300 text-slate-800'} flex items-center justify-center mb-4 shadow-sm`}>
               <Medal className="w-7 h-7" />
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+            <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               Peringkat 2 &amp; 3
             </span>
-            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+            <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
               Voucher Diskon 70% &amp; 50%
             </h3>
-            <p className="text-xs text-slate-600 mb-4">
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
               Potongan langsung hingga Rp 500.000 dan Rp 300.000 saat checkout belanja.
             </p>
-            <div className="mt-auto w-full pt-4 border-t border-slate-200 text-xs font-bold text-slate-700">
+            <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'} text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-700'}`}>
               2 Pemenang Tiap Minggu
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-blue-50 to-white border border-blue-200 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-4 shadow-sm">
+          <div className={`${isDark ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-blue-900' : 'bg-gradient-to-b from-blue-50 to-white border-blue-200'} border rounded-2xl p-6 shadow-sm flex flex-col items-center text-center`}>
+            <div className={`w-14 h-14 rounded-2xl ${isDark ? 'bg-blue-900 text-blue-400' : 'bg-blue-500 text-white'} flex items-center justify-center mb-4 shadow-sm`}>
               <Gift className="w-7 h-7" />
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-500">
               Top 4 s/d 10 Elite
             </span>
-            <h3 className="text-2xl font-black text-slate-900 mt-1 mb-2">
+            <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
               Voucher 30% + 500 Koin
             </h3>
-            <p className="text-xs text-slate-600 mb-4">
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
               Tambahan modal koin diskon dan voucher hemat 30% untuk seluruh peserta sepuluh besar.
             </p>
-            <div className="mt-auto w-full pt-4 border-t border-blue-100 text-xs font-bold text-blue-800">
+            <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-blue-900' : 'border-blue-100'} text-xs font-bold text-blue-500`}>
               7 Pemenang Tiap Minggu
             </div>
           </div>
