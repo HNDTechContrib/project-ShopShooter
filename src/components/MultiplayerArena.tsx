@@ -44,7 +44,6 @@ import {
   Volume2,
   VolumeX,
   Crosshair,
-  Keyboard,
   Sparkles,
   ArrowRight,
   Maximize2,
@@ -55,7 +54,6 @@ import {
   Trees,
   Flame,
   Heart,
-  Smartphone,
   Compass,
   Target,
   Skull,
@@ -3712,32 +3710,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-500">MERAH</span>
             <span className="text-base md:text-xl leading-none font-mono-numbers">{hudRedScore}</span>
           </div>
-
-          {/* Control Mode Toggle (Touch vs Keyboard/Mouse) */}
-          <button
-            onClick={inputDevice.toggleVirtualControls}
-            className={`p-1.5 md:p-2.5 rounded-xl border transition-colors flex items-center gap-1.5 ${
-              showVirtualControls
-                ? isDark
-                  ? 'bg-cyan-500/20 border-cyan-500/50 hover:bg-cyan-500/30 text-cyan-300'
-                  : 'bg-cyan-100 border-cyan-300 hover:bg-cyan-200 text-cyan-800 shadow-xs'
-                : isDark
-                  ? 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300'
-                  : 'bg-slate-100 border-slate-300 hover:bg-slate-200 text-slate-700 shadow-xs'
-            }`}
-            title={`Mode Kontrol: ${showVirtualControls ? 'Layar Sentuh (Virtual Joystick Aktif)' : 'Keyboard & Mouse (Desktop)'}. Klik untuk beralih mode.`}
-            aria-label="Ganti Mode Kontrol"
-          >
-            {showVirtualControls ? (
-              <Smartphone className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
-            ) : (
-              <Keyboard className="w-4 h-4 md:w-5 md:h-5 text-slate-300" />
-            )}
-            <span className="hidden xl:inline text-[10px] font-bold">
-              {showVirtualControls ? 'Sentuh' : 'PC'}
-            </span>
-          </button>
-
           {/* Customizer Button in Header */}
           <button
             onClick={() => setShowCustomizerModal(true)}
@@ -3894,7 +3866,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* MOBILE ON-SCREEN TOUCH CONTROLS (ONLY ON TOUCH-CAPABLE DEVICES / TOUCH MODE) */}
         {showVirtualControls && matchStatus === 'playing' && hudRespawnTimer === 0 && (
-          <div className="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-3 sm:p-5 md:p-6 select-none touch-none">
+          <div className="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-2.5 sm:p-4 md:p-6 select-none touch-none">
             {/* Left: Virtual Movement Joystick */}
             <div className="pointer-events-auto flex flex-col items-center">
               <div
@@ -3902,28 +3874,28 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 onTouchMove={handleJoyTouchMove}
                 onTouchEnd={handleJoyTouchEnd}
                 onTouchCancel={handleJoyTouchEnd}
-                className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700/80 flex items-center justify-center touch-none shadow-2xl active:border-cyan-400"
+                className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-34 md:h-34 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700/80 flex items-center justify-center touch-none shadow-2xl active:border-cyan-400"
               >
                 {/* Center crosshair mark */}
                 <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
                 {/* Floating Knob */}
                 <div
-                  className="absolute w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
+                  className="absolute w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
                   style={{
                     transform: `translate(${joyKnobPos.x}px, ${joyKnobPos.y}px)`,
                   }}
                 >
-                  <Compass className="w-5 h-5 text-white/90" />
+                  <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-white/90" />
                 </div>
               </div>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1.5 bg-slate-950/80 px-2 py-0.5 rounded-full border border-slate-800">
+              <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 bg-slate-950/80 px-2 py-0.5 rounded-full border border-slate-800">
                 🕹️ Gerak 360°
               </span>
             </div>
 
             {/* Right: Aim Touch Pad, Shoot Button & Dash */}
-            <div className="pointer-events-auto flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2 mb-1">
+            <div className="pointer-events-auto flex flex-col items-end gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-2 mb-0.5">
                 {/* Dash / Evade Button */}
                 <button
                   onClick={triggerDash}
@@ -3932,7 +3904,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     triggerDash();
                   }}
                   disabled={hudDashCooldown > 0}
-                  className={`px-3.5 py-1.5 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1.5 shadow-md ${
+                  className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[9px] sm:text-[10px] font-bold border transition-all flex items-center gap-1.5 shadow-md ${
                     hudDashCooldown > 0
                       ? 'bg-slate-800/80 border-slate-700 text-slate-400 opacity-70'
                       : 'bg-emerald-500/25 border-emerald-400 text-emerald-300 hover:bg-emerald-500/35 active:scale-90'
@@ -3944,17 +3916,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               </div>
 
               {/* Aim Touch Pad and Big Shoot Button */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {/* Touch Aim Wheel */}
                 <div
                   onTouchStart={handleAimTouchStart}
                   onTouchMove={handleAimTouchMove}
                   onTouchEnd={handleAimTouchEnd}
                   onTouchCancel={handleAimTouchEnd}
-                  className="w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700 flex flex-col items-center justify-center touch-none text-slate-400 active:border-rose-400 shadow-xl"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700 flex flex-col items-center justify-center touch-none text-slate-400 active:border-rose-400 shadow-xl"
                 >
-                  <Crosshair className="w-6 h-6 text-slate-400" />
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">BIDIK</span>
+                  <Crosshair className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
+                  <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">BIDIK</span>
                 </div>
 
                 {/* Big Ergonomic FIRE Button */}
@@ -3980,10 +3952,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onMouseUp={() => {
                     isMouseDown.current = false;
                   }}
-                  className="w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-3 sm:border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
                 >
-                  <Flame className="w-6 h-6 fill-white" />
-                  <span className="text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
+                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+                  <span className="text-[8px] sm:text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
                 </button>
               </div>
             </div>

@@ -1,34 +1,36 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export type InputMode = 'keyboard_mouse' | 'touch';
-export type ControlPreference = 'auto' | 'keyboard_mouse' | 'touch';
 
 export interface DeviceInputCapabilities {
   hasTouch: boolean;
-  hasPointerFine: boolean;
   hasPointerCoarse: boolean;
+  hasPointerFine: boolean;
   canHover: boolean;
   isHybrid: boolean;
+  isPortrait: boolean;
   activeInputMode: InputMode;
-  controlPreference: ControlPreference;
   showVirtualControls: boolean;
-  setControlPreference: (pref: ControlPreference) => void;
-  toggleVirtualControls: () => void;
   notifyTouchEvent: () => void;
 }
 
 /**
- * Hook to intelligently detect device capabilities (touch vs keyboard/mouse)
- * Handles desktop, laptops, smartphones, tablets, and touchscreen hybrid laptops.
+ * Intelligent automatic input detection for ShopShooter:
+ * - Detects touch primary devices (mobile phones & tablets) via pointer: coarse or maxTouchPoints > 0.
+ * - Displays touch controls (virtual joystick + action buttons) on touch devices and hides keyboard hints.
+ * - Activates keyboard/mouse controls on desktop devices and hides virtual controls.
+ * - For hybrid devices (touchscreen laptops), automatically detects based on the last used input event:
+ *   - keydown or mousemove -> switches to desktop mode (hides virtual controls)
+ *   - touchstart -> switches to touch mode (shows virtual controls)
+ * - Transitions seamlessly without buttons, reloads, or manual toggles.
+ * - Updates on 'resize' and 'orientationchange' to keep layout accurate.
  */
 export function useInputDevice(): DeviceInputCapabilities {
-  // Query hardware capabilities accurately
-  const checkHardwareTouch = (): boolean => {
-    if (typeof window === 'undefined') return false;
+  const checkTouchPoints = (): boolean => {
+    if (typeof navigator === 'undefined') return false;
     return (
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0 ||
-      ((navigator as any).msMaxTouchPoints && (navigator as any).msMaxTouchPoints > 0)
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+      Boolean((navigator as any).msMaxTouchPoints && (navigator as any).msMaxTouchPoints > 0)
     );
   };
 
@@ -47,132 +49,132 @@ export function useInputDevice(): DeviceInputCapabilities {
     return window.matchMedia('(hover: hover)').matches;
   };
 
-  const [capabilities, setCapabilities] = useState(() => {
-    const hasTouch = checkHardwareTouch();
+  const checkIsPortrait = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    if (window.screen?.orientation?.type) {
+      return window.screen.orientation.type.includes('portrait');
+    }
+    return window.innerHeight > window.innerWidth;
+  };
+
+  // Initial detection: touch device if pointer is coarse or has touch points
+  const [activeInputMode, setActiveInputMode] = useState<InputMode>(() => {
+    if (typeof window === 'undefined') return 'keyboard_mouse';
+    const isCoarse = window.matchMedia ? window.matchMedia('(pointer: coarse)').matches : false;
+    const hasPoints = typeof navigator !== 'undefined' && (
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+      Boolean((navigator as any).msMaxTouchPoints && (navigator as any).msMaxTouchPoints > 0)
+    );
+    const hasTouchStart = 'ontouchstart' in window;
+
+    // Mobile / Tablet touchscreens initialize directly in touch mode
+    if (isCoarse || hasPoints || hasTouchStart) {
+      return 'touch';
+    }
+    return 'keyboard_mouse';
+  });
+
+  const [deviceCaps, setDeviceCaps] = useState(() => {
+    const hasTouch = checkTouchPoints() || ('ontouchstart' in (typeof window !== 'undefined' ? window : {}));
     const hasPointerCoarse = checkPointerCoarse();
     const hasPointerFine = checkPointerFine();
     const canHover = checkCanHover();
-    // Hybrid device: has touchscreen capability AND a fine pointer / mouse / touchpad
-    const isHybrid = hasTouch && (hasPointerFine || canHover);
+    const isHybrid = (hasTouch || hasPointerCoarse) && (hasPointerFine || canHover);
+    const isPortrait = checkIsPortrait();
 
     return {
-      hasTouch,
+      hasTouch: Boolean(hasTouch || hasPointerCoarse),
       hasPointerCoarse,
       hasPointerFine,
       canHover,
       isHybrid,
+      isPortrait,
     };
   });
 
-  // Stored user preference: 'auto' | 'keyboard_mouse' | 'touch'
-  const [controlPreference, setControlPreferenceState] = useState<ControlPreference>(() => {
-    try {
-      const saved = localStorage.getItem('shopshooter_control_pref');
-      if (saved === 'keyboard_mouse' || saved === 'touch' || saved === 'auto') {
-        return saved;
-      }
-    } catch {}
-    return 'auto';
-  });
+  // Track timestamp of last touch interaction to prevent synthetic mousemove events from immediately reverting mode
+  const lastTouchTimeRef = useRef<number>(0);
 
-  // Dynamic state when touch event actually occurs at runtime
-  const [detectedRuntimeTouch, setDetectedRuntimeTouch] = useState<boolean>(false);
-
-  // Update capabilities on media query changes (e.g. tablet docked, external mouse connected)
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
+    if (typeof window === 'undefined') return;
 
-    const coarseQuery = window.matchMedia('(pointer: coarse)');
-    const fineQuery = window.matchMedia('(pointer: fine)');
-    const hoverQuery = window.matchMedia('(hover: hover)');
+    // On touch event: switch to touch mode immediately
+    const handleTouchStart = () => {
+      lastTouchTimeRef.current = Date.now();
+      setActiveInputMode((current) => (current !== 'touch' ? 'touch' : current));
+    };
 
-    const updateCapabilities = () => {
-      const hasTouch = checkHardwareTouch();
-      const hasPointerCoarse = coarseQuery.matches;
-      const hasPointerFine = fineQuery.matches;
-      const canHover = hoverQuery.matches;
-      const isHybrid = hasTouch && (hasPointerFine || canHover);
+    // On keyboard event: switch to desktop mode immediately
+    const handleKeyDown = () => {
+      setActiveInputMode((current) => (current !== 'keyboard_mouse' ? 'keyboard_mouse' : current));
+    };
 
-      setCapabilities({
-        hasTouch,
+    // On mouse move: switch to desktop mode (safeguarded against synthetic touch-generated mousemove)
+    const handleMouseMove = (e: MouseEvent) => {
+      // Ignore synthetic mousemove within 650ms after touch
+      if (Date.now() - lastTouchTimeRef.current < 650) {
+        return;
+      }
+      // Ignore static mouse movements (some browsers fire mousemove with 0 delta on tap)
+      if (e.movementX === 0 && e.movementY === 0) {
+        return;
+      }
+      setActiveInputMode((current) => (current !== 'keyboard_mouse' ? 'keyboard_mouse' : current));
+    };
+
+    // Screen resize and orientation change handler
+    const handleScreenChange = () => {
+      const hasTouch = checkTouchPoints() || ('ontouchstart' in window);
+      const hasPointerCoarse = checkPointerCoarse();
+      const hasPointerFine = checkPointerFine();
+      const canHover = checkCanHover();
+      const isHybrid = (hasTouch || hasPointerCoarse) && (hasPointerFine || canHover);
+      const isPortrait = checkIsPortrait();
+
+      setDeviceCaps({
+        hasTouch: Boolean(hasTouch || hasPointerCoarse),
         hasPointerCoarse,
         hasPointerFine,
         canHover,
         isHybrid,
+        isPortrait,
       });
+
+      // If switched to pure touch screen device without fine pointer on resize/orientation
+      if (hasPointerCoarse && !hasPointerFine && !canHover) {
+        setActiveInputMode('touch');
+      }
     };
 
-    coarseQuery.addEventListener?.('change', updateCapabilities);
-    fineQuery.addEventListener?.('change', updateCapabilities);
-    hoverQuery.addEventListener?.('change', updateCapabilities);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('resize', handleScreenChange);
+    window.addEventListener('orientationchange', handleScreenChange);
+
+    // Initial orientation/screen check
+    handleScreenChange();
 
     return () => {
-      coarseQuery.removeEventListener?.('change', updateCapabilities);
-      fineQuery.removeEventListener?.('change', updateCapabilities);
-      hoverQuery.removeEventListener?.('change', updateCapabilities);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleScreenChange);
+      window.removeEventListener('orientationchange', handleScreenChange);
     };
   }, []);
 
-  // Set control preference and persist
-  const setControlPreference = useCallback((pref: ControlPreference) => {
-    setControlPreferenceState(pref);
-    try {
-      localStorage.setItem('shopshooter_control_pref', pref);
-    } catch {}
-  }, []);
-
-  // When a touch interaction happens on the arena, record runtime touch
   const notifyTouchEvent = useCallback(() => {
-    if (!detectedRuntimeTouch) {
-      setDetectedRuntimeTouch(true);
-    }
-  }, [detectedRuntimeTouch]);
-
-  // Determine active input mode
-  let activeInputMode: InputMode = 'keyboard_mouse';
-
-  if (controlPreference === 'touch') {
-    activeInputMode = 'touch';
-  } else if (controlPreference === 'keyboard_mouse') {
-    activeInputMode = 'keyboard_mouse';
-  } else {
-    // 'auto' mode:
-    // If no hardware touch at all -> desktop (keyboard/mouse)
-    if (!capabilities.hasTouch) {
-      activeInputMode = 'keyboard_mouse';
-    } 
-    // Pure touch device (smartphone or tablet with coarse pointer and no hover)
-    else if (capabilities.hasPointerCoarse && !capabilities.canHover) {
-      activeInputMode = 'touch';
-    }
-    // Hybrid laptop with touch and mouse:
-    // If runtime touch was detected, or coarse is primary and no fine pointer -> touch
-    // Otherwise default to keyboard_mouse so desktop arena stays clean!
-    else if (capabilities.isHybrid) {
-      if (detectedRuntimeTouch) {
-        activeInputMode = 'touch';
-      } else {
-        activeInputMode = 'keyboard_mouse';
-      }
-    } else {
-      activeInputMode = capabilities.hasTouch ? 'touch' : 'keyboard_mouse';
-    }
-  }
+    lastTouchTimeRef.current = Date.now();
+    setActiveInputMode((current) => (current !== 'touch' ? 'touch' : current));
+  }, []);
 
   const showVirtualControls = activeInputMode === 'touch';
 
-  const toggleVirtualControls = useCallback(() => {
-    const nextPref: ControlPreference = showVirtualControls ? 'keyboard_mouse' : 'touch';
-    setControlPreference(nextPref);
-  }, [showVirtualControls, setControlPreference]);
-
   return {
-    ...capabilities,
+    ...deviceCaps,
     activeInputMode,
-    controlPreference,
     showVirtualControls,
-    setControlPreference,
-    toggleVirtualControls,
     notifyTouchEvent,
   };
 }
