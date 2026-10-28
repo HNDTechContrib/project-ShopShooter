@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LeaderboardEntry } from '../types';
 import { 
   Trophy, 
@@ -38,6 +38,68 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const [inputName, setInputName] = useState<string>(currentUsername);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
+  const [timeLeft, setTimeLeft] = useState<number>(() => {
+    const getNextSundayWIB = () => {
+      const now = new Date();
+      const wibOffset = 7 * 60 * 60 * 1000;
+      const nowWIB = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000 + wibOffset);
+      const dayOfWeek = nowWIB.getDay();
+      let daysUntilSunday = (7 - dayOfWeek) % 7;
+      if (daysUntilSunday === 0) {
+        const hours = nowWIB.getHours();
+        const minutes = nowWIB.getMinutes();
+        const seconds = nowWIB.getSeconds();
+        if (hours * 3600 + minutes * 60 + seconds >= 23 * 3600 + 59 * 60 + 59) {
+          daysUntilSunday = 7;
+        }
+      }
+      const targetWIB = new Date(nowWIB);
+      targetWIB.setDate(targetWIB.getDate() + daysUntilSunday);
+      targetWIB.setHours(23, 59, 59, 0);
+      return targetWIB.getTime() - nowWIB.getTime();
+    };
+    return getNextSundayWIB();
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const getNextSundayWIB = () => {
+        const now = new Date();
+        const wibOffset = 7 * 60 * 60 * 1000;
+        const nowWIB = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000 + wibOffset);
+        const dayOfWeek = nowWIB.getDay();
+        let daysUntilSunday = (7 - dayOfWeek) % 7;
+        if (daysUntilSunday === 0) {
+          const hours = nowWIB.getHours();
+          const minutes = nowWIB.getMinutes();
+          const seconds = nowWIB.getSeconds();
+          if (hours * 3600 + minutes * 60 + seconds >= 23 * 3600 + 59 * 60 + 59) {
+            daysUntilSunday = 7;
+          }
+        }
+        const targetWIB = new Date(nowWIB);
+        targetWIB.setDate(targetWIB.getDate() + daysUntilSunday);
+        targetWIB.setHours(23, 59, 59, 0);
+        return targetWIB.getTime() - nowWIB.getTime();
+      };
+      const diff = getNextSundayWIB();
+      setTimeLeft(diff > 0 ? diff : 0);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatCountdown = (ms: number) => {
+    if (ms <= 0) return '0:00:00:00';
+    const totalSeconds = Math.floor(ms / 1000);
+    const days = Math.floor(totalSeconds / (3600 * 24));
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${days}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputName.trim()) return;
@@ -69,7 +131,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               Papan Peringkat Global
             </h2>
             <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'} mt-1 max-w-lg`}>
-              Tembak target sebanyak-banyaknya di Arena Shooter. Raih posisi 3 besar setiap hari Minggu pukul 23:59 WIB untuk menangkan voucher belanja hingga 90%!
+              Tembak target sebanyak-banyaknya di Arena Shooter. Raih posisi 3 besar setiap hari Minggu pukul 23:59 WIB untuk memenangkan voucher belanja.
             </p>
           </div>
 
@@ -82,7 +144,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 Reset Peringkat Dalam
               </span>
               <span className={`text-lg font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} font-mono-numbers`}>
-                2 Hari 14 Jam 28 Menit
+                {formatCountdown(timeLeft)}
               </span>
             </div>
           </div>

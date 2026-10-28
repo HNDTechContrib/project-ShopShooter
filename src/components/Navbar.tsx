@@ -43,12 +43,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onSelectTab('multiplayer')}
           className="text-lg font-black tracking-tight whitespace-nowrap shrink-0 flex items-center gap-2.5 hover:opacity-90 transition-opacity"
         >
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-emerald-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-cyan-500/20 border border-cyan-400/30">
-            <Shield className="w-5 h-5 fill-current" />
+          <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-amber-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-cyan-500/20 border border-cyan-400/30">
+            <Swords className="w-5 h-5 fill-current" />
           </span>
           <div className="flex flex-col text-left">
             <span className={`text-base font-black tracking-wider uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              TANK ARENA
+              SHOPSHOOTER
             </span>
             <span className="text-[9.5px] font-extrabold tracking-widest uppercase text-cyan-500">
               SKY CLASH TDM

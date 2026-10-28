@@ -42,11 +42,14 @@ export const renderPassSystem = ({
   isDark,
   isLocalPlayer,
 }: RenderPassParams) => {
-  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme];
+  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme] || MAP_THEMES_CONFIG['mall'];
 
-  if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+  const displayWidth = canvas.clientWidth > 0 ? canvas.clientWidth : 1200;
+  const displayHeight = canvas.clientHeight > 0 ? canvas.clientHeight : 800;
+
+  if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
   }
 
   ctx.save();
@@ -206,6 +209,7 @@ export const renderPassSystem = ({
 
   // 8. Players
   sim.players.forEach((p) => {
+    if (p.isRespawning) return;
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.angle);
@@ -222,7 +226,7 @@ export const renderPassSystem = ({
       ctx.stroke();
     }
 
-    ctx.fillStyle = p.color;
+    ctx.fillStyle = p.customization?.primaryColor || p.color;
     ctx.beginPath();
     ctx.roundRect(-22, -18, 36, 36, 10);
     ctx.fill();

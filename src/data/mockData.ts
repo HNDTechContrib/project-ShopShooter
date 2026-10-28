@@ -143,7 +143,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1840,
     date: '14 Okt 2026',
     badge: '👑 Juara 1 Nasional',
-    rewardTier: 'Kupon Diskon 90% (Maks Rp 1.000.000)',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 2,
@@ -151,7 +151,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1620,
     date: '15 Okt 2026',
     badge: '🥈 Peringkat 2',
-    rewardTier: 'Kupon Diskon 70% (Maks Rp 500.000)',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 3,
@@ -159,7 +159,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1490,
     date: '13 Okt 2026',
     badge: '🥉 Peringkat 3',
-    rewardTier: 'Kupon Diskon 50% (Maks Rp 300.000)',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 4,
@@ -167,7 +167,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1280,
     date: '15 Okt 2026',
     badge: '🎖️ Top 10 Elite',
-    rewardTier: 'Kupon Diskon 30% + 500 Koin',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 5,
@@ -175,7 +175,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1150,
     date: '14 Okt 2026',
     badge: '🎖️ Top 10 Elite',
-    rewardTier: 'Kupon Diskon 30% + 500 Koin',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 6,
@@ -183,7 +183,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 1040,
     date: '12 Okt 2026',
     badge: '🎖️ Top 10 Elite',
-    rewardTier: 'Kupon Diskon 30% + 500 Koin',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 7,
@@ -191,7 +191,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 960,
     date: '15 Okt 2026',
     badge: '🎖️ Top 10 Elite',
-    rewardTier: 'Kupon Diskon 30% + 500 Koin',
+    rewardTier: 'Mendapatkan Voucher',
   },
   {
     rank: 8,
@@ -199,7 +199,7 @@ export const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
     score: 890,
     date: '11 Okt 2026',
     badge: '🎖️ Top 10 Elite',
-    rewardTier: 'Kupon Diskon 30% + 500 Koin',
+    rewardTier: 'Mendapatkan Voucher',
   },
 ];
 
