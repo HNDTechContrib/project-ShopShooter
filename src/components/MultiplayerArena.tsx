@@ -16,6 +16,7 @@ import { CharacterCustomizerModal } from './CharacterCustomizerModal';
 import { MapSelectorModal, MAP_CATALOG } from './MapSelectorModal';
 import { ArenaLobbyView } from './arena/ArenaLobbyView';
 import { ArenaMatchResultModal, ArenaMatchResultStats } from './arena/ArenaMatchResultModal';
+import { LobbyLightParticles } from './arena/LobbyLightParticles';
 import { 
   renderArenaPerimeter, 
   renderArenaFloor, 
@@ -2333,7 +2334,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         {/* Lobby Overlay */}
         {inLobby && (
           <div 
-            className={`w-full flex flex-col items-center justify-center p-1 sm:p-2 transition-all duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`} 
+            className={`w-full flex flex-col items-center justify-center p-1 sm:p-2 transition-all duration-300 relative overflow-hidden ${isDark ? 'text-white' : 'text-slate-900'}`} 
             style={{
               backgroundImage: `
                 linear-gradient(135deg, ${
@@ -2355,6 +2356,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               `
             }}
           >
+            <LobbyLightParticles isDark={isDark} />
             <ArenaLobbyView
               isDark={isDark}
               gameModeType={gameModeType}
