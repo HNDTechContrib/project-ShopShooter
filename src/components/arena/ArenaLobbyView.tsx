@@ -11,6 +11,7 @@ import { MultiplayerRoomPanel } from './MultiplayerRoomPanel';
 import { SoloLobbyPanel } from './SoloLobbyPanel';
 import { LobbyMapShowcase } from './LobbyMapShowcase';
 import { LobbyFooterControls } from './LobbyFooterControls';
+import { TankThumbnailCanvas } from '../customizer/TankThumbnailCanvas';
 
 interface ArenaLobbyViewProps {
   isDark: boolean;
@@ -149,8 +150,8 @@ export const ArenaLobbyView: React.FC<ArenaLobbyViewProps> = ({
               isDark ? 'bg-slate-950/70 hover:bg-slate-800 border-slate-800 text-white' : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-900'
             }`}
           >
-            <div className="w-8 h-8 rounded-xl bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
-              <img src={activeMap.image} alt="Avatar Preview" className="w-full h-full object-cover" />
+            <div className="w-9 h-9 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 border border-slate-800 shadow-inner overflow-hidden p-0.5">
+              <TankThumbnailCanvas customization={characterCustomization} size={34} />
             </div>
             <div className="min-w-0 flex-1">
               <span className="text-[9px] font-bold text-slate-400 uppercase block leading-none mb-0.5">

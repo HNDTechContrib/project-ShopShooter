@@ -15,6 +15,7 @@ import { POINT_TO_RUPIAH_RATIO, formatRupiah } from '../data/mockData';
 import { CharacterCustomizerModal } from './CharacterCustomizerModal';
 import { MapSelectorModal, MAP_CATALOG } from './MapSelectorModal';
 import { ArenaLobbyView } from './arena/ArenaLobbyView';
+import { ArenaMatchResultModal, ArenaMatchResultStats } from './arena/ArenaMatchResultModal';
 import { 
   renderArenaPerimeter, 
   renderArenaFloor, 
@@ -287,6 +288,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const [hudActiveSkill, setHudActiveSkill] = useState<{ type: InGameSkillType; label: string; timeLeft: number } | null>(null);
   const [hudKillFeed, setHudKillFeed] = useState<{ id: string; text: string; team: TeamId }[]>([]);
   const [hudRespawnTimer, setHudRespawnTimer] = useState<number>(0);
+  const matchAwardGivenRef = useRef<boolean>(false);
+  const [matchResultStats, setMatchResultStats] = useState<ArenaMatchResultStats | null>(null);
 
   // Intelligent Device Input Detection (Mobile Touch vs Desktop Keyboard/Mouse)
   const inputDevice = useInputDevice();
@@ -391,7 +394,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       vx: Math.cos(fireAngle) * speed,
       vy: Math.sin(fireAngle) * speed,
       damage: Math.floor(18 + Math.random() * 25),
-      color: p.team === 'blue' ? (isTriple ? '#38bdf8' : '#0284c7') : (isTriple ? '#fb7185' : '#e11d48'),
+      color: p.customization?.visorColor || (p.team === 'blue' ? (isTriple ? '#38bdf8' : '#0284c7') : (isTriple ? '#fb7185' : '#e11d48')),
       life: 75,
     });
 
@@ -417,23 +420,50 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const finishMatch = useCallback(() => {
     matchStartedRef.current = false;
     setMatchStatus('ended');
-    const myPlayer = simState.current.players.find((p) => !p.isBot);
-    const blueWon = simState.current.blueScore >= simState.current.redScore;
-    const myTeamWon = myPlayer?.team === 'blue' ? blueWon : !blueWon;
 
-    const baseReward = myTeamWon ? 500 : 150;
-    const killBonus = (myPlayer?.kills || 0) * 30;
+    const finalBlue = simState.current.blueScore;
+    const finalRed = simState.current.redScore;
+    const myPlayer = simState.current.players.find((p) => isLocalPlayer(p.id)) || simState.current.players.find((p) => !p.isBot);
+    const myTeam = myPlayer?.team || playerTeam;
+
+    let outcome: 'victory' | 'defeat' | 'draw' = 'draw';
+    if (finalBlue === finalRed) {
+      outcome = 'draw';
+    } else if (finalBlue > finalRed) {
+      outcome = myTeam === 'blue' ? 'victory' : 'defeat';
+    } else {
+      outcome = myTeam === 'red' ? 'victory' : 'defeat';
+    }
+
+    const isWinner = outcome === 'victory';
+    const isDraw = outcome === 'draw';
+    const baseReward = isWinner ? 500 : isDraw ? 250 : 150;
+    const kills = myPlayer?.kills || 0;
+    const killBonus = kills * 30;
     const totalAward = baseReward + killBonus;
 
-    onAddDiscountPoints(totalAward);
+    setMatchResultStats({
+      outcome,
+      blueScore: finalBlue,
+      redScore: finalRed,
+      playerKills: kills,
+      playerTeam: myTeam,
+      pointsAwarded: totalAward,
+    });
 
-    incrementDailyQuestProgress('match', 1);
-    if (myTeamWon) {
-      incrementDailyQuestProgress('win', 1);
+    // Guard against duplicate points addition if finishMatch is called multiple times
+    if (!matchAwardGivenRef.current) {
+      matchAwardGivenRef.current = true;
+      onAddDiscountPoints(totalAward);
+
+      incrementDailyQuestProgress('match', 1);
+      if (isWinner) {
+        incrementDailyQuestProgress('win', 1);
+      }
+      incrementDailyQuestProgress('score', totalAward);
     }
-    incrementDailyQuestProgress('score', totalAward);
 
-    if (myTeamWon) {
+    if (isWinner) {
       soundEngine.playCheckoutSuccess();
       confetti({
         particleCount: 150,
@@ -441,7 +471,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         origin: { y: 0.5 },
       });
     }
-  }, [onAddDiscountPoints]);
+  }, [isLocalPlayer, playerTeam, onAddDiscountPoints]);
 
   const addKillFeed = useCallback((killer: string, victim: string, team: TeamId) => {
     const id = `${Date.now()}-${Math.random()}`;
@@ -1339,6 +1369,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 shieldTimer: 3.0,
                 isRespawning: false,
                 respawnTimer: 0,
+                customization: characterCustomization,
               };
             }
             return {
@@ -1556,6 +1587,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     setHudKillFeed([]);
     setHudActiveSkill(null);
     setHudRespawnTimer(0);
+    matchAwardGivenRef.current = false;
+    setMatchResultStats(null);
 
     initRoster(effectiveMode);
     setInLobby(false);
@@ -2364,91 +2397,46 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
       {/* Match Ended Victory Screen */}
       {matchStatus === 'ended' && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-200 text-center animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-600">
-              <Trophy className="w-9 h-9" />
-            </div>
-
-            <h3 className="text-2xl font-black text-slate-900 mb-1">
-              {hudBlueScore === hudRedScore
-                ? 'Hasil Pertandingan: SERI (DRAW)!'
-                : (hudBlueScore > hudRedScore && playerTeam === 'blue') || (hudRedScore > hudBlueScore && playerTeam === 'red')
-                ? '🏆 TIM KAMU MENANG! VICTORY!'
-                : 'Pertandingan Berakhir! DEFEAT!'}
-            </h3>
-            <p className="text-xs text-slate-500 mb-5">
-              Skor Akhir: Tim Biru <strong>{hudBlueScore}</strong> vs Tim Merah <strong>{hudRedScore}</strong>
-            </p>
-
-            {/* Reward Breakdown Box */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-5 mb-6 text-left space-y-3">
-              <div className="flex items-center justify-between text-xs text-slate-600 pb-2 border-b border-amber-200">
-                <span>Hadiah Tim Juara:</span>
-                <span className="font-bold text-amber-800">
-                  {(hudBlueScore >= hudRedScore && playerTeam === 'blue') || (hudRedScore >= hudBlueScore && playerTeam === 'red')
-                    ? 'Kupon Diskon 90% (Maks Rp 750.000)'
-                    : 'Voucher Diskon 40% (Maks Rp 250.000)'}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-700">Total Kill Kamu:</span>
-                <span className="font-extrabold text-slate-900 font-mono-numbers">
-                  {hudMyKills} Kill
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-700">Poin Belanja Ditambahkan:</span>
-                <span className="font-extrabold text-emerald-600 font-mono-numbers text-base">
-                  +{(playerTeam === 'blue' && hudBlueScore >= hudRedScore) || (playerTeam === 'red' && hudRedScore >= hudBlueScore) ? 500 : 150} Poin
-                </span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2.5">
-              <button
-                onClick={onNavigateToCart}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 text-sm transition-all"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Gunakan Hadiah Diskon di Keranjang Belanja
-              </button>
-
-              {gameModeType === 'bot' ? (
-                <button
-                  onClick={async () => {
-                    await handleLeaveMatch();
-                    setTimeout(() => {
-                      startMatch();
-                    }, 80);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition-colors shadow-md"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Main Lagi Sekarang (Match Baru vs Bot)
-                </button>
-              ) : null}
-
-              <button
-                onClick={handleLeaveMatch}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-xs transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Tinggalkan Match & Kembali ke Lobi
-              </button>
-
-              <button
-                onClick={onNavigateToLeaderboard}
-                className="w-full py-2 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900"
-              >
-                Cek Papan Peringkat Mingguan
-              </button>
-            </div>
-          </div>
-        </div>
+        <ArenaMatchResultModal
+          stats={
+            matchResultStats || {
+              outcome:
+                hudBlueScore === hudRedScore
+                  ? 'draw'
+                  : (hudBlueScore > hudRedScore && playerTeam === 'blue') ||
+                    (hudRedScore > hudBlueScore && playerTeam === 'red')
+                  ? 'victory'
+                  : 'defeat',
+              blueScore: hudBlueScore,
+              redScore: hudRedScore,
+              playerKills: hudMyKills,
+              playerTeam: playerTeam,
+              pointsAwarded:
+                (hudBlueScore === hudRedScore
+                  ? 250
+                  : (hudBlueScore > hudRedScore && playerTeam === 'blue') ||
+                    (hudRedScore > hudBlueScore && playerTeam === 'red')
+                  ? 500
+                  : 150) +
+                hudMyKills * 30,
+            }
+          }
+          isDark={isDark}
+          gameModeType={gameModeType}
+          onPlayAgain={
+            gameModeType === 'bot'
+              ? async () => {
+                  await handleLeaveMatch();
+                  setTimeout(() => {
+                    startMatch('bot');
+                  }, 80);
+                }
+              : undefined
+          }
+          onReturnToLobby={handleLeaveMatch}
+          onNavigateToRedemption={onNavigateToCart}
+          onNavigateToLeaderboard={onNavigateToLeaderboard}
+        />
       )}
 
       {/* Character Customization Modal */}

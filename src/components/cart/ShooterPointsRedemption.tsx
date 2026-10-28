@@ -31,14 +31,14 @@ export const ShooterPointsRedemption: React.FC<ShooterPointsRedemptionProps> = (
           </div>
           <div>
             <h4 className="text-sm font-bold text-slate-900">
-              Tukarkan Koin Diskon Shooter Game
+              Penukaran Poin Hadiah ShopShooter
             </h4>
             <p className="text-xs text-slate-600">
-              Kamu memiliki{' '}
+              Saldo kamu:{' '}
               <strong className="text-slate-900 font-bold">
                 {userDiscountPoints} Poin
               </strong>{' '}
-              (Bisa hemat hingga {formatRupiah(maxRedeemablePoints * POINT_TO_RUPIAH_RATIO)})
+              · Poin dapat ditukar dengan hadiah kejutan spesial saat transaksi.
             </p>
           </div>
         </div>
@@ -54,10 +54,9 @@ export const ShooterPointsRedemption: React.FC<ShooterPointsRedemptionProps> = (
       {/* Slider control */}
       <div className="space-y-2 mt-4">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-600">Gunakan Poin:</span>
+          <span className="text-slate-600">Poin yang Ditukar:</span>
           <span className="font-extrabold text-amber-700 font-mono-numbers text-sm">
-            {pointsToRedeem} Poin = Potongan{' '}
-            {formatRupiah(pointsToRedeem * POINT_TO_RUPIAH_RATIO)}
+            {pointsToRedeem} Poin
           </span>
         </div>
 
