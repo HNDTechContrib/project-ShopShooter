@@ -37,59 +37,61 @@ export const ShooterSummaryModal: React.FC<ShooterSummaryModalProps> = ({
           Ronde Selesai!
         </h3>
         <p className={`text-xs text-center ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-6`}>
-          Hasil bidikan tembakan produk diskon kamu telah tersimpan.
+          Hasil bidikan target kamu telah berhasil tersimpan.
         </p>
 
         <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} rounded-xl p-4 mb-6 space-y-3`}>
           <div className="flex items-center justify-between text-sm">
-            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Poin Berhasil Didapat:</span>
+            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Poin Diperoleh:</span>
             <span className="font-extrabold text-emerald-500 font-mono-numbers text-lg">
               +{lastRoundStats.score} Poin
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Nilai Potongan Belanja:</span>
-            <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              {formatRupiah(lastRoundStats.score * POINT_TO_RUPIAH_RATIO)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Berhasil Ditembak:</span>
+            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Tertembak:</span>
             <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{lastRoundStats.hits} Target</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Spesial Tertembak:</span>
+            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Spesial:</span>
             <span className="font-semibold text-amber-500">{lastRoundStats.specialHits} Emas</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Streak Combo Tertinggi:</span>
+            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Kombo Tertinggi:</span>
             <span className="font-semibold text-orange-500">{lastRoundStats.maxCombo}x Hit</span>
           </div>
+          <p className={`text-[11px] pt-1 border-t ${isDark ? 'border-slate-700 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+            Poin berhasil ditambahkan ke saldo akunmu.
+          </p>
         </div>
 
         <div className="flex flex-col gap-2.5">
           <button
-            onClick={onNavigateToCart}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm"
+            onClick={onRestart}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-md active:scale-[0.99]"
           >
-            <ShoppingBag className="w-4 h-4" />
-            Tukarkan di Keranjang Belanja ({formatRupiah(lastRoundStats.score * POINT_TO_RUPIAH_RATIO)})
+            <RotateCcw className="w-4 h-4" />
+            Main Lagi
           </button>
 
           <button
-            onClick={onRestart}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-sm transition-colors"
+            onClick={onNavigateToCart}
+            className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-xs transition-colors border ${
+              isDark
+                ? 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
+                : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700 shadow-sm'
+            }`}
           >
-            <RotateCcw className="w-4 h-4" />
-            Main Lagi untuk Tambah Poin
+            <ShoppingBag className="w-4 h-4 text-amber-500" />
+            Lihat Penukaran Poin
           </button>
 
           <button
             onClick={onNavigateToLeaderboard}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-colors"
+            className={`w-full pt-1.5 pb-1 text-xs font-medium transition-colors hover:underline ${
+              isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+            }`}
           >
-            <Award className="w-4 h-4" />
-            Lihat Peringkat &amp; Hadiah
+            Cek Papan Peringkat Mingguan
           </button>
         </div>
       </div>

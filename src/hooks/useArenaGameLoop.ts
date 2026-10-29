@@ -3,6 +3,8 @@ import { TeamId, MapTheme, CharacterClass, CollectibleSkill, InGameSkillType } f
 import { updatePlayerMovementSystem } from '../game/systems/playerMovementSystem';
 import { updateCombatCollisionSystem } from '../game/systems/combatCollisionSystem';
 import { renderPassSystem } from '../game/systems/renderPassSystem';
+import { renderTacticalRadar } from '../game/rendering/renderTacticalRadar';
+import '../utils/canvasHelper';
 import { WORLD_WIDTH, WORLD_HEIGHT, SimPlayer, SimBullet, SimDamageText, SimBoss, AmbientParticle } from '../types/multiplayerTypes';
 
 interface UseArenaGameLoopProps {
@@ -23,6 +25,7 @@ interface UseArenaGameLoopProps {
     currentTheme: MapTheme;
   }>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  minimapCanvasRef?: React.RefObject<HTMLCanvasElement | null>;
   keysPressed: React.MutableRefObject<Record<string, boolean>>;
   isMouseDown: React.MutableRefObject<boolean>;
   mobileMoveVector: React.MutableRefObject<{ x: number; y: number }>;
@@ -52,6 +55,7 @@ export const useArenaGameLoop = ({
   matchStatus,
   simState,
   canvasRef,
+  minimapCanvasRef,
   keysPressed,
   isMouseDown,
   mobileMoveVector,
@@ -215,15 +219,41 @@ export const useArenaGameLoop = ({
         }
       }
 
-      // 7. Render Pass
+      // 7. Render Pass (Main Battlefield)
       if (canvas && ctx) {
-        renderPassSystem({
-          ctx,
-          canvas,
-          sim,
-          isDark,
-          isLocalPlayer,
-        });
+        try {
+          renderPassSystem({
+            ctx,
+            canvas,
+            sim,
+            isDark,
+            isLocalPlayer,
+          });
+        } catch (renderErr) {
+          console.error("Render pass error:", renderErr);
+        }
+      }
+
+      // 8. Radar Minimap Pass
+      if (minimapCanvasRef?.current) {
+        const miniCanvas = minimapCanvasRef.current;
+        const miniCtx = miniCanvas.getContext('2d');
+        if (miniCtx) {
+          try {
+            renderTacticalRadar({
+              ctx: miniCtx,
+              width: miniCanvas.width || 240,
+              height: miniCanvas.height || 140,
+              sim,
+              viewW: canvas?.width || 1200,
+              viewH: canvas?.height || 800,
+              isLocalPlayer,
+              isDark,
+            });
+          } catch (radarErr) {
+            console.error("Radar render error:", radarErr);
+          }
+        }
       }
 
       animFrameId = requestAnimationFrame(loop);

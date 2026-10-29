@@ -30,7 +30,7 @@ export const updateCombatCollisionSystem = ({
   addDamageText,
   addKillFeed,
 }: UpdateCombatCollisionParams) => {
-  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme];
+  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme] || MAP_THEMES_CONFIG['mall'];
 
   // 1. Collectible In-Game Skills Check
   sim.skills.forEach((skill) => {

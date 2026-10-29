@@ -5,6 +5,7 @@ import {
   renderArenaBaseZones, 
   renderThemedObstacle 
 } from '../../utils/arenaRenderer';
+import { renderTankModel } from '../rendering/renderTankModel';
 import { WORLD_WIDTH, WORLD_HEIGHT, SimPlayer, SimBullet, SimBoss, CollectibleSkill, MapTheme } from '../../types/multiplayerTypes';
 
 interface RenderPassParams {
@@ -42,11 +43,14 @@ export const renderPassSystem = ({
   isDark,
   isLocalPlayer,
 }: RenderPassParams) => {
-  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme];
+  const themeConfig = MAP_THEMES_CONFIG[sim.currentTheme] || MAP_THEMES_CONFIG['mall'];
 
-  if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+  const displayWidth = canvas.clientWidth > 0 ? canvas.clientWidth : 1200;
+  const displayHeight = canvas.clientHeight > 0 ? canvas.clientHeight : 800;
+
+  if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
   }
 
   ctx.save();
@@ -206,46 +210,44 @@ export const renderPassSystem = ({
 
   // 8. Players
   sim.players.forEach((p) => {
+    if (p.isRespawning) return;
+
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.angle);
 
-    if (p.isShielded || p.activeSkill?.type === 'shield') {
-      ctx.shadowBlur = 22;
-      ctx.shadowColor = '#38bdf8';
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 3;
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
-      ctx.beginPath();
-      ctx.arc(0, 0, 34, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    }
+    renderTankModel(ctx, {
+      customization: p.customization,
+      team: p.team,
+      fallbackColor: p.color,
+      isShielded: p.isShielded || p.activeSkill?.type === 'shield',
+      scale: 1.0,
+      showTrail: p.activeSkill?.type === 'speed',
+      showTeamBadge: true,
+      isMoving: false,
+    });
 
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.roundRect(-22, -18, 36, 36, 10);
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(10, -5, 18, 10);
     ctx.restore();
 
     ctx.save();
+    // Name label
     ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = isLocalPlayer(p.id) ? '#38bdf8' : '#ffffff';
     ctx.textAlign = 'center';
     ctx.shadowBlur = 4;
     ctx.shadowColor = '#000000';
     ctx.fillText(p.name, p.x, p.y - 32);
 
-    ctx.fillStyle = '#1e293b';
+    // HP Bar background
+    ctx.fillStyle = '#0f172a';
     ctx.fillRect(p.x - 22, p.y - 25, 44, 5);
+    // HP Fill
     ctx.fillStyle = p.team === 'blue' ? '#38bdf8' : '#f43f5e';
-    ctx.fillRect(p.x - 22, p.y - 25, (p.hp / p.maxHp) * 44, 5);
+    ctx.fillRect(p.x - 22, p.y - 25, Math.max(0, (p.hp / p.maxHp) * 44), 5);
+    // HP Bar border
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(p.x - 22, p.y - 25, 44, 5);
     ctx.restore();
   });
 

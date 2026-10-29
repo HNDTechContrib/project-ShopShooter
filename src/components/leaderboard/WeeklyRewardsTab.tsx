@@ -16,11 +16,8 @@ export const WeeklyRewardsTab: React.FC<WeeklyRewardsTabProps> = ({ isDark }) =>
           Juara 1 Mingguan
         </span>
         <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
-          Voucher Diskon 90%
+          Mendapatkan Voucher
         </h3>
-        <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
-          Maksimum potongan hingga Rp 1.000.000 untuk belanja semua produk di katalog + Gelar Emas Juara Nasional.
-        </p>
         <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-amber-900' : 'border-amber-200'} text-xs font-bold text-amber-500`}>
           1 Pemenang Tiap Minggu
         </div>
@@ -34,11 +31,8 @@ export const WeeklyRewardsTab: React.FC<WeeklyRewardsTabProps> = ({ isDark }) =>
           Peringkat 2 &amp; 3
         </span>
         <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
-          Voucher Diskon 70% &amp; 50%
+          Mendapatkan Voucher
         </h3>
-        <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
-          Potongan langsung hingga Rp 500.000 dan Rp 300.000 saat checkout belanja.
-        </p>
         <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'} text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-700'}`}>
           2 Pemenang Tiap Minggu
         </div>
@@ -52,11 +46,8 @@ export const WeeklyRewardsTab: React.FC<WeeklyRewardsTabProps> = ({ isDark }) =>
           Top 4 s/d 10 Elite
         </span>
         <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1 mb-2`}>
-          Voucher 30% + 500 Koin
+          Mendapatkan Voucher
         </h3>
-        <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
-          Tambahan modal koin diskon dan voucher hemat 30% untuk seluruh peserta sepuluh besar.
-        </p>
         <div className={`mt-auto w-full pt-4 border-t ${isDark ? 'border-blue-900' : 'border-blue-100'} text-xs font-bold text-blue-500`}>
           7 Pemenang Tiap Minggu
         </div>

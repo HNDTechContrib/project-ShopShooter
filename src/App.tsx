@@ -164,7 +164,7 @@ export default function App() {
       date: 'Hari Ini',
       badge: '🎯 Shooter Aktif',
       isCurrentUser: true,
-      rewardTier: userDiscountPoints > 1500 ? 'Kupon 90%' : userDiscountPoints > 1000 ? 'Kupon 70%' : 'Kupon 30%',
+      rewardTier: 'Mendapatkan Voucher',
     };
 
     // Recalculate ranks

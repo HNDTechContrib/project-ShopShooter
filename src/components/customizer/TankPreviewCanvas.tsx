@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { CharacterCustomization } from '../../types';
+import { renderTankModel } from '../../game/rendering/renderTankModel';
 
 interface TankPreviewCanvasProps {
   customization: CharacterCustomization;
@@ -28,7 +29,7 @@ export const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = ({ customizat
 
       ctx.clearRect(0, 0, w, h);
 
-      // Radial background aura
+      // Radial background aura matching primary color
       const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 110);
       grad.addColorStop(0, `${customization.primaryColor}33`);
       grad.addColorStop(1, 'transparent');
@@ -62,139 +63,13 @@ export const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = ({ customizat
       // Rotate character model
       ctx.rotate(angle);
 
-      // Weapon Barrel Drawing
-      ctx.save();
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = customization.visorColor;
-      ctx.fillStyle = '#f8fafc';
-
-      if (customization.weaponSkin === 'dual_blaster') {
-        ctx.fillRect(14, -9, 22, 6);
-        ctx.fillRect(14, 3, 22, 6);
-        ctx.fillStyle = customization.visorColor;
-        ctx.fillRect(32, -8, 6, 4);
-        ctx.fillRect(32, 4, 6, 4);
-      } else if (customization.weaponSkin === 'laser_cannon') {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(12, -7, 28, 14);
-        ctx.fillStyle = customization.visorColor;
-        ctx.fillRect(36, -5, 8, 10);
-      } else if (customization.weaponSkin === 'plasma_rifle') {
-        ctx.fillRect(12, -4, 32, 8);
-        ctx.fillStyle = customization.visorColor;
-        ctx.fillRect(20, -6, 8, 3);
-      } else {
-        ctx.fillRect(10, -8, 20, 16);
-        ctx.fillStyle = customization.visorColor;
-        ctx.fillRect(26, -9, 8, 18);
-      }
-      ctx.restore();
-
-      // Class-specific body details
-      if (customization.characterClass === 'phantom') {
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = customization.primaryColor;
-        ctx.fillStyle = customization.primaryColor;
-        ctx.beginPath();
-        ctx.arc(-4, 0, 26, -Math.PI * 0.7, Math.PI * 0.7);
-        ctx.lineTo(-24, 0);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.arc(0, 0, 20, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (customization.characterClass === 'tanker') {
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(-22, -24, 18, 12);
-        ctx.fillRect(-22, 12, 18, 12);
-
-        ctx.fillStyle = customization.primaryColor;
-        ctx.beginPath();
-        ctx.roundRect(-20, -20, 40, 40, 8);
-        ctx.fill();
-        ctx.strokeStyle = '#f8fafc';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      } else if (customization.characterClass === 'ninja') {
-        ctx.fillStyle = customization.visorColor;
-        ctx.save();
-        ctx.rotate(-Math.PI / 4);
-        ctx.fillRect(-34, -3, 38, 5);
-        ctx.restore();
-
-        ctx.fillStyle = customization.primaryColor;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 22, 17, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-      } else if (customization.characterClass === 'commando') {
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.arc(0, 0, 22, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = customization.primaryColor;
-        ctx.fillRect(-12, -18, 24, 36);
-        ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-12, -18, 24, 36);
-      } else {
-        ctx.fillStyle = customization.primaryColor;
-        ctx.beginPath();
-        ctx.arc(0, 0, 21, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#f8fafc';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(-16, -26, 4, 10);
-        ctx.fillRect(-16, 16, 4, 10);
-      }
-
-      // Visor Glow
-      ctx.save();
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = customization.visorColor;
-      ctx.fillStyle = customization.visorColor;
-      ctx.beginPath();
-      ctx.arc(8, 0, 8, -Math.PI / 2, Math.PI / 2);
-      ctx.fill();
-      ctx.restore();
-
-      // Accessories
-      if (customization.accessory === 'crown') {
-        ctx.font = '22px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('👑', -2, -18);
-      } else if (customization.accessory === 'halo') {
-        ctx.strokeStyle = '#fef08a';
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = '#facc15';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 28, 28, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      } else if (customization.accessory === 'horns') {
-        ctx.fillStyle = '#dc2626';
-        ctx.beginPath();
-        ctx.moveTo(-10, -18);
-        ctx.lineTo(-6, -30);
-        ctx.lineTo(-2, -18);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(-10, 18);
-        ctx.lineTo(-6, 30);
-        ctx.lineTo(-2, 18);
-        ctx.fill();
-      } else if (customization.accessory === 'cyber_goggles') {
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillRect(4, -8, 8, 16);
-      }
+      // Render unified tank model
+      renderTankModel(ctx, {
+        customization,
+        scale: 1.0,
+        showTrail: true,
+        showTeamBadge: false,
+      });
 
       ctx.restore();
 

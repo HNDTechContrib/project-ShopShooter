@@ -48,7 +48,7 @@ export const updatePlayerMovementSystem = ({
   wsRef,
   shootLaser,
 }: UpdatePlayerMovementParams) => {
-  const themeConfig = MAP_THEMES_CONFIG[currentTheme];
+  const themeConfig = MAP_THEMES_CONFIG[currentTheme] || MAP_THEMES_CONFIG['mall'];
 
   // 1. Move Local Player
   const myP = simPlayers.find((p) => isLocalPlayer(p.id));
