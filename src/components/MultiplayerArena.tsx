@@ -13,6 +13,7 @@ import {
 import { soundEngine } from '../utils/audio';
 import { POINT_TO_RUPIAH_RATIO, formatRupiah } from '../data/mockData';
 import { CharacterCustomizerModal } from './CharacterCustomizerModal';
+import { PlayerProfileModal } from './profile/PlayerProfileModal';
 import { MapSelectorModal, MAP_CATALOG } from './MapSelectorModal';
 import { ArenaLobbyView } from './arena/ArenaLobbyView';
 import { ArenaMatchResultModal, ArenaMatchResultStats } from './arena/ArenaMatchResultModal';
@@ -255,6 +256,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     };
   });
   const [showCustomizerModal, setShowCustomizerModal] = useState<boolean>(false);
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
 
   const getCharacterStats = useCallback((charClass?: CharacterClass) => {
     switch (charClass) {
@@ -2377,6 +2379,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               setRoomCodeInput={setRoomCodeInput}
               handleCopyRoomCode={handleCopyRoomCode}
               handleJoinMultiplayerRoom={handleJoinMultiplayerRoom}
+              onOpenProfile={() => setShowProfileModal(true)}
               isJoinedRoom={isJoinedRoom}
               joinedAsHost={joinedAsHost}
               isEffectiveHost={isEffectiveHost}
@@ -2458,6 +2461,30 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         onClose={() => setShowMapSelectorModal(false)}
         themeMode={themeMode}
       />
+
+      {/* Player Profile Modal */}
+      {showProfileModal && (
+        <PlayerProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          isDark={isDark}
+          isSelf={true}
+          profile={{
+            id: myPlayerId.current,
+            username: playerName,
+            avatarClass: characterCustomization.characterClass,
+            primaryColor: characterCustomization.primaryColor,
+            weaponSkin: characterCustomization.weaponSkin,
+            totalMatches: 0, // Placeholder, ideally fetch from database
+            wins: 0,
+            losses: 0,
+            kills: hudMyKills,
+            points: userDiscountPoints,
+            isOnline: true,
+            createdAt: '2026-10-01',
+          }}
+        />
+      )}
     </div>
   );
 };

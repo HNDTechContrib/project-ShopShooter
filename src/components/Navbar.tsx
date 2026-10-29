@@ -13,6 +13,7 @@ import {
   Check 
 } from 'lucide-react';
 import { getUnclaimedRewardsSummary } from '../utils/dailyChallenge';
+import { ProfileNavbarWidget } from './profile/ProfileNavbarWidget';
 
 interface NavbarProps {
   activeTab: 'multiplayer' | 'shooter' | 'leaderboard' | 'powerups';
@@ -186,6 +187,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: Dark/White Switcher + Daily Rewards + Combat XP */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          {/* Profile & Friends Widget */}
+          <ProfileNavbarWidget
+            isDark={isDark}
+            userPoints={userPoints}
+            onNavigateToLeaderboard={() => onSelectTab('leaderboard')}
+          />
+
           {/* Dark / Light Theme Toggle Button */}
           <button
             onClick={onToggleTheme}

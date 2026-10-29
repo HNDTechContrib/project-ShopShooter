@@ -47,6 +47,7 @@ interface ArenaLobbyViewProps {
   handleSelectMapTheme: (theme: MapTheme) => void;
   setShowMapSelectorModal: (show: boolean) => void;
   isLocalPlayer: (id: string) => boolean;
+  onOpenProfile: () => void;
 }
 
 export const ArenaLobbyView: React.FC<ArenaLobbyViewProps> = ({
@@ -82,6 +83,7 @@ export const ArenaLobbyView: React.FC<ArenaLobbyViewProps> = ({
   handleSelectMapTheme,
   setShowMapSelectorModal,
   isLocalPlayer,
+  onOpenProfile,
 }) => {
   const currentMapIndex = MAP_CATALOG.findIndex((m) => m.id === selectedMapTheme);
   const activeMap = MAP_CATALOG[currentMapIndex >= 0 ? currentMapIndex : 0];
@@ -118,30 +120,29 @@ export const ArenaLobbyView: React.FC<ArenaLobbyViewProps> = ({
 
         {/* Profile and Avatar Cards */}
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
-          {/* Card: Nama Pemain */}
-          <div className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl border text-left min-w-[170px] ${
-            isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-50 border-slate-200'
-          }`}>
+          {/* Card: Nama Pemain & Avatar (Clickable) */}
+          <button
+            onClick={onOpenProfile}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl border text-left min-w-[170px] transition-all ${
+              isDark ? 'bg-slate-950/70 hover:bg-slate-800 border-slate-800' : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+            }`}
+          >
             <div className="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xs font-black shrink-0">
               {playerName ? playerName.charAt(0).toUpperCase() : 'P'}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1 leading-none mb-0.5">
                 <span className="text-[9px] uppercase font-bold text-slate-400">Nama Pemain:</span>
-                <span className="text-[9px] text-emerald-500 font-semibold">✓ Tersimpan</span>
+                <span className="text-[9px] text-emerald-500 font-semibold">✓ Profil</span>
               </div>
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => handlePlayerNameChange(e.target.value)}
-                placeholder="Nama kamu..."
-                className={`w-full bg-transparent text-xs font-black border-none p-0 focus:outline-none truncate ${
+              <div className={`w-full bg-transparent text-xs font-black border-none p-0 focus:outline-none truncate ${
                   isDark ? 'text-white' : 'text-slate-900'
-                }`}
-                maxLength={18}
-              />
+                }`}>
+                {playerName}
+              </div>
             </div>
-          </div>
+          </button>
+
 
           {/* Card: Kustomisasi Avatar */}
           <button
