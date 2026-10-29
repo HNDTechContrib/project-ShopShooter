@@ -27,6 +27,7 @@ import { PowerUpStore } from './components/PowerUpStore';
 import { SpecialTargetNotification } from './components/SpecialTargetNotification';
 import { DailyChallengeModal } from './components/DailyChallengeModal';
 import { soundEngine } from './utils/audio';
+import { getStoredProfile, subscribeToProfileUpdates } from './services/profileStorage';
 
 export default function App() {
   const [isDailyModalOpen, setIsDailyModalOpen] = useState<boolean>(false);
@@ -73,8 +74,17 @@ export default function App() {
 
   const [powerUpInventory, setPowerUpInventory] = useState<PowerUpItem[]>(INITIAL_POWER_UPS);
 
-  // Leaderboard
-  const [currentUsername, setCurrentUsername] = useState<string>('Commander_Ace');
+  // Leaderboard & Player Identity
+  const [currentUsername, setCurrentUsername] = useState<string>(() => {
+    return getStoredProfile().username;
+  });
+
+  useEffect(() => {
+    const unsub = subscribeToProfileUpdates((profile) => {
+      setCurrentUsername(profile.username);
+    });
+    return unsub;
+  }, []);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(INITIAL_LEADERBOARD);
 
   // Notifications

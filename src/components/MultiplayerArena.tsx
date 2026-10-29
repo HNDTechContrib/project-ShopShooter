@@ -109,6 +109,16 @@ import {
   MapDecorationItem, 
   AmbientParticle 
 } from '../config/mapThemesConfig';
+import { 
+  getTeamPalette, 
+  normalizeTeamId, 
+  harmonizeCustomizationForTeam 
+} from '../config/teamConfig';
+import { 
+  getStoredProfile, 
+  saveStoredProfile, 
+  subscribeToProfileUpdates 
+} from '../services/profileStorage';
 
 export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   userDiscountPoints,
@@ -183,36 +193,35 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     };
   }, []);
 
-  // Player Name State (Persisted)
-  const [playerName, setPlayerName] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem('db_player_name');
-      if (saved) return saved;
-    } catch (e) {}
-    return `Striker_${Math.floor(Math.random() * 900 + 100)}`;
-  });
+  // Player Profile and Name State (Persisted via profileStorage single source of truth)
+  const [profileData, setProfileData] = useState(() => getStoredProfile(userDiscountPoints));
+  const [playerName, setPlayerName] = useState<string>(() => profileData.username);
+  const [playerStatus, setPlayerStatus] = useState<string>(() => profileData.statusMessage || 'Siap bertempur di Arena TDM!');
 
   // Handle player name change with immediate UI sync
   const handlePlayerNameChange = (newName: string) => {
-    setPlayerName(newName);
-    try {
-      localStorage.setItem('db_player_name', newName);
-    } catch (e) {}
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setPlayerName(trimmed);
+
+    // Save to storage
+    saveStoredProfile({ username: trimmed }, userDiscountPoints);
 
     // Update in local sim
     const myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (myP) {
-      myP.name = newName;
+      myP.name = trimmed;
     }
 
     // Update waiting room roster immediately!
-    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: newName } : p));
+    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: trimmed, name: trimmed } : p));
 
     // Update in Firestore
     if (isJoinedRoom && currentRoomCode) {
       const roomRef = doc(db, 'rooms', currentRoomCode);
       updateDoc(roomRef, {
-        [`players.${myPlayerId.current}.username`]: newName,
+        [`players.${myPlayerId.current}.username`]: trimmed,
+        [`players.${myPlayerId.current}.name`]: trimmed,
         updatedAt: Date.now()
       }).catch(() => {});
     }
@@ -221,20 +230,28 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'update-name',
-        username: newName,
+        username: trimmed,
       }));
     }
   };
 
+  // Listen to centralized profile updates
   useEffect(() => {
-    try {
-      localStorage.setItem('db_player_name', playerName);
-    } catch (e) {}
-
-    const myP = simState.current.players.find(p => isLocalPlayer(p.id));
-    if (myP) {
-      myP.name = playerName;
-    }
+    const unsub = subscribeToProfileUpdates((updated) => {
+      setProfileData(updated);
+      if (updated.username && updated.username !== playerName) {
+        setPlayerName(updated.username);
+        const myP = simState.current.players.find(p => isLocalPlayer(p.id));
+        if (myP) {
+          myP.name = updated.username;
+        }
+        setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: updated.username, name: updated.username } : p));
+      }
+      if (updated.statusMessage) {
+        setPlayerStatus(updated.statusMessage);
+      }
+    });
+    return unsub;
   }, [playerName, isLocalPlayer]);
 
   // Character Customization State (Persisted)
@@ -387,17 +404,20 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
 
     const speed = 23;
+    const pTeam = normalizeTeamId(p.team);
+    const pPalette = getTeamPalette(pTeam);
+    const laserColor = isTriple ? pPalette.tripleBullet : pPalette.bullet;
 
     const createBullet = (fireAngle: number) => ({
       id: `${p.id}-${now}-${Math.random()}`,
       shooterId: p.id,
-      team: p.team,
+      team: pTeam,
       x: p.x + Math.cos(fireAngle) * 30,
       y: p.y + Math.sin(fireAngle) * 30,
       vx: Math.cos(fireAngle) * speed,
       vy: Math.sin(fireAngle) * speed,
       damage: Math.floor(18 + Math.random() * 25),
-      color: p.customization?.visorColor || (p.team === 'blue' ? (isTriple ? '#38bdf8' : '#0284c7') : (isTriple ? '#fb7185' : '#e11d48')),
+      color: laserColor,
       life: 75,
     });
 
@@ -830,16 +850,18 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     const newPlayers: SimPlayer[] = [];
 
     // Human Player with customized traits and unique ID - Correctly spawns on playerTeam base (left for blue, right for red)
-    const mySpawnX = playerTeam === 'blue'
+    const normPlayerTeam = normalizeTeamId(playerTeam);
+    const myPalette = getTeamPalette(normPlayerTeam);
+    const mySpawnX = normPlayerTeam === 'blue'
       ? 220 + Math.random() * 60
       : (WORLD_WIDTH - 260) - Math.random() * 80;
     const mySpawnY = 560 + (Math.random() - 0.5) * 160;
-    const mySpawnAngle = playerTeam === 'blue' ? 0 : Math.PI;
+    const mySpawnAngle = normPlayerTeam === 'blue' ? 0 : Math.PI;
     const myStats = getCharacterStats(characterCustomization.characterClass);
     newPlayers.push({
       id: myPlayerId.current,
       name: playerName || 'Player',
-      team: playerTeam,
+      team: normPlayerTeam,
       x: mySpawnX,
       y: mySpawnY,
       angle: mySpawnAngle,
@@ -853,8 +875,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       shieldTimer: 3.0,
       isRespawning: false,
       respawnTimer: 0,
-      color: playerTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-      customization: characterCustomization,
+      color: myPalette.primary,
+      customization: harmonizeCustomizationForTeam(characterCustomization, normPlayerTeam),
     });
 
     if (isMultiplayer) {
@@ -1071,35 +1093,41 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   // Switch Team (Tim Biru / Tim Merah) with live sync
   const handleSelectTeam = async (newTeam: TeamId) => {
-    setPlayerTeam(newTeam);
+    const normTeam = normalizeTeamId(newTeam);
+    setPlayerTeam(normTeam);
     soundEngine.playPowerUp();
 
-    const newSpawnX = newTeam === 'blue' 
+    const tPalette = getTeamPalette(normTeam);
+    const newSpawnX = normTeam === 'blue' 
       ? 220 + Math.random() * 60 
       : (WORLD_WIDTH - 260) - Math.random() * 80;
-    const newSpawnAngle = newTeam === 'blue' ? 0 : Math.PI;
+    const newSpawnAngle = normTeam === 'blue' ? 0 : Math.PI;
 
     const myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (myP) {
-      myP.team = newTeam;
-      myP.color = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
+      myP.team = normTeam;
+      myP.color = tPalette.primary;
       myP.x = newSpawnX;
       myP.y = 440 + Math.random() * 200;
       myP.angle = newSpawnAngle;
+      if (myP.customization) {
+        myP.customization = harmonizeCustomizationForTeam(myP.customization, normTeam);
+      }
     }
 
     setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { 
       ...p, 
-      team: newTeam, 
-      color: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+      team: normTeam, 
+      color: tPalette.primary,
       x: newSpawnX,
       angle: newSpawnAngle,
+      customization: p.customization ? harmonizeCustomizationForTeam(p.customization, normTeam) : undefined,
     } : p));
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && currentRoomCode) {
       wsRef.current.send(JSON.stringify({
         type: 'change-team',
-        team: newTeam,
+        team: normTeam,
         playerId: myPlayerId.current,
         roomCode: currentRoomCode,
       }));
@@ -1110,8 +1138,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         const roomRef = doc(db, 'rooms', currentRoomCode);
         const uid = myPlayerId.current;
         await updateDoc(roomRef, {
-          [`players.${uid}.team`]: newTeam,
-          [`players.${uid}.color`]: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+          [`players.${uid}.team`]: normTeam,
+          [`players.${uid}.color`]: tPalette.primary,
           [`players.${uid}.x`]: newSpawnX,
           [`players.${uid}.y`]: 440 + Math.random() * 200,
           [`players.${uid}.angle`]: newSpawnAngle,
@@ -2475,13 +2503,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             avatarClass: characterCustomization.characterClass,
             primaryColor: characterCustomization.primaryColor,
             weaponSkin: characterCustomization.weaponSkin,
-            totalMatches: 0, // Placeholder, ideally fetch from database
-            wins: 0,
-            losses: 0,
-            kills: hudMyKills,
+            totalMatches: profileData.totalMatches,
+            wins: profileData.wins,
+            losses: profileData.losses,
+            kills: hudMyKills || profileData.kills,
             points: userDiscountPoints,
             isOnline: true,
-            createdAt: '2026-10-01',
+            statusMessage: playerStatus,
+            createdAt: profileData.createdAt,
+          }}
+          onUpdateProfile={(updated) => {
+            saveStoredProfile(updated, userDiscountPoints);
+            if (updated.username) {
+              handlePlayerNameChange(updated.username);
+            }
+            if (updated.statusMessage) {
+              setPlayerStatus(updated.statusMessage);
+            }
           }}
         />
       )}

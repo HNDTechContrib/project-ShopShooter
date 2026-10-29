@@ -4,6 +4,11 @@ import { PlayerProfile, FriendRequest } from '../../types/profileTypes';
 import { PlayerProfileModal } from './PlayerProfileModal';
 import { FriendsManagerModal } from '../friends/FriendsManagerModal';
 import { TankThumbnailCanvas } from '../customizer/TankThumbnailCanvas';
+import { 
+  getStoredProfile, 
+  saveStoredProfile, 
+  subscribeToProfileUpdates 
+} from '../../services/profileStorage';
 
 interface ProfileNavbarWidgetProps {
   isDark?: boolean;
@@ -16,41 +21,23 @@ export const ProfileNavbarWidget: React.FC<ProfileNavbarWidgetProps> = ({
   userPoints,
   onNavigateToLeaderboard,
 }) => {
-  // Current User Profile State (Persisted)
+  // Current User Profile State (Single Source of Truth)
   const [myProfile, setMyProfile] = useState<PlayerProfile>(() => {
-    try {
-      const saved = localStorage.getItem('shopshooter_my_profile');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    const defaultName = localStorage.getItem('db_player_name') || `Striker_${Math.floor(Math.random() * 900 + 100)}`;
-    const defaultCustom = JSON.parse(localStorage.getItem('db_char_customization') || '{}');
-    return {
-      id: 'MY_STRIKER_ID',
-      username: defaultName,
-      avatarClass: defaultCustom.characterClass || 'phantom',
-      primaryColor: defaultCustom.primaryColor || '#06b6d4',
-      weaponSkin: defaultCustom.weaponSkin || 'laser_cannon',
-      totalMatches: 14,
-      wins: 9,
-      losses: 5,
-      kills: 42,
-      points: userPoints,
-      isOnline: true,
-      statusMessage: 'Siap mendominasi arena TDM!',
-      createdAt: '2026-10-01',
-    };
+    return getStoredProfile(userPoints);
   });
+
+  // Listen for centralized profile updates across the whole app
+  useEffect(() => {
+    const unsubscribe = subscribeToProfileUpdates((updated) => {
+      setMyProfile((prev) => ({ ...prev, ...updated }));
+    });
+    return unsubscribe;
+  }, []);
 
   // Sync points with App state
   useEffect(() => {
     setMyProfile((prev: PlayerProfile) => ({ ...prev, points: userPoints }));
   }, [userPoints]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('shopshooter_my_profile', JSON.stringify(myProfile));
-    } catch {}
-  }, [myProfile]);
 
   // Mock All Profiles for Discovery & Friends
   const [allProfiles, setAllProfiles] = useState<PlayerProfile[]>(() => {
@@ -173,7 +160,7 @@ export const ProfileNavbarWidget: React.FC<ProfileNavbarWidgetProps> = ({
         isDark={isDark}
         isSelf={true}
         onUpdateProfile={(updated: Partial<PlayerProfile>) => {
-          setMyProfile((prev: PlayerProfile) => ({ ...prev, ...updated }));
+          saveStoredProfile(updated, userPoints);
         }}
       />
 

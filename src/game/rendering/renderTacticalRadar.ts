@@ -1,5 +1,6 @@
 import { WORLD_WIDTH, WORLD_HEIGHT, SimPlayer, SimBullet, SimBoss, CollectibleSkill, MapTheme } from '../../types/multiplayerTypes';
 import { MAP_THEMES_CONFIG } from '../../config/mapThemesConfig';
+import { getTeamPalette, normalizeTeamId } from '../../config/teamConfig';
 
 interface RenderTacticalRadarParams {
   ctx: CanvasRenderingContext2D;
@@ -201,10 +202,11 @@ export const renderTacticalRadar = ({
       const px = p.x * scaleX;
       const py = p.y * scaleY;
       const isLocal = isLocalPlayer(p.id);
-      const isBlue = p.team === 'blue';
+      const teamNorm = normalizeTeamId(p.team);
+      const pPalette = getTeamPalette(teamNorm);
 
       // Directional pointer line
-      ctx.strokeStyle = isLocal ? '#34d399' : isBlue ? '#38bdf8' : '#f43f5e';
+      ctx.strokeStyle = isLocal ? pPalette.outline : pPalette.primary;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(px, py);
@@ -212,35 +214,32 @@ export const renderTacticalRadar = ({
       ctx.stroke();
 
       if (isLocal) {
-        // Local Player: Bright pulsing Emerald/Cyan ping
+        // Local Player: Bright pulsing ping in Team Colors
         const pulse = 1 + Math.sin(now / 150) * 0.3;
-        ctx.fillStyle = '#10b981';
+        ctx.fillStyle = pPalette.primary;
         ctx.beginPath();
         ctx.arc(px, py, 4.5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = '#34d399';
+        ctx.strokeStyle = pPalette.visor;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(px, py, 6.5 * pulse, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Local player label
+        // Local player label in Team Color
         ctx.font = 'bold 8px monospace';
-        ctx.fillStyle = '#34d399';
+        ctx.fillStyle = pPalette.visor;
         ctx.textAlign = 'center';
         ctx.fillText('(Kamu)', px, Math.max(9, py - 7));
       } else {
-        // Remote Player or AI Bot
-        const dotColor = isBlue ? '#0ea5e9' : '#e11d48';
-        const ringColor = isBlue ? '#38bdf8' : '#fb7185';
-
-        ctx.fillStyle = dotColor;
+        // Remote Player or AI Bot in Team Colors
+        ctx.fillStyle = pPalette.radarDot;
         ctx.beginPath();
         ctx.arc(px, py, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = ringColor;
+        ctx.strokeStyle = pPalette.radarRing;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(px, py, 5, 0, Math.PI * 2);
@@ -251,7 +250,7 @@ export const renderTacticalRadar = ({
         const shortName = cleanName.length > 7 ? cleanName.substring(0, 6) + '…' : cleanName;
 
         ctx.font = 'bold 7px monospace';
-        ctx.fillStyle = isBlue ? '#bae6fd' : '#fecdd3';
+        ctx.fillStyle = pPalette.outline;
         ctx.textAlign = 'center';
         ctx.fillText(shortName, px, Math.max(8, py - 6));
       }
