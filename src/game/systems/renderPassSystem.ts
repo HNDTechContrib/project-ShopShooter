@@ -6,6 +6,7 @@ import {
   renderThemedObstacle 
 } from '../../utils/arenaRenderer';
 import { renderTankModel } from '../rendering/renderTankModel';
+import { getTeamPalette, normalizeTeamId } from '../../config/teamConfig';
 import { WORLD_WIDTH, WORLD_HEIGHT, SimPlayer, SimBullet, SimBoss, CollectibleSkill, MapTheme } from '../../types/multiplayerTypes';
 
 interface RenderPassParams {
@@ -230,9 +231,13 @@ export const renderPassSystem = ({
     ctx.restore();
 
     ctx.save();
+    const teamNorm = normalizeTeamId(p.team);
+    const pPalette = getTeamPalette(teamNorm);
+    const isMe = isLocalPlayer(p.id);
+
     // Name label
-    ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = isLocalPlayer(p.id) ? '#38bdf8' : '#ffffff';
+    ctx.font = isMe ? 'bold 11px monospace' : 'bold 10px monospace';
+    ctx.fillStyle = isMe ? pPalette.visor : '#ffffff';
     ctx.textAlign = 'center';
     ctx.shadowBlur = 4;
     ctx.shadowColor = '#000000';
@@ -242,7 +247,7 @@ export const renderPassSystem = ({
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(p.x - 22, p.y - 25, 44, 5);
     // HP Fill
-    ctx.fillStyle = p.team === 'blue' ? '#38bdf8' : '#f43f5e';
+    ctx.fillStyle = pPalette.primary;
     ctx.fillRect(p.x - 22, p.y - 25, Math.max(0, (p.hp / p.maxHp) * 44), 5);
     // HP Bar border
     ctx.strokeStyle = '#334155';

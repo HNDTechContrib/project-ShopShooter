@@ -1,8 +1,9 @@
 import { CharacterCustomization, CharacterClass, WeaponSkin, AccessoryType, TeamId } from '../../types';
+import { getTeamPalette, normalizeTeamId } from '../../config/teamConfig';
 
 export interface RenderTankOptions {
   customization?: CharacterCustomization;
-  team?: TeamId;
+  team?: TeamId | string;
   fallbackColor?: string;
   isShielded?: boolean;
   scale?: number;
@@ -43,9 +44,18 @@ export const renderTankModel = (
   } = options;
 
   const charClass: CharacterClass = customization.characterClass || 'phantom';
-  const primaryColor = customization.primaryColor || fallbackColor || (team === 'blue' ? '#06b6d4' : '#f43f5e');
-  const secondaryColor = customization.secondaryColor || (team === 'blue' ? '#0284c7' : '#be123c');
-  const visorColor = customization.visorColor || (team === 'blue' ? '#38bdf8' : '#fb7185');
+
+  // Team Palette takes absolute precedence in matches to guarantee team identification
+  const teamPalette = team ? getTeamPalette(team) : undefined;
+  const primaryColor = teamPalette 
+    ? teamPalette.primary 
+    : (customization.primaryColor || fallbackColor || '#06b6d4');
+  const secondaryColor = teamPalette 
+    ? teamPalette.secondary 
+    : (customization.secondaryColor || '#0284c7');
+  const visorColor = teamPalette 
+    ? teamPalette.visor 
+    : (customization.visorColor || '#38bdf8');
   const weaponSkin: WeaponSkin = customization.weaponSkin || 'laser_cannon';
   const accessory: AccessoryType = customization.accessory || 'none';
 
@@ -57,11 +67,15 @@ export const renderTankModel = (
   // 1. Forcefield Shield Aura (if active)
   if (isShielded) {
     ctx.save();
+    const shieldGlow = teamPalette ? teamPalette.visor : (team === 'red' ? '#fb7185' : '#38bdf8');
+    const shieldStroke = teamPalette ? teamPalette.glow : (team === 'red' ? '#f43f5e' : '#38bdf8');
+    const shieldFill = teamPalette ? teamPalette.shieldFill : (team === 'red' ? 'rgba(244, 63, 94, 0.16)' : 'rgba(56, 189, 248, 0.18)');
+
     ctx.shadowBlur = 18;
-    ctx.shadowColor = team === 'red' ? '#fb7185' : '#38bdf8';
-    ctx.strokeStyle = team === 'red' ? '#f43f5e' : '#38bdf8';
+    ctx.shadowColor = shieldGlow;
+    ctx.strokeStyle = shieldStroke;
     ctx.lineWidth = 2.5;
-    ctx.fillStyle = team === 'red' ? 'rgba(244, 63, 94, 0.16)' : 'rgba(56, 189, 248, 0.18)';
+    ctx.fillStyle = shieldFill;
     ctx.beginPath();
     ctx.arc(0, 0, 34, 0, Math.PI * 2);
     ctx.fill();
@@ -400,20 +414,28 @@ export const renderTankModel = (
   ctx.fill();
   ctx.restore();
 
-  // 6. Subtle Team Identification Ring (Arena match support)
-  if (showTeamBadge && team) {
+  // 6. Prominent Team Identification Ring & Badge (Arena match support)
+  if (showTeamBadge && (team || teamPalette)) {
     ctx.save();
-    const teamColor = team === 'blue' ? '#38bdf8' : '#f43f5e';
-    ctx.strokeStyle = teamColor;
-    ctx.lineWidth = 2;
+    const badgeColor = teamPalette ? teamPalette.primary : (team === 'red' ? '#e11d48' : '#0284c7');
+    const ringColor = teamPalette ? teamPalette.visor : (team === 'red' ? '#fb7185' : '#38bdf8');
+    
+    // Team identification boundary circle with subtle glow
+    ctx.strokeStyle = ringColor;
+    ctx.lineWidth = 1.5;
     ctx.shadowBlur = 8;
-    ctx.shadowColor = teamColor;
-
-    // Small team insignia notch at the rear
+    ctx.shadowColor = ringColor;
     ctx.beginPath();
-    ctx.arc(-16, 0, 4, 0, Math.PI * 2);
-    ctx.fillStyle = teamColor;
+    ctx.arc(0, 0, 26, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Solid team insignia notch at the rear
+    ctx.beginPath();
+    ctx.arc(-18, 0, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = badgeColor;
     ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
   }

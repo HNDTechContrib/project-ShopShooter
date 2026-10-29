@@ -15,6 +15,12 @@ import { POINT_TO_RUPIAH_RATIO, formatRupiah } from '../data/mockData';
 import { CharacterCustomizerModal } from './CharacterCustomizerModal';
 import { PlayerProfileModal } from './profile/PlayerProfileModal';
 import { MapSelectorModal, MAP_CATALOG } from './MapSelectorModal';
+import { ArenaScoreHeader } from './arena/hud/ArenaScoreHeader';
+import { ArenaKillFeedOverlay } from './arena/hud/ArenaKillFeedOverlay';
+import { ArenaRespawnModal } from './arena/hud/ArenaRespawnModal';
+import { ArenaDesktopControlsBar } from './arena/hud/ArenaDesktopControlsBar';
+import { ArenaMobileControls } from './arena/controls/ArenaMobileControls';
+import { generateMatchRoster } from '../game/arena/rosterGenerator';
 import { ArenaLobbyView } from './arena/ArenaLobbyView';
 import { ArenaMatchResultModal, ArenaMatchResultStats } from './arena/ArenaMatchResultModal';
 import { LobbyLightParticles } from './arena/LobbyLightParticles';
@@ -109,6 +115,16 @@ import {
   MapDecorationItem, 
   AmbientParticle 
 } from '../config/mapThemesConfig';
+import { 
+  getTeamPalette, 
+  normalizeTeamId, 
+  harmonizeCustomizationForTeam 
+} from '../config/teamConfig';
+import { 
+  getStoredProfile, 
+  saveStoredProfile, 
+  subscribeToProfileUpdates 
+} from '../services/profileStorage';
 
 export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   userDiscountPoints,
@@ -183,36 +199,35 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     };
   }, []);
 
-  // Player Name State (Persisted)
-  const [playerName, setPlayerName] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem('db_player_name');
-      if (saved) return saved;
-    } catch (e) {}
-    return `Striker_${Math.floor(Math.random() * 900 + 100)}`;
-  });
+  // Player Profile and Name State (Persisted via profileStorage single source of truth)
+  const [profileData, setProfileData] = useState(() => getStoredProfile(userDiscountPoints));
+  const [playerName, setPlayerName] = useState<string>(() => profileData.username);
+  const [playerStatus, setPlayerStatus] = useState<string>(() => profileData.statusMessage || 'Siap bertempur di Arena TDM!');
 
   // Handle player name change with immediate UI sync
   const handlePlayerNameChange = (newName: string) => {
-    setPlayerName(newName);
-    try {
-      localStorage.setItem('db_player_name', newName);
-    } catch (e) {}
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setPlayerName(trimmed);
+
+    // Save to storage
+    saveStoredProfile({ username: trimmed }, userDiscountPoints);
 
     // Update in local sim
     const myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (myP) {
-      myP.name = newName;
+      myP.name = trimmed;
     }
 
     // Update waiting room roster immediately!
-    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: newName } : p));
+    setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: trimmed, name: trimmed } : p));
 
     // Update in Firestore
     if (isJoinedRoom && currentRoomCode) {
       const roomRef = doc(db, 'rooms', currentRoomCode);
       updateDoc(roomRef, {
-        [`players.${myPlayerId.current}.username`]: newName,
+        [`players.${myPlayerId.current}.username`]: trimmed,
+        [`players.${myPlayerId.current}.name`]: trimmed,
         updatedAt: Date.now()
       }).catch(() => {});
     }
@@ -221,20 +236,28 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'update-name',
-        username: newName,
+        username: trimmed,
       }));
     }
   };
 
+  // Listen to centralized profile updates
   useEffect(() => {
-    try {
-      localStorage.setItem('db_player_name', playerName);
-    } catch (e) {}
-
-    const myP = simState.current.players.find(p => isLocalPlayer(p.id));
-    if (myP) {
-      myP.name = playerName;
-    }
+    const unsub = subscribeToProfileUpdates((updated) => {
+      setProfileData(updated);
+      if (updated.username && updated.username !== playerName) {
+        setPlayerName(updated.username);
+        const myP = simState.current.players.find(p => isLocalPlayer(p.id));
+        if (myP) {
+          myP.name = updated.username;
+        }
+        setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: updated.username, name: updated.username } : p));
+      }
+      if (updated.statusMessage) {
+        setPlayerStatus(updated.statusMessage);
+      }
+    });
+    return unsub;
   }, [playerName, isLocalPlayer]);
 
   // Character Customization State (Persisted)
@@ -387,17 +410,20 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
 
     const speed = 23;
+    const pTeam = normalizeTeamId(p.team);
+    const pPalette = getTeamPalette(pTeam);
+    const laserColor = isTriple ? pPalette.tripleBullet : pPalette.bullet;
 
     const createBullet = (fireAngle: number) => ({
       id: `${p.id}-${now}-${Math.random()}`,
       shooterId: p.id,
-      team: p.team,
+      team: pTeam,
       x: p.x + Math.cos(fireAngle) * 30,
       y: p.y + Math.sin(fireAngle) * 30,
       vx: Math.cos(fireAngle) * speed,
       vy: Math.sin(fireAngle) * speed,
       damage: Math.floor(18 + Math.random() * 25),
-      color: p.customization?.visorColor || (p.team === 'blue' ? (isTriple ? '#38bdf8' : '#0284c7') : (isTriple ? '#fb7185' : '#e11d48')),
+      color: laserColor,
       life: 75,
     });
 
@@ -806,300 +832,73 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     addDamageText('💨 DASH EVASIVE!', myP.x, myP.y - 20, '#10b981');
   }, [isLocalPlayer]);
 
-  // Initialize Roster, Skills & Particles
+  // Initialize Roster, Skills & Particles via modular generator
   const initRoster = useCallback((forcedMode?: 'bot' | 'multiplayer', customTotalSlots?: number) => {
     const effectiveMode = forcedMode || gameModeType;
     const effectiveSlots = customTotalSlots || totalPlayersConfig;
-    const isMultiplayer = effectiveMode === 'multiplayer';
 
-    const botNames = [
-      'Ghost_Sniper',
-      'Valkyrie_Bot',
-      'Titan_Mech',
-      'Shadow_Reaper',
-      'Nexus_Blaster',
-      'Cyber_Knight',
-      'Frost_Byte',
-      'Apex_Hunter'
-    ];
-
-    const botClasses: CharacterClass[] = ['phantom', 'ninja', 'tanker', 'commando', 'mecha'];
-    const botWeapons: WeaponSkin[] = ['dual_blaster', 'laser_cannon', 'plasma_rifle', 'pulse_shotgun'];
-    const botAccessories: AccessoryType[] = ['horns', 'cyber_goggles', 'halo', 'none', 'crown'];
-
-    const newPlayers: SimPlayer[] = [];
-
-    // Human Player with customized traits and unique ID - Correctly spawns on playerTeam base (left for blue, right for red)
-    const mySpawnX = playerTeam === 'blue'
-      ? 220 + Math.random() * 60
-      : (WORLD_WIDTH - 260) - Math.random() * 80;
-    const mySpawnY = 560 + (Math.random() - 0.5) * 160;
-    const mySpawnAngle = playerTeam === 'blue' ? 0 : Math.PI;
-    const myStats = getCharacterStats(characterCustomization.characterClass);
-    newPlayers.push({
-      id: myPlayerId.current,
-      name: playerName || 'Player',
-      team: playerTeam,
-      x: mySpawnX,
-      y: mySpawnY,
-      angle: mySpawnAngle,
-      hp: myStats.maxHp,
-      maxHp: myStats.maxHp,
-      score: 0,
-      kills: 0,
-      deaths: 0,
-      isBot: false,
-      isShielded: true,
-      shieldTimer: 3.0,
-      isRespawning: false,
-      respawnTimer: 0,
-      color: playerTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-      customization: characterCustomization,
+    const roster = generateMatchRoster({
+      gameModeType: effectiveMode,
+      totalPlayersConfig: effectiveSlots,
+      playerTeam,
+      playerName,
+      myPlayerId: myPlayerId.current,
+      characterCustomization,
+      roomPlayersList,
+      selectedMapTheme,
+      getCharacterStats,
+      isLocalPlayer,
     });
 
-    if (isMultiplayer) {
-      // Include any other humans and bots that were in roomPlayersList
-      const otherRoomPlayers = roomPlayersList.filter(p => !isLocalPlayer(p.id));
-      otherRoomPlayers.forEach((rp, idx) => {
-        const team = rp.team || (idx % 2 === 0 ? 'blue' : 'red');
-        const isBlue = team === 'blue';
-        const spawnX = isBlue ? 220 + Math.random() * 80 : (WORLD_WIDTH - 260) - Math.random() * 80;
-        const spawnY = 360 + (idx * 120);
-        const spawnAngle = isBlue ? 0 : Math.PI;
-        const bClass = rp.customization?.characterClass || botClasses[idx % botClasses.length];
-        const bStats = getCharacterStats(bClass);
-
-        newPlayers.push({
-          id: rp.id || `room-p-${idx}`,
-          name: rp.name || rp.username || `Player_${idx + 1}`,
-          team,
-          x: spawnX,
-          y: spawnY,
-          angle: spawnAngle,
-          hp: bStats.maxHp,
-          maxHp: bStats.maxHp,
-          score: 0,
-          kills: 0,
-          deaths: 0,
-          isBot: rp.isBot ?? false,
-          isShielded: true,
-          shieldTimer: 3.0,
-          isRespawning: false,
-          respawnTimer: 0,
-          color: isBlue ? '#38bdf8' : '#f43f5e',
-          customization: rp.customization || {
-            characterClass: bClass,
-            primaryColor: isBlue ? '#0284c7' : '#e11d48',
-            secondaryColor: isBlue ? '#0369a1' : '#be123c',
-            visorColor: isBlue ? '#38bdf8' : '#fb7185',
-            weaponSkin: botWeapons[idx % botWeapons.length],
-            accessory: botAccessories[idx % botAccessories.length],
-            trailEffect: isBlue ? 'sparks' : 'flames',
-          },
-        });
-      });
-
-      // If room has unfilled slots, fill with AI bots
-      const remainingSlots = Math.max(0, effectiveSlots - newPlayers.length);
-      for (let i = 0; i < remainingSlots; i++) {
-        const blueCount = newPlayers.filter(p => p.team === 'blue').length;
-        const redCount = newPlayers.filter(p => p.team === 'red').length;
-        const team = blueCount <= redCount ? 'blue' : 'red';
-        const isBlue = team === 'blue';
-        const botX = isBlue ? 180 + Math.random() * 80 : (WORLD_WIDTH - 260) - Math.random() * 80;
-        const botY = 360 + (newPlayers.length * 90);
-        const botAngle = isBlue ? 0 : Math.PI;
-        const botClass = botClasses[newPlayers.length % botClasses.length];
-        const botStats = getCharacterStats(botClass);
-
-        newPlayers.push({
-          id: `bot-fill-${i}`,
-          name: `${botNames[newPlayers.length % botNames.length]} (BOT)`,
-          team,
-          x: botX,
-          y: botY,
-          angle: botAngle,
-          hp: botStats.maxHp,
-          maxHp: botStats.maxHp,
-          score: 0,
-          kills: 0,
-          deaths: 0,
-          isBot: true,
-          isShielded: true,
-          shieldTimer: 3.0,
-          isRespawning: false,
-          respawnTimer: 0,
-          color: isBlue ? '#38bdf8' : '#f43f5e',
-          customization: {
-            characterClass: botClass,
-            primaryColor: isBlue ? '#0284c7' : '#e11d48',
-            secondaryColor: isBlue ? '#0369a1' : '#be123c',
-            visorColor: isBlue ? '#38bdf8' : '#fb7185',
-            weaponSkin: botWeapons[i % botWeapons.length],
-            accessory: botAccessories[i % botAccessories.length],
-            trailEffect: isBlue ? 'sparks' : 'flames',
-          },
-        });
-      }
-    } else {
-      // VS AI MODE:
-      // Always spawn the exact number of bots configured!
-      const totalBotsNeeded = Math.max(1, effectiveSlots - 1);
-      const allyBotsNeeded = Math.floor(totalBotsNeeded / 2);
-      const enemyBotsNeeded = totalBotsNeeded - allyBotsNeeded;
-      const blueNeeded = playerTeam === 'blue' ? allyBotsNeeded : enemyBotsNeeded;
-      const redNeeded = playerTeam === 'red' ? allyBotsNeeded : enemyBotsNeeded;
-
-      let botIdx = 0;
-
-      // Team Blue Bots
-      for (let i = 0; i < blueNeeded; i++) {
-        const botX = 180 + Math.random() * 80;
-        const botY = 360 + (i * 140);
-        const botAngle = 0;
-        const botClass = botClasses[botIdx % botClasses.length];
-        const botStats = getCharacterStats(botClass);
-
-        newPlayers.push({
-          id: `bot-blue-${i}`,
-          name: `${botNames[botIdx % botNames.length]} (BOT)`,
-          team: 'blue',
-          x: botX,
-          y: botY,
-          angle: botAngle,
-          hp: botStats.maxHp,
-          maxHp: botStats.maxHp,
-          score: 0,
-          kills: 0,
-          deaths: 0,
-          isBot: true,
-          isShielded: true,
-          shieldTimer: 3.0,
-          isRespawning: false,
-          respawnTimer: 0,
-          color: '#38bdf8',
-          customization: {
-            characterClass: botClass,
-            primaryColor: '#0284c7',
-            secondaryColor: '#0369a1',
-            visorColor: '#38bdf8',
-            weaponSkin: botWeapons[botIdx % botWeapons.length],
-            accessory: botAccessories[botIdx % botAccessories.length],
-            trailEffect: 'sparks',
-          },
-        });
-        botIdx++;
-      }
-
-      // Team Red Bots
-      for (let i = 0; i < redNeeded; i++) {
-        const botX = (WORLD_WIDTH - 260) - Math.random() * 80;
-        const botY = 360 + (i * 140);
-        const botAngle = Math.PI;
-        const botClass = botClasses[botIdx % botClasses.length];
-        const botStats = getCharacterStats(botClass);
-
-        newPlayers.push({
-          id: `bot-red-${i}`,
-          name: `${botNames[botIdx % botNames.length]} (BOT)`,
-          team: 'red',
-          x: botX,
-          y: botY,
-          angle: botAngle,
-          hp: botStats.maxHp,
-          maxHp: botStats.maxHp,
-          score: 0,
-          kills: 0,
-          deaths: 0,
-          isBot: true,
-          isShielded: true,
-          shieldTimer: 3.0,
-          isRespawning: false,
-          respawnTimer: 0,
-          color: '#f43f5e',
-          customization: {
-            characterClass: botClass,
-            primaryColor: '#e11d48',
-            secondaryColor: '#be123c',
-            visorColor: '#fb7185',
-            weaponSkin: botWeapons[botIdx % botWeapons.length],
-            accessory: botAccessories[botIdx % botAccessories.length],
-            trailEffect: 'flames',
-          },
-        });
-        botIdx++;
-      }
-    }
-
-    // Initialize 45 Atmospheric Ambient Particles for the Theme
-    const particles: AmbientParticle[] = [];
-    for (let p = 0; p < 45; p++) {
-      particles.push({
-        x: Math.random() * WORLD_WIDTH,
-        y: Math.random() * WORLD_HEIGHT,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6 - 0.4,
-        size: Math.random() * 3 + 1.5,
-        color: MAP_THEMES_CONFIG[selectedMapTheme].particleColor,
-        alpha: Math.random() * 0.7 + 0.3,
-      });
-    }
-
-    simState.current.players = newPlayers;
+    simState.current.players = roster.players;
     simState.current.bullets = [];
     simState.current.damageTexts = [];
-    simState.current.skills = JSON.parse(JSON.stringify(INITIAL_SKILLS));
-    simState.current.ambientParticles = particles;
+    simState.current.skills = roster.skills;
+    simState.current.ambientParticles = roster.ambientParticles;
     simState.current.blueScore = 0;
     simState.current.redScore = 0;
     simState.current.timeLeft = 90;
     simState.current.currentTheme = selectedMapTheme;
-
-    // Central Boss
-    simState.current.boss = {
-      id: 'boss-deal-box',
-      name: 'Mega Golden Deal Box',
-      x: 1100,
-      y: 640,
-      vx: 1.2,
-      vy: 0.9,
-      hp: 300,
-      maxHp: 300,
-      size: 58,
-    };
+    simState.current.boss = roster.boss;
   }, [totalPlayersConfig, playerTeam, selectedMapTheme, characterCustomization, gameModeType, roomPlayersList, playerName, isLocalPlayer, getCharacterStats]);
 
   // Switch Team (Tim Biru / Tim Merah) with live sync
   const handleSelectTeam = async (newTeam: TeamId) => {
-    setPlayerTeam(newTeam);
+    const normTeam = normalizeTeamId(newTeam);
+    setPlayerTeam(normTeam);
     soundEngine.playPowerUp();
 
-    const newSpawnX = newTeam === 'blue' 
+    const tPalette = getTeamPalette(normTeam);
+    const newSpawnX = normTeam === 'blue' 
       ? 220 + Math.random() * 60 
       : (WORLD_WIDTH - 260) - Math.random() * 80;
-    const newSpawnAngle = newTeam === 'blue' ? 0 : Math.PI;
+    const newSpawnAngle = normTeam === 'blue' ? 0 : Math.PI;
 
     const myP = simState.current.players.find(p => isLocalPlayer(p.id));
     if (myP) {
-      myP.team = newTeam;
-      myP.color = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
+      myP.team = normTeam;
+      myP.color = tPalette.primary;
       myP.x = newSpawnX;
       myP.y = 440 + Math.random() * 200;
       myP.angle = newSpawnAngle;
+      if (myP.customization) {
+        myP.customization = harmonizeCustomizationForTeam(myP.customization, normTeam);
+      }
     }
 
     setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { 
       ...p, 
-      team: newTeam, 
-      color: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+      team: normTeam, 
+      color: tPalette.primary,
       x: newSpawnX,
       angle: newSpawnAngle,
+      customization: p.customization ? harmonizeCustomizationForTeam(p.customization, normTeam) : undefined,
     } : p));
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && currentRoomCode) {
       wsRef.current.send(JSON.stringify({
         type: 'change-team',
-        team: newTeam,
+        team: normTeam,
         playerId: myPlayerId.current,
         roomCode: currentRoomCode,
       }));
@@ -1110,8 +909,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         const roomRef = doc(db, 'rooms', currentRoomCode);
         const uid = myPlayerId.current;
         await updateDoc(roomRef, {
-          [`players.${uid}.team`]: newTeam,
-          [`players.${uid}.color`]: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
+          [`players.${uid}.team`]: normTeam,
+          [`players.${uid}.color`]: tPalette.primary,
           [`players.${uid}.x`]: newSpawnX,
           [`players.${uid}.y`]: 440 + Math.random() * 200,
           [`players.${uid}.angle`]: newSpawnAngle,
@@ -2019,95 +1818,22 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           : 'max-w-6xl mx-auto space-y-3'
       }`}
     >
-      {/* Top TDM Scoreboard Header (Visible only when match is active) */}
-      {!inLobby && (
-      <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white shadow-2xl' : 'bg-white border-slate-200 text-slate-900 shadow-lg'} border-2 rounded-xl md:rounded-2xl ${isFullscreen ? 'p-1.5 md:p-3' : 'p-2.5 md:p-3'} flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0 transition-colors duration-200`}>
-        {/* Team Blue Score */}
-        <div className="flex items-center gap-1.5 md:gap-3">
-          <div className={`w-9 h-9 md:w-12 md:h-12 rounded-xl ${isDark ? 'bg-cyan-950 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'bg-cyan-50 text-cyan-900 shadow-sm'} border-2 border-cyan-400 flex flex-col items-center justify-center font-black`}>
-            <span className="text-[8px] md:text-[10px] uppercase font-bold text-cyan-500">BIRU</span>
-            <span className="text-base md:text-xl leading-none font-mono-numbers">{hudBlueScore}</span>
-          </div>
-          <div className="hidden md:block">
-            <span className="text-xs font-bold text-cyan-500 block">TIM CYBER BIRU</span>
-            <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Kills: {hudBlueScore}
-            </span>
-          </div>
-        </div>
-
-        {/* Center: Match Timer, Active Skill, Customizer Button */}
-        <div className="text-center flex flex-col items-center">
-          <div className="flex items-center justify-center gap-1 text-[10px] md:text-xs font-extrabold tracking-wider uppercase text-amber-500">
-            <Swords className="w-3 h-3 md:w-4 md:h-4 text-amber-500" />
-            <span className="truncate max-w-[130px] md:max-w-none">
-              TDM · {MAP_THEMES_CONFIG[selectedMapTheme].name.split('(')[0]}
-            </span>
-          </div>
-
-          <div className={`text-lg md:text-3xl font-black font-mono-numbers ${isDark ? 'text-white' : 'text-slate-900'} tracking-tight leading-tight`}>
-            {hudTimeLeft}s
-          </div>
-
-          {/* Active Skill or Room Code */}
-          {hudActiveSkill ? (
-            <div className={`flex items-center gap-1 ${isDark ? 'bg-amber-500/20 border-amber-400/80 text-amber-300' : 'bg-amber-100 border-amber-400 text-amber-800'} border px-2 py-0.5 rounded-full text-[9px] md:text-[11px] font-bold animate-pulse mt-0.5`}>
-              <span>⚡ {hudActiveSkill.label}</span>
-              <span className="font-mono">({hudActiveSkill.timeLeft}s)</span>
-            </div>
-          ) : (
-            <span className={`text-[8px] md:text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-600'} block font-mono`}>
-              HP: <strong className={hudMyHp < 30 ? 'text-rose-500' : 'text-emerald-500'}>{hudMyHp}%</strong> · Kills: <strong>{hudMyKills}</strong>
-            </span>
-          )}
-        </div>
-
-        {/* Team Red Score & Controls */}
-        <div className="flex items-center gap-1.5 md:gap-3">
-          <div className="hidden md:block text-right">
-            <span className="text-xs font-bold text-rose-500 block">TIM PLASMA MERAH</span>
-            <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Kills: {hudRedScore}
-            </span>
-          </div>
-          <div className={`w-9 h-9 md:w-12 md:h-12 rounded-xl ${isDark ? 'bg-rose-950 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.3)]' : 'bg-rose-50 text-rose-900 shadow-sm'} border-2 border-rose-500 flex flex-col items-center justify-center font-black`}>
-            <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-500">MERAH</span>
-            <span className="text-base md:text-xl leading-none font-mono-numbers">{hudRedScore}</span>
-          </div>
-          {/* Customizer Button in Header */}
-          <button
-            onClick={() => setShowCustomizerModal(true)}
-            className={`p-1.5 md:p-2.5 rounded-xl border transition-colors ${isDark ? 'bg-amber-500/25 border-amber-500/50 hover:bg-amber-500/35 text-amber-300' : 'bg-amber-100 border-amber-300 hover:bg-amber-200 text-amber-800 shadow-xs'}`}
-            title="Kustomisasi Karakter"
-            aria-label="Kustomisasi Karakter"
-          >
-            <Palette className="w-4 h-4 md:w-5 md:h-5" />
-          </button>
-
-          {/* Fullscreen Button */}
-          <button
-            onClick={toggleFullscreen}
-            className={`p-1.5 md:p-2.5 rounded-xl border transition-colors ${isDark ? 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300' : 'bg-slate-100 border-slate-300 hover:bg-slate-200 text-slate-700 shadow-xs'}`}
-            title={isFullscreen ? 'Keluar Fullscreen (F)' : 'Layar Penuh / Fullscreen (F)'}
-            aria-label="Toggle Fullscreen"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4 md:w-5 md:h-5 text-amber-500" /> : <Maximize2 className="w-4 h-4 md:w-5 md:h-5" />}
-          </button>
-
-          {/* Leave Match Button */}
-          {!inLobby && (
-            <button
-              onClick={handleLeaveMatch}
-              className={`px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border transition-colors flex items-center gap-1 text-xs font-bold ${isDark ? 'bg-rose-500/20 border-rose-500/50 hover:bg-rose-500/30 text-rose-300' : 'bg-rose-100 border-rose-300 hover:bg-rose-200 text-rose-800 shadow-xs'}`}
-              title="Tinggalkan Match"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Keluar</span>
-            </button>
-          )}
-        </div>
-      </div>
-      )}
+      {/* Top TDM Scoreboard Header */}
+      <ArenaScoreHeader
+        isDark={isDark}
+        hudBlueScore={hudBlueScore}
+        hudRedScore={hudRedScore}
+        hudTimeLeft={hudTimeLeft}
+        selectedMapTheme={selectedMapTheme}
+        hudActiveSkill={hudActiveSkill}
+        hudMyHp={hudMyHp}
+        hudMyKills={hudMyKills}
+        setShowCustomizerModal={setShowCustomizerModal}
+        isFullscreen={isFullscreen}
+        toggleFullscreen={toggleFullscreen}
+        inLobby={inLobby}
+        handleLeaveMatch={handleLeaveMatch}
+      />
 
       {/* Main Game Battlefield Container with Canvas */}
       <div
@@ -2129,209 +1855,68 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         {/* In-Game Match HUD Layers (Radar, Killfeed, Boss, Controls) */}
         {!inLobby && (
           <>
-            {/* Tactical Minimap Radar in Top-Left (Visible on match, 60fps canvas with clear player names) */}
+            {/* Tactical Minimap Radar in Top-Left */}
             <div className="absolute top-3 left-3 z-30 w-44 h-28 sm:w-52 sm:h-32 md:w-60 md:h-36 bg-slate-950/90 backdrop-blur-md rounded-xl border border-cyan-500/40 p-1.5 pointer-events-none shadow-[0_0_20px_rgba(0,0,0,0.7)] flex flex-col">
-          <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-800/80 mb-1">
-            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-400 flex items-center gap-1 uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              📡 RADAR ARENA
-            </span>
-            <span className="text-[7.5px] sm:text-[8px] text-slate-400 font-mono">
-              Posisi &amp; Nama Player
-            </span>
-          </div>
-          <div className="relative flex-1 w-full bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
-            <canvas
-              ref={minimapCanvasRef}
-              width={240}
-              height={140}
-              className="w-full h-full block"
-            />
-          </div>
-        </div>
-
-        {/* Live Killfeed in Top Left (Stacked cleanly below the Minimap) */}
-        <div className="absolute top-[138px] sm:top-[158px] md:top-[178px] left-3 z-30 flex flex-col gap-1.5 pointer-events-none max-w-[200px] md:max-w-xs">
-          {hudKillFeed.map((kf) => (
-            <div
-              key={kf.id}
-              className={`text-[10px] md:text-[11px] font-bold px-2 py-0.5 md:py-1 rounded-md border backdrop-blur-md animate-in slide-in-from-left-2 ${
-                kf.team === 'blue'
-                  ? 'bg-cyan-950/80 text-cyan-200 border-cyan-500/50'
-                  : 'bg-rose-950/80 text-rose-200 border-rose-500/50'
-              }`}
-            >
-              {kf.text}
-            </div>
-          ))}
-        </div>
-
-        {/* RESPAWN BANNER / OVERLAY WHEN HUMAN PLAYER DIES */}
-        {hudRespawnTimer > 0 && (
-          <div className="absolute inset-0 z-40 bg-slate-950/75 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-in fade-in duration-150">
-            <div className="bg-slate-900 border-2 border-rose-500/80 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl">
-              <div className="w-16 h-16 rounded-2xl bg-rose-950 border-2 border-rose-500 flex items-center justify-center mx-auto mb-3 animate-pulse">
-                <Skull className="w-9 h-9 text-rose-400" />
+              <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-800/80 mb-1">
+                <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-400 flex items-center gap-1 uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  📡 RADAR ARENA
+                </span>
+                <span className="text-[7.5px] sm:text-[8px] text-slate-400 font-mono">
+                  Posisi &amp; Nama Player
+                </span>
               </div>
-              <h3 className="text-xl md:text-2xl font-black text-white mb-1">
-                KAMU TERELIMINASI!
-              </h3>
-              <p className="text-xs text-slate-400 mb-4">
-                Mempersiapkan respawn kembali ke markas tim...
-              </p>
-
-              {/* Progress Countdown Bar */}
-              <div className="w-full bg-slate-800 rounded-full h-3 mb-4 overflow-hidden border border-slate-700">
-                <div
-                  className="bg-gradient-to-r from-amber-500 to-rose-500 h-full transition-all duration-100 ease-linear"
-                  style={{ width: `${Math.max(0, 100 - (hudRespawnTimer / 3.5) * 100)}%` }}
+              <div className="relative flex-1 w-full bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+                <canvas
+                  ref={minimapCanvasRef}
+                  width={240}
+                  height={140}
+                  className="w-full h-full block"
                 />
               </div>
-
-              <div className="text-3xl font-black font-mono-numbers text-amber-400 mb-5">
-                {hudRespawnTimer.toFixed(1)}s
-              </div>
-
-              {/* Instant Respawn Button */}
-              <button
-                onClick={handleInstantRespawn}
-                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                <Zap className="w-4 h-4 fill-white" />
-                ⚡ Respawn Sekarang (Instan)
-              </button>
             </div>
-          </div>
+
+            {/* Live Killfeed */}
+            <ArenaKillFeedOverlay killFeed={hudKillFeed} />
+
+            {/* Respawn Modal */}
+            <ArenaRespawnModal
+              respawnTimer={hudRespawnTimer}
+              onInstantRespawn={handleInstantRespawn}
+            />
+
+            {/* Desktop Controls Bar */}
+            <ArenaDesktopControlsBar
+              isDark={isDark}
+              showVirtualControls={showVirtualControls}
+              matchStatus={matchStatus}
+              respawnTimer={hudRespawnTimer}
+            />
+
+            {/* Mobile Touch Controls */}
+            <ArenaMobileControls
+              showVirtualControls={showVirtualControls}
+              matchStatus={matchStatus}
+              respawnTimer={hudRespawnTimer}
+              dashCooldown={hudDashCooldown}
+              onTriggerDash={triggerDash}
+              onJoyTouchStart={handleJoyTouchStart}
+              onJoyTouchMove={handleJoyTouchMove}
+              onJoyTouchEnd={handleJoyTouchEnd}
+              joyKnobPos={joyKnobPos}
+              onAimTouchStart={handleAimTouchStart}
+              onAimTouchMove={handleAimTouchMove}
+              onAimTouchEnd={handleAimTouchEnd}
+              onFireStart={() => {
+                isMouseDown.current = true;
+                shootLaser(myPlayerId.current);
+              }}
+              onFireEnd={() => {
+                isMouseDown.current = false;
+              }}
+            />
+          </>
         )}
-
-        {/* DESKTOP KEYBOARD & MOUSE CONTROLS HELPER BAR (Clean, non-intrusive HUD at bottom of arena) */}
-        {!showVirtualControls && matchStatus === 'playing' && hudRespawnTimer === 0 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none max-w-[95%]">
-            <div className={`flex items-center flex-wrap justify-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md text-[10px] md:text-xs font-semibold shadow-lg border transition-all ${
-              isDark 
-                ? 'bg-slate-950/85 border-slate-700/60 text-slate-300 shadow-black/40' 
-                : 'bg-white/95 border-slate-200/90 text-slate-700 shadow-slate-300/40'
-            }`}>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">W A S D</kbd>
-                <span>/</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Panah</kbd>
-                <span className="text-slate-400">Gerak</span>
-              </span>
-              <span className="text-slate-500">•</span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Klik Kiri</kbd>
-                <span className="text-slate-400">Bidik &amp; Tembak</span>
-              </span>
-              <span className="text-slate-500">•</span>
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 font-mono text-[9px] md:text-[10px] font-bold border border-slate-600">Spasi / Shift</kbd>
-                <span className="text-slate-400">Dash</span>
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* MOBILE ON-SCREEN TOUCH CONTROLS (ONLY ON TOUCH-CAPABLE DEVICES / TOUCH MODE) */}
-        {showVirtualControls && matchStatus === 'playing' && hudRespawnTimer === 0 && (
-          <div className="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-2.5 sm:p-4 md:p-6 select-none touch-none">
-            {/* Left: Virtual Movement Joystick */}
-            <div className="pointer-events-auto flex flex-col items-center">
-              <div
-                onTouchStart={handleJoyTouchStart}
-                onTouchMove={handleJoyTouchMove}
-                onTouchEnd={handleJoyTouchEnd}
-                onTouchCancel={handleJoyTouchEnd}
-                className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-34 md:h-34 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700/80 flex items-center justify-center touch-none shadow-2xl active:border-cyan-400"
-              >
-                {/* Center crosshair mark */}
-                <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-                {/* Floating Knob */}
-                <div
-                  className="absolute w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
-                  style={{
-                    transform: `translate(${joyKnobPos.x}px, ${joyKnobPos.y}px)`,
-                  }}
-                >
-                  <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-white/90" />
-                </div>
-              </div>
-              <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 bg-slate-950/80 px-2 py-0.5 rounded-full border border-slate-800">
-                🕹️ Gerak 360°
-              </span>
-            </div>
-
-            {/* Right: Aim Touch Pad, Shoot Button & Dash */}
-            <div className="pointer-events-auto flex flex-col items-end gap-1.5 sm:gap-2">
-              <div className="flex items-center gap-2 mb-0.5">
-                {/* Dash / Evade Button */}
-                <button
-                  onClick={triggerDash}
-                  onTouchStart={(e) => {
-                    e.preventDefault();
-                    triggerDash();
-                  }}
-                  disabled={hudDashCooldown > 0}
-                  className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[9px] sm:text-[10px] font-bold border transition-all flex items-center gap-1.5 shadow-md ${
-                    hudDashCooldown > 0
-                      ? 'bg-slate-800/80 border-slate-700 text-slate-400 opacity-70'
-                      : 'bg-emerald-500/25 border-emerald-400 text-emerald-300 hover:bg-emerald-500/35 active:scale-90'
-                  }`}
-                >
-                  <Wind className="w-3.5 h-3.5" />
-                  <span>{hudDashCooldown > 0 ? `${hudDashCooldown.toFixed(1)}s` : 'DASH'}</span>
-                </button>
-              </div>
-
-              {/* Aim Touch Pad and Big Shoot Button */}
-              <div className="flex items-center gap-2 sm:gap-3">
-                {/* Touch Aim Wheel */}
-                <div
-                  onTouchStart={handleAimTouchStart}
-                  onTouchMove={handleAimTouchMove}
-                  onTouchEnd={handleAimTouchEnd}
-                  onTouchCancel={handleAimTouchEnd}
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-slate-900/80 backdrop-blur-md border-2 border-slate-700 flex flex-col items-center justify-center touch-none text-slate-400 active:border-rose-400 shadow-xl"
-                >
-                  <Crosshair className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
-                  <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">BIDIK</span>
-                </div>
-
-                {/* Big Ergonomic FIRE Button */}
-                <button
-                  onTouchStart={(e) => {
-                    e.preventDefault();
-                    inputDevice.notifyTouchEvent();
-                    isMouseDown.current = true;
-                    shootLaser(myPlayerId.current);
-                  }}
-                  onTouchEnd={(e) => {
-                    e.preventDefault();
-                    isMouseDown.current = false;
-                  }}
-                  onTouchCancel={(e) => {
-                    e.preventDefault();
-                    isMouseDown.current = false;
-                  }}
-                  onMouseDown={() => {
-                    isMouseDown.current = true;
-                    shootLaser(myPlayerId.current);
-                  }}
-                  onMouseUp={() => {
-                    isMouseDown.current = false;
-                  }}
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-3 sm:border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
-                >
-                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
-                  <span className="text-[8px] sm:text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* Close In-Game Match HUD Layers */}
-        </>
-      )}
 
         {/* Lobby Overlay */}
         {inLobby && (
@@ -2475,13 +2060,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             avatarClass: characterCustomization.characterClass,
             primaryColor: characterCustomization.primaryColor,
             weaponSkin: characterCustomization.weaponSkin,
-            totalMatches: 0, // Placeholder, ideally fetch from database
-            wins: 0,
-            losses: 0,
-            kills: hudMyKills,
+            totalMatches: profileData.totalMatches,
+            wins: profileData.wins,
+            losses: profileData.losses,
+            kills: hudMyKills || profileData.kills,
             points: userDiscountPoints,
             isOnline: true,
-            createdAt: '2026-10-01',
+            statusMessage: playerStatus,
+            createdAt: profileData.createdAt,
+          }}
+          onUpdateProfile={(updated) => {
+            saveStoredProfile(updated, userDiscountPoints);
+            if (updated.username) {
+              handlePlayerNameChange(updated.username);
+            }
+            if (updated.statusMessage) {
+              setPlayerStatus(updated.statusMessage);
+            }
           }}
         />
       )}

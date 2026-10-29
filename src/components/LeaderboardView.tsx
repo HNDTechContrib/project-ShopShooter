@@ -38,6 +38,10 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const [inputName, setInputName] = useState<string>(currentUsername);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
+  useEffect(() => {
+    setInputName(currentUsername);
+  }, [currentUsername]);
+
   const [timeLeft, setTimeLeft] = useState<number>(() => {
     const getNextSundayWIB = () => {
       const now = new Date();

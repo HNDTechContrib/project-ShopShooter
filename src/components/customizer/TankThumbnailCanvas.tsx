@@ -1,13 +1,15 @@
 import React, { useRef, useEffect } from 'react';
-import { CharacterCustomization } from '../../types';
+import { CharacterCustomization, TeamId } from '../../types';
 import { renderTankModel } from '../../game/rendering/renderTankModel';
+import { getTeamPalette } from '../../config/teamConfig';
 
 interface TankThumbnailCanvasProps {
   customization: CharacterCustomization;
+  team?: TeamId | string;
   size?: number;
 }
 
-export const TankThumbnailCanvas: React.FC<TankThumbnailCanvasProps> = ({ customization, size = 36 }) => {
+export const TankThumbnailCanvas: React.FC<TankThumbnailCanvasProps> = ({ customization, team, size = 36 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -23,9 +25,12 @@ export const TankThumbnailCanvas: React.FC<TankThumbnailCanvasProps> = ({ custom
 
     ctx.clearRect(0, 0, w, h);
 
+    const teamPalette = team ? getTeamPalette(team) : undefined;
+    const bgPrimaryColor = teamPalette ? teamPalette.primary : customization.primaryColor;
+
     // Subtle radial background aura matching primary color
     const grad = ctx.createRadialGradient(cx, cy, 4, cx, cy, w * 0.45);
-    grad.addColorStop(0, `${customization.primaryColor}55`);
+    grad.addColorStop(0, `${bgPrimaryColor}55`);
     grad.addColorStop(1, 'transparent');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
@@ -37,13 +42,14 @@ export const TankThumbnailCanvas: React.FC<TankThumbnailCanvasProps> = ({ custom
 
     renderTankModel(ctx, {
       customization,
+      team,
       scale: 0.65,
       showTrail: false,
-      showTeamBadge: false,
+      showTeamBadge: Boolean(team),
     });
 
     ctx.restore();
-  }, [customization]);
+  }, [customization, team]);
 
   return (
     <canvas

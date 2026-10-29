@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { User, X, Trophy, Swords, Shield, Zap, Sparkles, Check } from 'lucide-react';
+import { User, X, Trophy, Swords, Shield, Zap, Sparkles, Check, AlertCircle } from 'lucide-react';
 import { PlayerProfile } from '../../types/profileTypes';
 import { TankThumbnailCanvas } from '../customizer/TankThumbnailCanvas';
+import { saveStoredProfile } from '../../services/profileStorage';
 
 interface PlayerProfileModalProps {
   profile: PlayerProfile | null;
@@ -22,16 +23,29 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
   onUpdateProfile,
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editName, setEditName] = useState<string>(profile?.username || '');
-  const [editStatus, setEditStatus] = useState<string>(profile?.statusMessage || 'Siap bertempur di Arena TDM!');
+  const [editName, setEditName] = useState<string>('');
+  const [editStatus, setEditStatus] = useState<string>('');
+  const [displayedName, setDisplayedName] = useState<string>('');
+  const [displayedStatus, setDisplayedStatus] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  // Sync state whenever profile prop or isOpen changes
   useEffect(() => {
     if (profile) {
-      setEditName(profile.username);
-      setEditStatus(profile.statusMessage || 'Siap bertempur di Arena TDM!');
+      const uname = profile.username || '';
+      const ustatus = profile.statusMessage || 'Siap bertempur di Arena TDM!';
+      setEditName(uname);
+      setEditStatus(ustatus);
+      setDisplayedName(uname);
+      setDisplayedStatus(ustatus);
+      setErrorMessage(null);
+      setSuccessMessage(null);
     }
-  }, [profile]);
+  }, [profile, isOpen]);
 
+  // Handle escape key and lock body scroll
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -48,16 +62,86 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
 
   if (!isOpen || !profile) return null;
 
+  const handleStartEdit = () => {
+    setEditName(displayedName);
+    setEditStatus(displayedStatus);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditName(displayedName);
+    setEditStatus(displayedStatus);
+    setErrorMessage(null);
+    setIsEditing(false);
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editName.trim()) return;
-    if (onUpdateProfile) {
-      onUpdateProfile({
-        username: editName.trim(),
-        statusMessage: editStatus.trim(),
-      });
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const trimmedName = editName.trim();
+    const trimmedStatus = editStatus.trim();
+
+    if (!trimmedName) {
+      setErrorMessage('Nama pemain tidak boleh kosong.');
+      return;
     }
-    setIsEditing(false);
+    if (trimmedName.length < 2) {
+      setErrorMessage('Nama pemain minimal 2 karakter.');
+      return;
+    }
+    if (trimmedName.length > 20) {
+      setErrorMessage('Nama pemain maksimal 20 karakter.');
+      return;
+    }
+    if (trimmedStatus.length > 60) {
+      setErrorMessage('Status bio maksimal 60 karakter.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // 1. Save to centralized storage & broadcast
+      const saveRes = saveStoredProfile({
+        username: trimmedName,
+        statusMessage: trimmedStatus,
+      }, profile.points);
+
+      if (!saveRes.success) {
+        setErrorMessage(saveRes.error || 'Gagal menyimpan perubahan profil.');
+        setIsSaving(false);
+        return;
+      }
+
+      // 2. Update local displayed state immediately
+      setDisplayedName(trimmedName);
+      setDisplayedStatus(trimmedStatus);
+
+      // 3. Trigger parent callback if provided
+      if (onUpdateProfile) {
+        onUpdateProfile({
+          username: trimmedName,
+          statusMessage: trimmedStatus,
+        });
+      }
+
+      setSuccessMessage('✓ Profil berhasil diperbarui!');
+      setIsSaving(false);
+      setIsEditing(false);
+
+      // Auto clear success notice after 3s
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err: any) {
+      console.error('Save profile error:', err);
+      setErrorMessage('Terjadi kesalahan saat menyimpan data profil.');
+      setIsSaving(false);
+    }
   };
 
   const winRate = profile.totalMatches > 0 ? Math.round((profile.wins / profile.totalMatches) * 100) : 0;
@@ -92,6 +176,21 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
           </button>
         </div>
 
+        {/* Global Feedback Banner */}
+        {successMessage && (
+          <div className="mb-4 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <Check className="w-4 h-4 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="mb-4 p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         {/* Avatar & Basic Info */}
         <div className="flex flex-col items-center text-center mb-6">
           <div className="relative w-20 h-20 rounded-2xl bg-slate-950 border-2 border-cyan-500/50 flex items-center justify-center shadow-xl mb-3 overflow-hidden">
@@ -101,47 +200,64 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
 
           {!isEditing ? (
             <>
-              <h2 className="text-xl font-black tracking-tight mb-0.5">{profile.username}</h2>
+              <h2 className="text-xl font-black tracking-tight mb-0.5">{displayedName || profile.username}</h2>
               <span className="text-[11px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded-md border border-cyan-500/30 mb-2">
                 ID: {profile.id}
               </span>
-              <p className={`text-xs italic ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                "{profile.statusMessage || 'Siap bertempur di Arena TDM!'}"
+              <p className={`text-xs italic max-w-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                "{displayedStatus || profile.statusMessage || 'Siap bertempur di Arena TDM!'}"
               </p>
             </>
           ) : (
-            <form onSubmit={handleSave} className="w-full space-y-3 mt-1">
+            <form onSubmit={handleSave} className="w-full space-y-3 mt-1 text-left">
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block text-left mb-1">Nama / Nickname:</label>
+                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  Nama / Nickname (2-20 Karakter):
+                </label>
                 <input
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   maxLength={20}
-                  className={`w-full text-xs font-bold px-3 py-2 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`}
+                  placeholder="Masukkan nama striker..."
+                  className={`w-full text-xs font-bold px-3 py-2 rounded-xl border focus:outline-none focus:border-cyan-500 transition-colors ${
+                    isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
+                  }`}
+                  disabled={isSaving}
+                  autoFocus
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block text-left mb-1">Status Bio:</label>
+                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  Status Bio (Maks. 60 Karakter):
+                </label>
                 <input
                   type="text"
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  maxLength={50}
-                  className={`w-full text-xs px-3 py-2 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`}
+                  maxLength={60}
+                  placeholder="Tulis status bio singkat kamu..."
+                  className={`w-full text-xs px-3 py-2 rounded-xl border focus:outline-none focus:border-cyan-500 transition-colors ${
+                    isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
+                  }`}
+                  disabled={isSaving}
                 />
               </div>
               <div className="flex gap-2 pt-1">
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-md"
+                  disabled={isSaving}
+                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
                 >
-                  Simpan Perubahan
+                  {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
-                  className={`px-3 py-2 text-xs font-bold rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-200 border-slate-300 text-slate-700'}`}
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className={`px-3 py-2 text-xs font-bold rounded-xl border ${
+                    isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-slate-200 border-slate-300 text-slate-700 hover:bg-slate-300'
+                  }`}
                 >
                   Batal
                 </button>
@@ -173,7 +289,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
         {/* Bottom Actions */}
         {isSelf && !isEditing && (
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={handleStartEdit}
             className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-[0.99]"
           >
             Edit Profil Striker

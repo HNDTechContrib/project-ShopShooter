@@ -152,7 +152,7 @@ export const ArenaLobbyView: React.FC<ArenaLobbyViewProps> = ({
             }`}
           >
             <div className="w-9 h-9 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 border border-slate-800 shadow-inner overflow-hidden p-0.5">
-              <TankThumbnailCanvas customization={characterCustomization} size={34} />
+              <TankThumbnailCanvas customization={characterCustomization} team={playerTeam} size={34} />
             </div>
             <div className="min-w-0 flex-1">
               <span className="text-[9px] font-bold text-slate-400 uppercase block leading-none mb-0.5">
