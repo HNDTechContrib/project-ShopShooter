@@ -221,24 +221,24 @@ const MAP_THEMES_CONFIG: Record<
     ],
     decorations: [
       // PC & Gadget Showcases
-      { id: 'sc-1', type: 'showcase', x: 680, y: 240, size: 28, color: '#06b6d4', secondaryColor: '#38bdf8', label: 'LAPTOP RTX 5090' },
-      { id: 'sc-2', type: 'showcase', x: 1520, y: 240, size: 28, color: '#f59e0b', secondaryColor: '#fbbf24', label: 'RGB KEYBOARD' },
-      { id: 'sc-3', type: 'showcase', x: 680, y: 1040, size: 28, color: '#ec4899', secondaryColor: '#f472b6', label: 'VR HEADSET OMNI' },
-      { id: 'sc-4', type: 'showcase', x: 1520, y: 1040, size: 28, color: '#10b981', secondaryColor: '#34d399', label: 'CYBER WATCH' },
+      { id: 'sc-1', type: 'showcase', x: 680, y: 240, size: 28, color: '#56889a', secondaryColor: '#a9cad2', label: 'LAPTOP RTX 5090' },
+      { id: 'sc-2', type: 'showcase', x: 1520, y: 240, size: 28, color: '#ba8b43', secondaryColor: '#dfc58e', label: 'RGB KEYBOARD' },
+      { id: 'sc-3', type: 'showcase', x: 680, y: 1040, size: 28, color: '#ad718c', secondaryColor: '#d6b0bd', label: 'VR HEADSET OMNI' },
+      { id: 'sc-4', type: 'showcase', x: 1520, y: 1040, size: 28, color: '#58836f', secondaryColor: '#a8c8b3', label: 'CYBER WATCH' },
       // Central Atrium Expo Stands
-      { id: 'sc-mid-1', type: 'showcase', x: 920, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO RIG' },
-      { id: 'sc-mid-2', type: 'showcase', x: 1280, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO MONITOR' },
+      { id: 'sc-mid-1', type: 'showcase', x: 920, y: 550, size: 24, color: '#64899a', secondaryColor: '#dbe6e8', label: 'EXPO RIG' },
+      { id: 'sc-mid-2', type: 'showcase', x: 1280, y: 550, size: 24, color: '#64899a', secondaryColor: '#dbe6e8', label: 'EXPO MONITOR' },
       // Promotional Neon Billboards
-      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#f59e0b', label: 'FLASH DEAL 70%' },
-      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#ec4899', label: 'CASHBACK 50% VOUCHER' },
-      { id: 'pb-3', type: 'promo_billboard', x: 380, y: 640, size: 35, color: '#06b6d4', label: 'CYBER MALL MEGA STORE' },
-      { id: 'pb-4', type: 'promo_billboard', x: 1820, y: 640, size: 35, color: '#f43f5e', label: 'SALE DISKON 80%' },
+      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#ba8b43', label: 'FLASH DEAL 70%' },
+      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#ad718c', label: 'CASHBACK 50% VOUCHER' },
+      { id: 'pb-3', type: 'promo_billboard', x: 380, y: 640, size: 35, color: '#56889a', label: 'CYBER MALL MEGA STORE' },
+      { id: 'pb-4', type: 'promo_billboard', x: 1820, y: 640, size: 35, color: '#b77683', label: 'SALE DISKON 80%' },
       // Escalators
-      { id: 'esc-1', type: 'escalator', x: 920, y: 760, size: 40, color: '#0284c7', label: 'LANTAI 2 ↗' },
-      { id: 'esc-2', type: 'escalator', x: 1280, y: 760, size: 40, color: '#0284c7', label: 'LANTAI 2 ↗' },
+      { id: 'esc-1', type: 'escalator', x: 920, y: 760, size: 40, color: '#6486aa', label: 'LANTAI 2 ↗' },
+      { id: 'esc-2', type: 'escalator', x: 1280, y: 760, size: 40, color: '#6486aa', label: 'LANTAI 2 ↗' },
       // Mall Directory Kiosks
-      { id: 'kiosk-1', type: 'kiosk', x: 740, y: 640, size: 22, color: '#38bdf8', label: 'DIREKTORI' },
-      { id: 'kiosk-2', type: 'kiosk', x: 1460, y: 640, size: 22, color: '#38bdf8', label: 'DIREKTORI' },
+      { id: 'kiosk-1', type: 'kiosk', x: 740, y: 640, size: 22, color: '#64899a', label: 'DIREKTORI' },
+      { id: 'kiosk-2', type: 'kiosk', x: 1460, y: 640, size: 22, color: '#64899a', label: 'DIREKTORI' },
     ],
   },
   rooftop: {
@@ -2384,10 +2384,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         sim.skills.forEach((skill) => {
           ctx.save();
           if (skill.isAvailable) {
-            ctx.shadowBlur = 18;
-            ctx.shadowColor = skill.color;
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
             ctx.strokeStyle = skill.color;
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 1.5;
             ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
             ctx.beginPath();
             ctx.arc(skill.x, skill.y, 24, 0, Math.PI * 2);
@@ -2420,16 +2420,26 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         // F. Themed Obstacles
         themeConfig.obstacles.forEach((obs) => {
+          ctx.save();
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
+          ctx.shadowBlur = 7;
+          ctx.shadowOffsetY = 3;
           ctx.fillStyle = obs.color;
           ctx.strokeStyle = obs.borderColor;
-          ctx.lineWidth = 3.5;
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 20);
+          ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 14);
           ctx.fill();
           ctx.stroke();
+          ctx.restore();
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.36)';
+          ctx.fillRect(obs.x + 8, obs.y + 8, obs.w - 16, 3);
+          ctx.fillStyle = 'rgba(71, 85, 105, 0.12)';
+          ctx.fillRect(obs.x + 8, obs.y + obs.h - 7, obs.w - 16, 2);
 
           ctx.fillStyle = '#475569';
-          ctx.font = 'bold 10px monospace';
+          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(obs.label, obs.x + obs.w / 2, obs.y + obs.h / 2 + 4);
         });
@@ -2442,8 +2452,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.fillStyle = '#fbbf24';
           ctx.fillRect(b.x - 36, b.y - 44, (b.hp / b.maxHp) * 72, 8);
 
-          ctx.shadowBlur = 25;
-          ctx.shadowColor = '#f59e0b';
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = 'rgba(180, 130, 75, 0.2)';
           ctx.fillStyle = '#f59e0b';
           ctx.beginPath();
           ctx.roundRect(b.x - b.size / 2, b.y - b.size / 2, b.size, b.size, 18);
@@ -2458,8 +2468,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         // H. Bullets (Glowing Projectiles)
         sim.bullets.forEach((bullet) => {
           ctx.save();
-          ctx.shadowBlur = 15;
-          ctx.shadowColor = bullet.color;
+          ctx.shadowBlur = 3;
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.18)';
           ctx.fillStyle = bullet.color;
           ctx.beginPath();
           ctx.arc(bullet.x, bullet.y, 6.5, 0, Math.PI * 2);
@@ -2473,14 +2483,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           ctx.save();
 
-          // Hexagonal glowing pedestal
+          // Subtle team marker keeps players easy to track without a neon halo.
           const hexRadius = 32;
           ctx.save();
-          ctx.shadowBlur = 22;
-          ctx.shadowColor = p.team === 'blue' ? '#06b6d4' : '#f43f5e';
-          ctx.strokeStyle = p.team === 'blue' ? '#38bdf8' : '#fb7185';
-          ctx.fillStyle = p.team === 'blue' ? 'rgba(6, 182, 212, 0.25)' : 'rgba(244, 63, 94, 0.25)';
-          ctx.lineWidth = 3;
+          ctx.shadowBlur = 3;
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
+          ctx.strokeStyle = p.team === 'blue' ? '#4e86a8' : '#bc6877';
+          ctx.fillStyle = p.team === 'blue' ? 'rgba(78, 134, 168, 0.12)' : 'rgba(188, 104, 119, 0.12)';
+          ctx.lineWidth = 2;
 
           ctx.beginPath();
           for (let s = 0; s < 6; s++) {
@@ -2498,16 +2508,16 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           // Spawn Shield / Invulnerability Dome
           if (p.isShielded || p.activeSkill?.type === 'shield') {
             ctx.save();
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = '#facc15';
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'rgba(180, 130, 75, 0.2)';
             ctx.beginPath();
             ctx.arc(p.x, p.y, 40, 0, Math.PI * 2);
-            ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = '#ba8b43';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             ctx.font = 'bold 9px monospace';
-            ctx.fillStyle = '#fde047';
+            ctx.fillStyle = '#91651f';
             ctx.textAlign = 'center';
             ctx.fillText('SHIELDED', p.x, p.y + 48);
             ctx.restore();
@@ -2692,7 +2702,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.strokeRect(barX - 1, barY - 1, barW + 2, barH + 2);
 
           // Health bar fill
-          ctx.fillStyle = p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+          ctx.fillStyle = p.team === 'blue' ? '#5685a0' : '#bd7180';
           ctx.fillRect(barX, barY, Math.max(0, (p.hp / p.maxHp) * barW), barH);
 
           // Highly Visible Player Name Badge (High Contrast & Polished)
@@ -2718,10 +2728,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Border for badge
           ctx.strokeStyle = isLocal
-            ? '#38bdf8'
+            ? '#5685a0'
             : p.team === 'blue'
-            ? 'rgba(56, 189, 248, 0.8)'
-            : 'rgba(251, 113, 133, 0.8)';
+            ? 'rgba(86, 133, 160, 0.75)'
+            : 'rgba(189, 113, 128, 0.75)';
           ctx.lineWidth = isLocal ? 1.5 : 1;
           ctx.stroke();
 
@@ -2752,8 +2762,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.font = '900 18px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = dtItem.color;
           ctx.textAlign = 'center';
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = '#000000';
+          ctx.shadowBlur = 2;
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.2)';
           ctx.fillText(dtItem.text, dtItem.x, dtItem.y);
           ctx.restore();
         }
@@ -2794,11 +2804,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           const rightTeam = playerTeam === 'blue' ? 'red' : 'blue';
 
           const leftMinimapFill = leftTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
-          const leftMinimapTextColor = leftTeam === 'blue' ? '#06b6d4' : '#f43f5e';
+          const leftMinimapTextColor = leftTeam === 'blue' ? '#416f88' : '#a95463';
           const leftMinimapLabel = leftTeam === 'blue' ? 'BIRU' : 'MERAH';
 
           const rightMinimapFill = rightTeam === 'blue' ? 'rgba(6, 182, 212, 0.22)' : 'rgba(244, 63, 94, 0.22)';
-          const rightMinimapTextColor = rightTeam === 'blue' ? '#06b6d4' : '#f43f5e';
+          const rightMinimapTextColor = rightTeam === 'blue' ? '#416f88' : '#a95463';
           const rightMinimapLabel = rightTeam === 'blue' ? 'BIRU' : 'MERAH';
 
           const baseW = (320 / WORLD_WIDTH) * mw;
@@ -2863,12 +2873,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             // Draw player position dot
             mCtx.beginPath();
             mCtx.arc(px, py, isLocal ? 3.5 : 2.5, 0, Math.PI * 2);
-            mCtx.fillStyle = isLocal ? '#38bdf8' : p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+            mCtx.fillStyle = isLocal ? '#416f88' : p.team === 'blue' ? '#416f88' : '#a95463';
             mCtx.fill();
 
             // Local player highlight ring
             if (isLocal) {
-              mCtx.strokeStyle = '#0f172a';
+              mCtx.strokeStyle = '#334155';
               mCtx.lineWidth = 1.5;
               mCtx.stroke();
             }
@@ -2888,14 +2898,13 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             const labelX = Math.max(badgeW / 2 + 2, Math.min(mw - badgeW / 2 - 2, px));
             const labelY = py > 14 ? py - 5 : py + 11;
 
-            // Background badge for extreme contrast
-            mCtx.fillStyle = 'rgba(2, 6, 23, 0.88)';
+            mCtx.fillStyle = 'rgba(255, 255, 255, 0.94)';
             mCtx.fillRect(labelX - badgeW / 2, labelY - 7, badgeW, badgeH);
-            mCtx.strokeStyle = isLocal ? '#38bdf8' : p.team === 'blue' ? '#06b6d4' : '#f43f5e';
+            mCtx.strokeStyle = isLocal ? '#416f88' : p.team === 'blue' ? '#416f88' : '#a95463';
             mCtx.lineWidth = 0.8;
             mCtx.strokeRect(labelX - badgeW / 2, labelY - 7, badgeW, badgeH);
 
-            mCtx.fillStyle = isLocal ? '#ffffff' : p.team === 'blue' ? '#7dd3fc' : '#fda4af';
+            mCtx.fillStyle = isLocal ? '#334155' : p.team === 'blue' ? '#416f88' : '#a95463';
             mCtx.fillText(label, labelX, labelY - 0.5);
           }
         }
@@ -3167,7 +3176,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onMouseUp={() => {
                     isMouseDown.current = false;
                   }}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-rose-600 via-orange-500 to-amber-500 border-4 border-white/80 shadow-[0_0_20px_rgba(244,63,94,0.5)] active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 border-4 border-white/90 shadow-lg active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
                 >
                   <Flame className="w-6 h-6 fill-white" />
                   <span className="text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
