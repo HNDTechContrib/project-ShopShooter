@@ -623,14 +623,14 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         ref={arenaRef}
         onClick={handleArenaClick}
         onMouseMove={handleMouseMove}
-        className={`relative w-full flex-1 min-h-[320px] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
+        className={`relative w-full flex-1 min-h-[320px] bg-slate-50 rounded-2xl overflow-hidden border-2 border-slate-200 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
           screenShake ? 'translate-x-1.5 -translate-y-1.5' : ''
         }`}
         style={{
           backgroundImage: `
-            radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
-            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+            radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
+            linear-gradient(to right, rgba(71, 85, 105, 0.08) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(71, 85, 105, 0.08) 1px, transparent 1px)
           `,
           backgroundSize: '100% 100%, 40px 40px, 40px 40px',
         }}
@@ -638,20 +638,20 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         {/* Active Power-up Gauge Badges inside Canvas */}
         <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 pointer-events-none">
           {activeFreezeTime > 0 && (
-            <div className="flex items-center gap-2 bg-sky-950/80 border border-sky-400/60 px-3 py-1 rounded-lg text-sky-300 text-xs font-semibold backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-sky-50 border border-sky-200 px-3 py-1 rounded-lg text-sky-800 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 animate-spin" />
               <span>Matrix Slow-Mo ({activeFreezeTime}s)</span>
             </div>
           )}
           {activeMultishotTime > 0 && (
-            <div className="flex items-center gap-2 bg-amber-950/80 border border-amber-400/60 px-3 py-1 rounded-lg text-amber-300 text-xs font-semibold backdrop-blur-sm">
-              <Flame className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-lg text-amber-800 text-xs font-semibold backdrop-blur-sm">
+              <Flame className="w-3.5 h-3.5 text-amber-700" />
               <span>Cluster Area Blast ({activeMultishotTime}s)</span>
             </div>
           )}
           {activeDoubleTime > 0 && (
-            <div className="flex items-center gap-2 bg-emerald-950/80 border border-emerald-400/60 px-3 py-1 rounded-lg text-emerald-300 text-xs font-semibold backdrop-blur-sm">
-              <Zap className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg text-emerald-800 text-xs font-semibold backdrop-blur-sm">
+              <Zap className="w-3.5 h-3.5 text-emerald-700 animate-pulse" />
               <span>Pengali 2X Aktif ({activeDoubleTime}s)</span>
             </div>
           )}
@@ -671,46 +671,46 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
 
         {/* Welcome / Idle Screen */}
         {!isPlaying && (
-          <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+          <div className="absolute inset-0 z-30 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center mb-3 shadow-xl shadow-orange-500/20">
               <Crosshair className="w-7 h-7 text-white" />
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
               Arena Latihan Target
             </h2>
-            <p className="text-xs md:text-sm text-slate-300 max-w-lg mb-6 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-600 max-w-lg mb-6 leading-relaxed">
               Tembak target diskon yang bergerak di arena. Kumpulkan poin sebanyak mungkin untuk ditukarkan menjadi potongan belanja di keranjang.
             </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl w-full mb-6 text-left text-xs text-slate-300">
-              <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-sky-400 flex items-center gap-1.5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl w-full mb-6 text-left text-xs text-slate-700">
+              <div className="bg-white border border-slate-200 p-3 rounded-xl flex flex-col gap-1">
+                <span className="font-bold text-sky-700 flex items-center gap-1.5">
                   <Target className="w-3.5 h-3.5" />
                   <span>Target Reguler</span>
                 </span>
-                <span className="text-[11px] text-slate-400">+25 s/d +60 Poin per hit.</span>
+                <span className="text-[11px] text-slate-600">+25 s/d +60 Poin per hit.</span>
               </div>
-              <div className="bg-slate-900/90 border border-amber-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-amber-400 flex items-center gap-1.5">
+              <div className="bg-white border border-amber-200 p-3 rounded-xl flex flex-col gap-1">
+                <span className="font-bold text-amber-700 flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5" />
                   <span>Target Emas</span>
                 </span>
-                <span className="text-[11px] text-slate-400">+250 Poin! Butuh 3x hit.</span>
+                <span className="text-[11px] text-slate-600">+250 Poin! Butuh 3x hit.</span>
               </div>
-              <div className="bg-slate-900/90 border border-red-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-rose-400 flex items-center gap-1.5">
+              <div className="bg-white border border-rose-200 p-3 rounded-xl flex flex-col gap-1">
+                <span className="font-bold text-rose-700 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>Bom Penalti</span>
                 </span>
-                <span className="text-[11px] text-slate-400">-60 Poin jika terkena tembak.</span>
+                <span className="text-[11px] text-slate-600">-60 Poin jika terkena tembak.</span>
               </div>
-              <div className="bg-slate-900/90 border border-emerald-500/30 p-3 rounded-xl flex flex-col gap-1">
-                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+              <div className="bg-white border border-emerald-200 p-3 rounded-xl flex flex-col gap-1">
+                <span className="font-bold text-emerald-700 flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5" />
                   <span>Power-Up</span>
                 </span>
-                <span className="text-[11px] text-slate-400">Slow-mo, Multi-shot, & Magnet.</span>
+                <span className="text-[11px] text-slate-600">Slow-mo, Multi-shot, & Magnet.</span>
               </div>
             </div>
 
@@ -726,8 +726,8 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
 
         {/* Paused Screen */}
         {isPlaying && isPaused && (
-          <div className="absolute inset-0 z-30 bg-slate-950/70 backdrop-blur-sm flex flex-col items-center justify-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Permainan Dijeda</h3>
+          <div className="absolute inset-0 z-30 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+            <h3 className="text-2xl font-bold text-slate-900 mb-4">Permainan Dijeda</h3>
             <button
               onClick={() => setIsPaused(false)}
               className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl"
@@ -767,12 +767,12 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
                       ? 'bg-gradient-to-tr from-emerald-500 to-teal-600 border-2 border-emerald-300 shadow-emerald-500/40'
                       : isSpeedy
                       ? 'bg-gradient-to-tr from-purple-600 to-indigo-600 border border-purple-300 shadow-purple-500/40'
-                      : 'bg-slate-800/90 border border-blue-400/50 hover:border-blue-400 shadow-blue-500/20'
+                      : 'bg-white/95 border border-blue-400/70 hover:border-blue-500 shadow-blue-500/20'
                   }`}
                 >
                   {/* Multi-hit health bar for Boss/Special target */}
                   {target.maxHp > 1 && (
-                    <div className="absolute -top-3 w-12 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
+                    <div className="absolute -top-3 w-12 h-1.5 bg-white rounded-full overflow-hidden border border-slate-300">
                       <div
                         className="h-full bg-emerald-400 transition-all duration-150"
                         style={{ width: `${(target.hp / target.maxHp) * 100}%` }}
@@ -807,8 +807,8 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
                     </div>
                   ) : (
                     <div className="text-center p-1">
-                      <ShoppingBag className="w-5 h-5 text-blue-300 mx-auto" />
-                      <span className="text-[10px] font-bold text-white block font-mono-numbers">
+                      <ShoppingBag className="w-5 h-5 text-blue-700 mx-auto" />
+                      <span className="text-[10px] font-bold text-slate-900 block font-mono-numbers">
                         +{target.points}
                       </span>
                     </div>
@@ -859,7 +859,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
             {onNavigateToCart && (
               <button
                 onClick={onNavigateToCart}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-lg text-xs font-semibold transition-colors"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 Gunakan di Keranjang
@@ -918,7 +918,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
 
       {/* Round Summary Modal */}
       {showSummaryModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-white/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
             <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-600">
               <Sparkles className="w-7 h-7" />
@@ -971,7 +971,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
 
               <button
                 onClick={startGame}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-semibold rounded-xl text-sm transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 Main Lagi untuk Tambah Poin
