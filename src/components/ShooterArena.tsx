@@ -26,9 +26,9 @@ interface ShooterArenaProps {
   onAddDiscountPoints: (points: number) => void;
   powerUpInventory: PowerUpItem[];
   onUsePowerUpItem: (id: PowerUpType) => boolean;
-  onNavigateToCart: () => void;
-  onNavigateToLeaderboard: () => void;
-  onTriggerSpecialNotification: (targetName: string, points: number) => void;
+  onNavigateToCart?: () => void;
+  onNavigateToLeaderboard?: () => void;
+  onTriggerSpecialNotification?: (targetName: string, points: number) => void;
 }
 
 export const ShooterArena: React.FC<ShooterArenaProps> = ({
@@ -325,7 +325,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         // If it's a special gold target, trigger sound siren & notification!
         if (targetType === 'special_gold') {
           soundEngine.playSpecialSiren();
-          onTriggerSpecialNotification(name, points);
+          onTriggerSpecialNotification?.(name, points);
         }
 
         const newTarget: ShooterTarget = {
@@ -856,13 +856,15 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
               <strong className="text-slate-900 font-bold">{userDiscountPoints} Poin</strong> (≈{' '}
               {formatRupiah(userDiscountPoints * POINT_TO_RUPIAH_RATIO)})
             </span>
-            <button
-              onClick={onNavigateToCart}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors"
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              Gunakan di Keranjang
-            </button>
+            {onNavigateToCart && (
+              <button
+                onClick={onNavigateToCart}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                Gunakan di Keranjang
+              </button>
+            )}
           </div>
         </div>
 
@@ -957,13 +959,15 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
             </div>
 
             <div className="flex flex-col gap-2.5">
-              <button
-                onClick={onNavigateToCart}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Tukarkan di Keranjang Belanja ({formatRupiah(lastRoundStats.score * POINT_TO_RUPIAH_RATIO)})
-              </button>
+              {onNavigateToCart && (
+                <button
+                  onClick={onNavigateToCart}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Tukarkan di Keranjang Belanja ({formatRupiah(lastRoundStats.score * POINT_TO_RUPIAH_RATIO)})
+                </button>
+              )}
 
               <button
                 onClick={startGame}
@@ -973,13 +977,15 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
                 Main Lagi untuk Tambah Poin
               </button>
 
-              <button
-                onClick={onNavigateToLeaderboard}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-colors"
-              >
-                <Award className="w-4 h-4 text-amber-600" />
-                Cek Posisi di Papan Peringkat Mingguan
-              </button>
+              {onNavigateToLeaderboard && (
+                <button
+                  onClick={onNavigateToLeaderboard}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-colors"
+                >
+                  <Award className="w-4 h-4 text-amber-600" />
+                  Cek Posisi di Papan Peringkat Mingguan
+                </button>
+              )}
             </div>
           </div>
         </div>

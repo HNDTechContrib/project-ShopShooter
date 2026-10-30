@@ -49,6 +49,8 @@ interface RoomState {
   code: string;
   players: Record<string, PlayerState>;
   gameState: 'waiting' | 'playing' | 'ended';
+  hostId: string;
+  mapTheme: string;
   blueScore: number;
   redScore: number;
   timeLeft: number;
@@ -80,6 +82,8 @@ wss.on('connection', (ws: WebSocket) => {
             code: currentRoom,
             players: {},
             gameState: 'waiting',
+            hostId: player.id,
+            mapTheme: msg.mapTheme || 'mall',
             blueScore: 0,
             redScore: 0,
             timeLeft: 90,
@@ -90,6 +94,10 @@ wss.on('connection', (ws: WebSocket) => {
 
         if (currentRoom && playerId) {
           const room = rooms[currentRoom];
+          if (!room) {
+            ws.send(JSON.stringify({ type: 'server-error', message: 'Room tidak dapat dibuat.' }));
+            return;
+          }
           const existingP = room.players[playerId];
           const humanEntries = Object.keys(room.players).length;
           // Player's chosen team if provided, otherwise preserve or balance
@@ -162,28 +170,10 @@ wss.on('connection', (ws: WebSocket) => {
       } else if (msg.type === 'add-bot' && currentRoom) {
         const room = rooms[currentRoom];
         if (room) {
-          const botNames = ['Cyber_Sniper', 'Valkyrie_Bot', 'Titan_Mech', 'Shadow_Reaper', 'Nexus_Bot', 'Apex_Bot'];
-          const botId = `server-bot-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
           const currentCount = Object.keys(room.players).length + (room.bots ? room.bots.length : 0);
-          if (currentCount < room.totalSlots) {
-            const team = currentCount % 2 === 0 ? 'red' : 'blue';
+          if (currentCount < room.totalSlots && msg.bot?.id) {
             if (!room.bots) room.bots = [];
-            room.bots.push({
-              id: botId,
-              username: `${botNames[room.bots.length % botNames.length]} (BOT)`,
-              team,
-              x: 220 + Math.random() * 60,
-              y: team === 'blue' ? 380 + (room.bots.length * 80) : 740 + (room.bots.length * 80),
-              angle: 0,
-              score: 0,
-              hp: 100,
-              maxHp: 100,
-              kills: 0,
-              deaths: 0,
-              isReady: true,
-              isBot: true,
-              color: team === 'blue' ? '#38bdf8' : '#f43f5e',
-            });
+            room.bots.push(msg.bot);
             broadcastToRoom(currentRoom, {
               type: 'room-updated',
               room: sanitizeRoom(room),
@@ -208,6 +198,9 @@ wss.on('connection', (ws: WebSocket) => {
             room.bots = room.bots.filter(b => b.id !== targetId);
           }
           if (room.players[targetId]) {
+            const target = room.players[targetId];
+            target.ws?.send(JSON.stringify({ type: 'player-kicked' }));
+            target.ws?.close();
             delete room.players[targetId];
           }
           broadcastToRoom(currentRoom, {
@@ -240,11 +233,11 @@ wss.on('connection', (ws: WebSocket) => {
         }
       } else if (msg.type === 'delete-room' && currentRoom) {
         const roomToDel = currentRoom;
-        delete rooms[roomToDel];
         broadcastToRoom(roomToDel, {
           type: 'room-deleted',
           roomCode: roomToDel,
         });
+        delete rooms[roomToDel];
         currentRoom = null;
       } else if (msg.type === 'leave-room' && currentRoom && playerId) {
         const room = rooms[currentRoom];
@@ -253,6 +246,9 @@ wss.on('connection', (ws: WebSocket) => {
           if (Object.keys(room.players).length === 0) {
             delete rooms[currentRoom];
           } else {
+            if (room.hostId === playerId) {
+              room.hostId = Object.keys(room.players)[0];
+            }
             broadcastToRoom(currentRoom, {
               type: 'player-left',
               playerId,
@@ -278,14 +274,18 @@ wss.on('connection', (ws: WebSocket) => {
 
   ws.on('close', () => {
     if (currentRoom && playerId && rooms[currentRoom]) {
-      delete rooms[currentRoom].players[playerId];
-      if (Object.keys(rooms[currentRoom].players).length === 0) {
+      const room = rooms[currentRoom];
+      delete room.players[playerId];
+      if (Object.keys(room.players).length === 0) {
         delete rooms[currentRoom];
       } else {
+        if (room.hostId === playerId) {
+          room.hostId = Object.keys(room.players)[0];
+        }
         broadcastToRoom(currentRoom, {
           type: 'player-left',
           playerId,
-          room: sanitizeRoom(rooms[currentRoom]),
+          room: sanitizeRoom(room),
         });
       }
     }
@@ -338,6 +338,8 @@ function sanitizeRoom(room: RoomState) {
     code: room.code,
     players: sanitizedPlayers,
     gameState: room.gameState,
+    hostId: room.hostId,
+    mapTheme: room.mapTheme,
     blueScore: room.blueScore || 0,
     redScore: room.redScore || 0,
     timeLeft: room.timeLeft,
@@ -371,7 +373,7 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     app.use(express.static(path.resolve(__dirname, 'dist')));
-    app.get('*', (req, res) => {
+    app.get('/{*path}', (req, res) => {
       res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
     });
   }

@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
+  body,
+  :host {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     color: #0f172a;
     background-color: #f8fafc;
     user-select: none;
     -webkit-user-select: none;
+    display: block;
   }
 }
 

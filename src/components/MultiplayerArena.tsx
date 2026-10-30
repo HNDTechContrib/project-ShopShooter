@@ -12,14 +12,6 @@ import {
 import { soundEngine } from '../utils/audio';
 import { POINT_TO_RUPIAH_RATIO, formatRupiah } from '../data/mockData';
 import { CharacterCustomizerModal } from './CharacterCustomizerModal';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, deleteField } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
-const auth = getAuth(firebaseApp);
 
 import { 
   Users, 
@@ -71,9 +63,10 @@ import confetti from 'canvas-confetti';
 interface MultiplayerArenaProps {
   userDiscountPoints: number;
   onAddDiscountPoints: (points: number) => void;
-  onNavigateToCart: () => void;
-  onNavigateToLeaderboard: () => void;
-  onTriggerSpecialNotification: (targetName: string, points: number) => void;
+  onNavigateToCart?: () => void;
+  onNavigateToLeaderboard?: () => void;
+  onTriggerSpecialNotification?: (targetName: string, points: number) => void;
+  webSocketUrl?: string;
 }
 
 // World Map Dimensions
@@ -405,6 +398,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   onNavigateToCart,
   onNavigateToLeaderboard,
   onTriggerSpecialNotification,
+  webSocketUrl,
 }) => {
   // Lobby and match state
   const [inLobby, setInLobby] = useState<boolean>(true);
@@ -421,7 +415,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
-  const firestoreUnsubRef = useRef<(() => void) | null>(null);
 
   // Globally unique player ID per client / tab (persisted in session)
   const myPlayerId = useRef<string>(
@@ -440,8 +433,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   const isLocalPlayer = useCallback((id: string) => {
     if (!id) return false;
-    const authUid = auth.currentUser?.uid;
-    return id === myPlayerId.current || (authUid && id === authUid) || id === 'local-p1' || id.startsWith('p_');
+    return id === myPlayerId.current || id === 'local-p1' || id.startsWith('p_');
   }, []);
 
   const [isJoinedRoom, setIsJoinedRoom] = useState<boolean>(false);
@@ -451,29 +443,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
   const isEffectiveHost = isRoomHost || (roomHostId !== null && (roomHostId === myPlayerId.current || isLocalPlayer(roomHostId)));
 
-  // Authenticate anonymously with Firebase on startup
   useEffect(() => {
-    signInAnonymously(auth).then((cred) => {
-      if (cred?.user?.uid) {
-        const oldId = myPlayerId.current;
-        const newId = cred.user.uid;
-        myPlayerId.current = newId;
-        simState.current.players.forEach(p => {
-          if (p.id === oldId) p.id = newId;
-        });
-        try {
-          sessionStorage.setItem('shop_shooter_player_uid', newId);
-        } catch (e) {}
-      }
-    }).catch((err) => {
-      console.warn("Firebase Auth fallback to local UID:", err);
-    });
-
     return () => {
-      if (firestoreUnsubRef.current) {
-        firestoreUnsubRef.current();
-        firestoreUnsubRef.current = null;
-      }
+      wsRef.current?.close();
+      wsRef.current = null;
     };
   }, []);
 
@@ -502,16 +475,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     // Update waiting room roster immediately!
     setRoomPlayersList(prev => prev.map(p => isLocalPlayer(p.id) ? { ...p, username: newName } : p));
 
-    // Update in Firestore
-    if (isJoinedRoom && currentRoomCode) {
-      const roomRef = doc(db, 'rooms', currentRoomCode);
-      updateDoc(roomRef, {
-        [`players.${myPlayerId.current}.username`]: newName,
-        updatedAt: Date.now()
-      }).catch(() => {});
-    }
-
-    // Update in WebSocket
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'update-name',
@@ -648,12 +611,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       myP.customization = newCustom;
     }
 
-    if (isJoinedRoom && currentRoomCode) {
-      const roomRef = doc(db, 'rooms', currentRoomCode);
-      updateDoc(roomRef, {
-        [`players.${myPlayerId.current}.customization`]: newCustom,
-        updatedAt: Date.now()
-      }).catch(() => {});
+    if (isJoinedRoom && wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'player-update',
+        updates: { customization: newCustom },
+      }));
     }
   };
 
@@ -744,41 +706,18 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       angle: botAngle,
     };
 
-    // Update in Firestore
-    if (currentRoomCode) {
-      try {
-        const roomRef = doc(db, 'rooms', currentRoomCode);
-        await updateDoc(roomRef, {
-          [`players.${botId}`]: newBot,
-          updatedAt: Date.now(),
-        });
-      } catch (e) {
-        console.warn("Firestore add bot error:", e);
-      }
-    }
-
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'add-bot' }));
+      wsRef.current.send(JSON.stringify({ type: 'add-bot', bot: newBot }));
     }
   };
 
   // Leave Match / Return to Lobby
   const handleLeaveMatch = async () => {
     soundEngine.playPowerUp();
-    if (currentRoomCode && isJoinedRoom) {
-      try {
-        const roomRef = doc(db, 'rooms', currentRoomCode);
-        await updateDoc(roomRef, {
-          [`players.${myPlayerId.current}`]: deleteField(),
-          updatedAt: Date.now(),
-        });
-      } catch (e) {}
-    }
-    if (firestoreUnsubRef.current) {
-      firestoreUnsubRef.current();
-      firestoreUnsubRef.current = null;
-    }
     if (wsRef.current) {
+      if (wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'leave-room' }));
+      }
       wsRef.current.close();
       wsRef.current = null;
     }
@@ -1063,7 +1002,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   }, [totalPlayersConfig, playerTeam, selectedMapTheme, characterCustomization]);
 
   // Switch Team (Tim Biru / Tim Merah) with live sync
-  const handleSelectTeam = async (newTeam: TeamId) => {
+  const handleSelectTeam = (newTeam: TeamId) => {
     setPlayerTeam(newTeam);
     soundEngine.playPowerUp();
 
@@ -1087,45 +1026,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }));
     }
 
-    if (isJoinedRoom && currentRoomCode) {
-      try {
-        const roomRef = doc(db, 'rooms', currentRoomCode);
-        const uid = myPlayerId.current;
-        await updateDoc(roomRef, {
-          [`players.${uid}.team`]: newTeam,
-          [`players.${uid}.color`]: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-          [`players.${uid}.x`]: 220 + Math.random() * 60,
-          [`players.${uid}.y`]: newTeam === 'blue' ? 440 : 760,
-          [`players.${uid}.angle`]: 0,
-        });
-      } catch (e) {
-        console.warn("Firestore update team error:", e);
-      }
-    }
   };
 
   // Connect / Join Multiplayer Room
-  const handleJoinMultiplayerRoom = async (targetCode?: string, asHost: boolean = false) => {
+  const handleJoinMultiplayerRoom = (targetCode?: string, asHost: boolean = false) => {
     soundEngine.playPowerUp();
     const codeToUse = (targetCode || roomCodeInput.trim() || currentRoomCode).toUpperCase();
     if (!codeToUse) return;
     setCurrentRoomCode(codeToUse);
     setIsJoinedRoom(true);
 
-    // Ensure Anonymous Auth for Firestore rules
-    let uid = auth.currentUser?.uid || myPlayerId.current;
-    if (!auth.currentUser) {
-      try {
-        const cred = await signInAnonymously(auth);
-        uid = cred.user.uid;
-        myPlayerId.current = uid;
-        try {
-          sessionStorage.setItem('shop_shooter_player_uid', uid);
-        } catch (e) {}
-      } catch (e) {
-        console.warn("Auth fallback to local UID:", e);
-      }
-    }
+    const uid = myPlayerId.current;
 
     if (asHost) {
       setIsRoomHost(true);
@@ -1175,168 +1086,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     // Immediately show self in room list
     setRoomPlayersList([myPlayerData]);
 
-    // 1. FIRESTORE REALTIME SYNC (Master cloud state for rooms and player roster across devices)
-    try {
-      const roomRef = doc(db, 'rooms', codeToUse);
-      if (firestoreUnsubRef.current) {
-        firestoreUnsubRef.current();
-        firestoreUnsubRef.current = null;
-      }
-
-      const snap = await getDoc(roomRef);
-      if (!snap.exists()) {
-        setIsRoomHost(true);
-        setRoomHostId(uid);
-        await setDoc(roomRef, {
-          code: codeToUse,
-          gameState: 'waiting',
-          totalSlots: totalPlayersConfig,
-          mapTheme: selectedMapTheme,
-          blueScore: 0,
-          redScore: 0,
-          timeLeft: 90,
-          hostId: uid,
-          updatedAt: Date.now(),
-          players: {
-            [uid]: myPlayerData,
-          },
-        });
-      } else {
-        const existingData = snap.data();
-        if (asHost) {
-          setIsRoomHost(true);
-          setRoomHostId(uid);
-          await updateDoc(roomRef, {
-            gameState: 'waiting',
-            hostId: uid,
-            totalSlots: totalPlayersConfig,
-            blueScore: 0,
-            redScore: 0,
-            timeLeft: 90,
-            players: {
-              [uid]: myPlayerData,
-            },
-            updatedAt: Date.now(),
-          });
-        } else {
-          if (existingData?.hostId) {
-            setRoomHostId(existingData.hostId);
-            if (existingData.hostId === uid || isLocalPlayer(existingData.hostId)) {
-              setIsRoomHost(true);
-            }
-          }
-          await updateDoc(roomRef, {
-            [`players.${uid}`]: myPlayerData,
-            updatedAt: Date.now(),
-          });
-        }
-      }
-
-      // Real-time snapshot listener on room doc
-      firestoreUnsubRef.current = onSnapshot(roomRef, (docSnap) => {
-        if (!docSnap.exists()) {
-          // Room was deleted by host
-          setIsJoinedRoom(false);
-          setIsRoomHost(false);
-          setRoomHostId(null);
-          setRoomPlayersList([]);
-          return;
-        }
-        const data = docSnap.data();
-        const playersMap = data.players || {};
-        const playersList = Object.values(playersMap) as any[];
-        setRoomPlayersList(playersList);
-
-        if (data.hostId) {
-          setRoomHostId(data.hostId);
-          if (data.hostId === uid || isLocalPlayer(data.hostId)) {
-            setIsRoomHost(true);
-          }
-        } else if (asHost) {
-          setRoomHostId(uid);
-          setIsRoomHost(true);
-        }
-
-        // If player was kicked or removed from room
-        if (!asHost && playersMap && !playersMap[uid] && playersList.length > 0) {
-          setIsJoinedRoom(false);
-          setIsRoomHost(false);
-          setRoomHostId(null);
-          setRoomPlayersList([]);
-          return;
-        }
-
-        if (data.mapTheme) setSelectedMapTheme(data.mapTheme);
-        if (data.totalSlots) setTotalPlayersConfig(data.totalSlots);
-
-        // Update local team if synced from room
-        if (playersMap[uid]) {
-          setPlayerTeam(playersMap[uid].team);
-          if (myP) {
-            myP.team = playersMap[uid].team;
-            myP.color = playersMap[uid].team === 'blue' ? '#38bdf8' : '#f43f5e';
-          }
-        }
-
-        // When host starts match!
-        if (data.gameState === 'playing' && matchStatus !== 'playing') {
-          const myTeam = playersMap[uid]?.team || playerTeam;
-          simState.current.players = playersList.map((p, pIdx) => {
-            const isAlly = p.team === myTeam;
-            const spawnX = isAlly 
-              ? 220 + Math.random() * 80 
-              : (WORLD_WIDTH - 260) - Math.random() * 80;
-            const spawnY = 360 + (pIdx * 120);
-            const spawnAngle = isAlly ? 0 : Math.PI;
-
-            if (isLocalPlayer(p.id)) {
-              return { 
-                ...p, 
-                id: uid, 
-                x: spawnX, 
-                y: spawnY, 
-                angle: spawnAngle, 
-                hp: p.hp || 100,
-                maxHp: 100,
-                isShielded: true,
-                isRespawning: false,
-                respawnTimer: 0,
-              };
-            }
-            return {
-              ...p,
-              x: p.x || spawnX,
-              y: p.y || spawnY,
-              angle: p.angle !== undefined ? p.angle : spawnAngle,
-              isBot: p.isBot || false,
-              isShielded: p.isShielded || false,
-              isRespawning: p.isRespawning || false,
-              respawnTimer: p.respawnTimer || 0,
-            };
-          });
-
-          if (data.blueScore !== undefined) simState.current.blueScore = data.blueScore;
-          if (data.redScore !== undefined) simState.current.redScore = data.redScore;
-          if (data.timeLeft !== undefined) simState.current.timeLeft = data.timeLeft;
-
-          setInLobby(false);
-          setMatchStatus('playing');
-          soundEngine.playPowerUp();
-          onTriggerSpecialNotification('Mega Golden Deal Box', 300);
-        } else if (data.gameState === 'ended' && matchStatus === 'playing') {
-          finishMatch();
-        }
-      });
-    } catch (err) {
-      console.warn("Firestore sync warning:", err);
-    }
-
-    // 2. WEBSOCKET FAST REALTIME PROTOCOL (Using unique player UID)
     try {
       if (wsRef.current) wsRef.current.close();
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
-      const ws = new WebSocket(wsUrl);
+      const ws = new WebSocket(webSocketUrl || `${protocol}//${window.location.host}/ws`);
       wsRef.current = ws;
       setWsConnectionStatus('connecting');
 
@@ -1346,6 +1099,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           type: 'join-room',
           roomCode: codeToUse,
           totalSlots: totalPlayersConfig,
+          mapTheme: selectedMapTheme,
           player: myPlayerData,
           asHost,
         }));
@@ -1353,6 +1107,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
       ws.onerror = () => {
         setWsConnectionStatus('disconnected');
+        setJoinError('Tidak dapat terhubung ke server multiplayer.');
       };
 
       ws.onclose = () => {
@@ -1361,11 +1116,51 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
       ws.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
+          const data: {
+            type: string;
+            message?: string;
+            playerId?: string;
+            room?: {
+              players?: Record<string, any>;
+              hostId?: string;
+              mapTheme?: MapTheme;
+              totalSlots?: number;
+              blueScore?: number;
+              redScore?: number;
+              timeLeft?: number;
+            };
+            updates?: Record<string, unknown>;
+            bullet?: SimBullet;
+          } = JSON.parse(event.data);
           if (data.type === 'room-updated') {
             if (data.room && data.room.players) {
-              const roomPlayers = Object.values(data.room.players) as any[];
+              const playersMap = data.room.players;
+              const roomPlayers = Object.values(playersMap);
               setRoomPlayersList(roomPlayers);
+              if (data.room.hostId) {
+                setRoomHostId(data.room.hostId);
+                setIsRoomHost(data.room.hostId === myPlayerId.current);
+              }
+              if (data.room.mapTheme) setSelectedMapTheme(data.room.mapTheme);
+              const totalSlots = data.room.totalSlots;
+              if (totalSlots === 2 || totalSlots === 4 || totalSlots === 6 || totalSlots === 8) {
+                setTotalPlayersConfig(totalSlots);
+              }
+
+              const self = playersMap[myPlayerId.current];
+              if (!self && roomPlayers.length > 0) {
+                setIsJoinedRoom(false);
+                setIsRoomHost(false);
+                setRoomHostId(null);
+                setJoinError('Anda sudah dikeluarkan dari room.');
+                ws.close();
+                return;
+              }
+              if (self) {
+                setPlayerTeam(self.team);
+                setRoomHostId(data.room.hostId ?? null);
+                setIsRoomHost(data.room.hostId === myPlayerId.current);
+              }
             }
           } else if (data.type === 'match-started') {
             if (data.room && data.room.players) {
@@ -1394,23 +1189,26 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 };
               });
             }
-            if (data.room.blueScore !== undefined) simState.current.blueScore = data.room.blueScore;
-            if (data.room.redScore !== undefined) simState.current.redScore = data.room.redScore;
-            if (data.room.timeLeft !== undefined) simState.current.timeLeft = data.room.timeLeft;
+            if (data.room?.blueScore !== undefined) simState.current.blueScore = data.room.blueScore;
+            if (data.room?.redScore !== undefined) simState.current.redScore = data.room.redScore;
+            if (data.room?.timeLeft !== undefined) simState.current.timeLeft = data.room.timeLeft;
 
             setInLobby(false);
             setMatchStatus('playing');
             soundEngine.playPowerUp();
-            onTriggerSpecialNotification('Mega Golden Deal Box', 300);
+            onTriggerSpecialNotification?.('Mega Golden Deal Box', 300);
           } else if (data.type === 'player-moved') {
-            if (!isLocalPlayer(data.playerId)) {
+            if (data.playerId && !isLocalPlayer(data.playerId) && data.updates) {
               const p = simState.current.players.find(item => item.id === data.playerId);
               if (p) {
                 Object.assign(p, data.updates);
               }
+              setRoomPlayersList(prev => prev.map(item =>
+                item.id === data.playerId ? { ...item, ...data.updates } : item
+              ));
             }
           } else if (data.type === 'bullet-fired') {
-            if (!isLocalPlayer(data.playerId)) {
+            if (data.playerId && data.bullet && !isLocalPlayer(data.playerId)) {
               simState.current.bullets.push(data.bullet);
             }
           } else if (data.type === 'room-deleted') {
@@ -1418,18 +1216,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             setIsRoomHost(false);
             setRoomHostId(null);
             setRoomPlayersList([]);
-            if (firestoreUnsubRef.current) {
-              firestoreUnsubRef.current();
-              firestoreUnsubRef.current = null;
-            }
+            setInLobby(true);
+            setJoinError('Room telah dihapus oleh host.');
+          } else if (data.type === 'player-kicked') {
+            setIsJoinedRoom(false);
+            setIsRoomHost(false);
+            setRoomHostId(null);
+            setRoomPlayersList([]);
+            setInLobby(true);
+            setJoinError('Anda telah dikeluarkan dari room.');
           } else if (data.type === 'player-left') {
             if (data.room && data.room.players) {
               setRoomPlayersList(Object.values(data.room.players));
+              setRoomHostId(data.room.hostId ?? null);
+              setIsRoomHost(data.room.hostId === myPlayerId.current);
             } else if (data.playerId) {
               setRoomPlayersList(prev => prev.filter(p => p.id !== data.playerId));
             }
           } else if (data.type === 'match-ended') {
             finishMatch();
+          } else if (data.type === 'server-error') {
+            setJoinError(data.message || 'Server multiplayer menolak permintaan.');
           }
         } catch (err) {
           console.error(err);
@@ -1441,48 +1248,23 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   };
 
   // Trigger Start Match (Bot or Multiplayer)
-  const startMatch = async () => {
+  const startMatch = () => {
     if (gameModeType === 'bot') {
       setInLobby(false);
       setMatchStatus('playing');
       initRoster();
       soundEngine.playPowerUp();
-      onTriggerSpecialNotification('Mega Golden Deal Box', 300);
+      onTriggerSpecialNotification?.('Mega Golden Deal Box', 300);
     } else {
       soundEngine.playPowerUp();
-      // Start match in Firestore
-      if (currentRoomCode) {
-        try {
-          const roomRef = doc(db, 'rooms', currentRoomCode);
-          await updateDoc(roomRef, {
-            gameState: 'playing',
-            updatedAt: Date.now(),
-          });
-        } catch (e) {
-          console.warn("Firestore start match error:", e);
-        }
-      }
-      // Also send via WebSocket
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ type: 'start-match' }));
       }
     }
   };
 
-  const handleKickPlayer = async (targetId: string) => {
+  const handleKickPlayer = (targetId: string) => {
     soundEngine.playPowerUp();
-
-    if (currentRoomCode) {
-      try {
-        const roomRef = doc(db, 'rooms', currentRoomCode);
-        await updateDoc(roomRef, {
-          [`players.${targetId}`]: deleteField(),
-          updatedAt: Date.now(),
-        });
-      } catch (e) {
-        console.warn("Firestore kick error:", e);
-      }
-    }
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
@@ -1492,7 +1274,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
   };
 
-  const handleUpdateBotTeam = async (botId: string, newTeam: 'blue' | 'red') => {
+  const handleUpdateBotTeam = (botId: string, newTeam: 'blue' | 'red') => {
     if (!currentRoomCode) return;
     soundEngine.playPowerUp();
 
@@ -1525,34 +1307,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }));
     }
 
-    // 3. Update in Firestore
-    try {
-      const roomRef = doc(db, 'rooms', currentRoomCode);
-      await updateDoc(roomRef, {
-        [`players.${botId}.team`]: newTeam,
-        [`players.${botId}.color`]: newTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-        [`players.${botId}.x`]: newX,
-        [`players.${botId}.angle`]: newAngle,
-        updatedAt: Date.now(),
-      });
-    } catch (e) {
-      console.warn("Firestore update bot team error:", e);
-    }
   };
 
   // Host deletes the waiting room
-  const handleDeleteRoom = async () => {
+  const handleDeleteRoom = () => {
     soundEngine.playPowerUp();
-    const code = currentRoomCode;
-
-    if (code) {
-      try {
-        const roomRef = doc(db, 'rooms', code);
-        await deleteDoc(roomRef);
-      } catch (e) {
-        console.warn("Firestore delete room error:", e);
-      }
-    }
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
@@ -1560,10 +1319,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }));
     }
 
-    if (firestoreUnsubRef.current) {
-      firestoreUnsubRef.current();
-      firestoreUnsubRef.current = null;
-    }
     setIsJoinedRoom(false);
     setIsRoomHost(false);
     setRoomHostId(null);
@@ -1573,21 +1328,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   };
 
   // Guest leaves the waiting room
-  const handleLeaveRoom = async () => {
+  const handleLeaveRoom = () => {
     soundEngine.playPowerUp();
-    const code = currentRoomCode;
-
-    if (code) {
-      try {
-        const roomRef = doc(db, 'rooms', code);
-        await updateDoc(roomRef, {
-          [`players.${myPlayerId.current}`]: deleteField(),
-          updatedAt: Date.now(),
-        });
-      } catch (e) {
-        console.warn("Firestore leave room error:", e);
-      }
-    }
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
@@ -1595,10 +1337,6 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }));
     }
 
-    if (firestoreUnsubRef.current) {
-      firestoreUnsubRef.current();
-      firestoreUnsubRef.current = null;
-    }
     setIsJoinedRoom(false);
     setIsRoomHost(false);
     setRoomHostId(null);
@@ -3874,13 +3612,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-2.5">
-              <button
-                onClick={onNavigateToCart}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 text-sm transition-all"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Gunakan Hadiah Diskon di Keranjang Belanja
-              </button>
+              {onNavigateToCart && (
+                <button
+                  onClick={onNavigateToCart}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 text-sm transition-all"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Gunakan Hadiah Diskon di Keranjang Belanja
+                </button>
+              )}
 
               <button
                 onClick={() => {
@@ -3893,12 +3633,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 Tanding Ulang TDM (Rematch)
               </button>
 
-              <button
-                onClick={onNavigateToLeaderboard}
-                className="w-full py-2 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900"
-              >
-                Cek Papan Peringkat Mingguan
-              </button>
+              {onNavigateToLeaderboard && (
+                <button
+                  onClick={onNavigateToLeaderboard}
+                  className="w-full py-2 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900"
+                >
+                  Cek Papan Peringkat Mingguan
+                </button>
+              )}
             </div>
           </div>
         </div>

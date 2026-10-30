@@ -1,4 +1,8 @@
 import { Product, PowerUpItem, LeaderboardEntry } from '../types';
+import headphonesImage from '../assets/images/product_anc_headphones_1792116552129.jpg';
+import keyboardImage from '../assets/images/product_mechanical_keyboard_1792116551254.jpg';
+import smartwatchImage from '../assets/images/product_smartwatch_titanium_1792116552983.jpg';
+import sneakersImage from '../assets/images/product_streetwear_sneaker_1792116552809.jpg';
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
@@ -8,7 +12,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 899000,
     originalPrice: 1299000,
     discountPercent: 30,
-    image: '/src/assets/images/product_mechanical_keyboard_1792116551254.jpg',
+    image: keyboardImage,
     rating: 4.9,
     reviewCount: 382,
     description: 'Keyboard mekanik nirkabel premium dengan switch hot-swappable tactile, koneksi triple-mode Bluetooth 5.2/2.4Ghz, dan keycaps PBT doubleshot.',
@@ -23,7 +27,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 1450000,
     originalPrice: 2200000,
     discountPercent: 34,
-    image: '/src/assets/images/product_anc_headphones_1792116552129.jpg',
+    image: headphonesImage,
     rating: 4.8,
     reviewCount: 512,
     description: 'Headphone over-ear peredam bising aktif hibrida dengan driver titanium 40mm, audio resolusi tinggi LDAC, dan kenyamanan memory foam berjam-jam.',
@@ -38,7 +42,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 1850000,
     originalPrice: 2600000,
     discountPercent: 28,
-    image: '/src/assets/images/product_smartwatch_titanium_1792116552983.jpg',
+    image: smartwatchImage,
     rating: 4.9,
     reviewCount: 290,
     description: 'Smartwatch outdoor berbalut bodi titanium grade aerospace dengan layar AMOLED selalu aktif, sensor SpO2 detak jantung akurat, dan GPS dual-band.',
@@ -53,7 +57,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 780000,
     originalPrice: 1100000,
     discountPercent: 29,
-    image: '/src/assets/images/product_streetwear_sneaker_1792116552809.jpg',
+    image: sneakersImage,
     rating: 4.7,
     reviewCount: 420,
     description: 'Sepatu sneaker aerodinamis modern dengan bantalan sole udara responsif, upper breathable mesh, dan aksen warna oranye vibrant untuk gaya harian.',
@@ -68,7 +72,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 499000,
     originalPrice: 750000,
     discountPercent: 33,
-    image: '/src/assets/images/product_mechanical_keyboard_1792116551254.jpg',
+    image: keyboardImage,
     rating: 4.8,
     reviewCount: 198,
     description: 'Mouse gaming ultralight 58g dengan sensor optik 26.000 DPI, switch optik 100 juta klik, dan kabel paracord fleksibel tanpa hambatan tarikan.',
@@ -83,7 +87,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 1250000,
     originalPrice: 1750000,
     discountPercent: 28,
-    image: '/src/assets/images/product_anc_headphones_1792116552129.jpg',
+    image: headphonesImage,
     rating: 4.9,
     reviewCount: 147,
     description: 'Speaker monitor stereo desktop bertenaga 80W RMS dengan cone woofer kevlar, input optik/Bluetooth 5.0, dan tuned bass reflex port.',
