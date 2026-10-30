@@ -208,16 +208,16 @@ const MAP_THEMES_CONFIG: Record<
   mall: {
     name: 'Shopping Mall (Pusat Elektronik & Komputer)',
     description: 'Arena di dalam pusat perbelanjaan futuristik dengan lorong belanja, etalase laptop & PC gaming, area tengah terbuka, serta papan promosi diskon.',
-    bgColor: '#080d1a',
-    gridColor: 'rgba(56, 189, 248, 0.08)',
-    particleColor: 'rgba(56, 189, 248, 0.45)',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(71, 85, 105, 0.12)',
+    particleColor: 'rgba(14, 116, 144, 0.35)',
     obstacles: [
-      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#0c1527', borderColor: '#06b6d4' },
-      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#0c1527', borderColor: '#38bdf8' },
-      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#0c1527', borderColor: '#f59e0b' },
-      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#0c1527', borderColor: '#ec4899' },
-      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#111c33', borderColor: '#3b82f6' },
-      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMARTPHONE HUB', color: '#111c33', borderColor: '#f43f5e' },
+      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#e2e8f0', borderColor: '#06b6d4' },
+      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#e2e8f0', borderColor: '#38bdf8' },
+      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#e2e8f0', borderColor: '#f59e0b' },
+      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#e2e8f0', borderColor: '#ec4899' },
+      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#f1f5f9', borderColor: '#3b82f6' },
+      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMARTPHONE HUB', color: '#f1f5f9', borderColor: '#f43f5e' },
     ],
     decorations: [
       // PC & Gadget Showcases
@@ -229,8 +229,8 @@ const MAP_THEMES_CONFIG: Record<
       { id: 'sc-mid-1', type: 'showcase', x: 920, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO RIG' },
       { id: 'sc-mid-2', type: 'showcase', x: 1280, y: 550, size: 24, color: '#38bdf8', secondaryColor: '#ffffff', label: 'EXPO MONITOR' },
       // Promotional Neon Billboards
-      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#f59e0b', label: '⚡ FLASH DEAL 70% ⚡' },
-      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#ec4899', label: '🎁 CASHBACK 50% VOUCHER' },
+      { id: 'pb-1', type: 'promo_billboard', x: 1100, y: 140, size: 45, color: '#f59e0b', label: 'FLASH DEAL 70%' },
+      { id: 'pb-2', type: 'promo_billboard', x: 1100, y: 1160, size: 45, color: '#ec4899', label: 'CASHBACK 50% VOUCHER' },
       { id: 'pb-3', type: 'promo_billboard', x: 380, y: 640, size: 35, color: '#06b6d4', label: 'CYBER MALL MEGA STORE' },
       { id: 'pb-4', type: 'promo_billboard', x: 1820, y: 640, size: 35, color: '#f43f5e', label: 'SALE DISKON 80%' },
       // Escalators
@@ -244,16 +244,16 @@ const MAP_THEMES_CONFIG: Record<
   rooftop: {
     name: 'Neon Rooftop (Atap Mall & Helipad)',
     description: 'Arena atap gedung dengan lampu neon malam hari, helipad terbuka untuk duel cepat, platform bertingkat, dan lorong sempit.',
-    bgColor: '#0a0614',
-    gridColor: 'rgba(244, 63, 94, 0.08)',
-    particleColor: 'rgba(244, 63, 94, 0.55)',
+    bgColor: '#fff7f9',
+    gridColor: 'rgba(190, 24, 93, 0.12)',
+    particleColor: 'rgba(190, 24, 93, 0.35)',
     obstacles: [
-      { x: 920, y: 280, w: 200, h: 120, label: 'HVAC CHILLER TOWER 01', color: '#18181b', borderColor: '#f43f5e' },
-      { x: 1080, y: 900, w: 200, h: 120, label: 'ENERGY GENERATOR B', color: '#18181b', borderColor: '#fb7185' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS WEST', color: '#111827', borderColor: '#06b6d4' },
-      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS EAST', color: '#111827', borderColor: '#a855f7' },
-      { x: 800, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT A', color: '#1f1326', borderColor: '#ec4899' },
-      { x: 1300, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT B', color: '#1f1326', borderColor: '#ec4899' },
+      { x: 920, y: 280, w: 200, h: 120, label: 'HVAC CHILLER TOWER 01', color: '#e2e8f0', borderColor: '#f43f5e' },
+      { x: 1080, y: 900, w: 200, h: 120, label: 'ENERGY GENERATOR B', color: '#e2e8f0', borderColor: '#fb7185' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS WEST', color: '#f1f5f9', borderColor: '#06b6d4' },
+      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK ACCESS EAST', color: '#f1f5f9', borderColor: '#a855f7' },
+      { x: 800, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT A', color: '#fce7f3', borderColor: '#ec4899' },
+      { x: 1300, y: 640, w: 100, h: 100, label: 'VENTILASI DUCT B', color: '#fce7f3', borderColor: '#ec4899' },
     ],
     decorations: [
       // Central Helipad
@@ -276,16 +276,16 @@ const MAP_THEMES_CONFIG: Record<
   warehouse: {
     name: 'Tech Warehouse (Gudang Logistik E-Commerce)',
     description: 'Gudang logistik belanja otomatis dengan rak kargo bertingkat, peti kemas dekoratif berlindung, dan variasi lorong strategis untuk tim.',
-    bgColor: '#0f1217',
-    gridColor: 'rgba(245, 158, 11, 0.08)',
-    particleColor: 'rgba(245, 158, 11, 0.5)',
+    bgColor: '#fffbeb',
+    gridColor: 'rgba(180, 83, 9, 0.12)',
+    particleColor: 'rgba(180, 83, 9, 0.35)',
     obstacles: [
-      { x: 860, y: 240, w: 220, h: 120, label: 'RAK KARGO A1: GADGETS', color: '#1c1917', borderColor: '#f59e0b' },
-      { x: 1120, y: 240, w: 220, h: 120, label: 'RAK KARGO A2: KOMPONEN', color: '#1c1917', borderColor: '#f59e0b' },
-      { x: 860, y: 940, w: 220, h: 120, label: 'RAK KARGO B1: DRONE PACK', color: '#1c1917', borderColor: '#eab308' },
-      { x: 1120, y: 940, w: 220, h: 120, label: 'RAK KARGO B2: BATTERY CELL', color: '#1c1917', borderColor: '#eab308' },
-      { x: 500, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #03', color: '#27272a', borderColor: '#38bdf8' },
-      { x: 1570, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #08', color: '#27272a', borderColor: '#f43f5e' },
+      { x: 860, y: 240, w: 220, h: 120, label: 'RAK KARGO A1: GADGETS', color: '#fef3c7', borderColor: '#f59e0b' },
+      { x: 1120, y: 240, w: 220, h: 120, label: 'RAK KARGO A2: KOMPONEN', color: '#fef3c7', borderColor: '#f59e0b' },
+      { x: 860, y: 940, w: 220, h: 120, label: 'RAK KARGO B1: DRONE PACK', color: '#fef3c7', borderColor: '#eab308' },
+      { x: 1120, y: 940, w: 220, h: 120, label: 'RAK KARGO B2: BATTERY CELL', color: '#fef3c7', borderColor: '#eab308' },
+      { x: 500, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #03', color: '#e2e8f0', borderColor: '#38bdf8' },
+      { x: 1570, y: 460, w: 130, h: 230, label: 'CONTAINER CARGO #08', color: '#e2e8f0', borderColor: '#f43f5e' },
     ],
     decorations: [
       // Pallet Crate Stacks
@@ -307,16 +307,16 @@ const MAP_THEMES_CONFIG: Record<
   garden: {
     name: 'Sky Garden (Taman Atrium Futuristik)',
     description: 'Taman atap futuristik mall dengan jembatan layang kaca, air mancur cyber lotus, tanaman bercahaya, dan platform melingkar santai.',
-    bgColor: '#051410',
-    gridColor: 'rgba(16, 185, 129, 0.08)',
-    particleColor: 'rgba(52, 211, 153, 0.55)',
+    bgColor: '#f0fdf4',
+    gridColor: 'rgba(21, 128, 61, 0.12)',
+    particleColor: 'rgba(21, 128, 61, 0.35)',
     obstacles: [
-      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#06281e', borderColor: '#10b981' },
-      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#06281e', borderColor: '#10b981' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#082f3a', borderColor: '#06b6d4' },
-      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#291224', borderColor: '#f43f5e' },
-      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#0a3628', borderColor: '#34d399' },
-      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#0a3628', borderColor: '#34d399' },
+      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#dcfce7', borderColor: '#10b981' },
+      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#dcfce7', borderColor: '#10b981' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#cffafe', borderColor: '#06b6d4' },
+      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#fce7f3', borderColor: '#f43f5e' },
+      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#d1fae5', borderColor: '#34d399' },
+      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#d1fae5', borderColor: '#34d399' },
     ],
     decorations: [
       // Central Cyber Lotus Fountain
@@ -337,16 +337,16 @@ const MAP_THEMES_CONFIG: Record<
   cavern: {
     name: 'Gua Batuan Kristal (Rocky Cavern)',
     description: 'Medan batuan basalt terjal dengan pilar kristal bercahaya, celah lava pijar, dan fosil purba.',
-    bgColor: '#090d16',
-    gridColor: 'rgba(245, 158, 11, 0.06)',
-    particleColor: 'rgba(245, 158, 11, 0.45)',
+    bgColor: '#f8fafc',
+    gridColor: 'rgba(71, 85, 105, 0.12)',
+    particleColor: 'rgba(180, 83, 9, 0.35)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 120, label: 'PILAR KRISTAL EMAS', color: '#1e1b18', borderColor: '#d97706' },
-      { x: 950, y: 880, w: 220, h: 120, label: 'BATUAN BASALT MAGMA', color: '#1e1b18', borderColor: '#dc2626' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'TEBING BATUAN BARAT', color: '#181b24', borderColor: '#0284c7' },
-      { x: 500, y: 800, w: 120, h: 240, label: 'FORMASI STALAGMIT', color: '#181b24', borderColor: '#0284c7' },
-      { x: 1550, y: 450, w: 120, h: 240, label: 'TEBING BATUAN TIMUR', color: '#241a1c', borderColor: '#e11d48' },
-      { x: 1550, y: 800, w: 120, h: 240, label: 'BONGKAHAN GRANIT', color: '#241a1c', borderColor: '#e11d48' },
+      { x: 950, y: 280, w: 220, h: 120, label: 'PILAR KRISTAL EMAS', color: '#fef3c7', borderColor: '#d97706' },
+      { x: 950, y: 880, w: 220, h: 120, label: 'BATUAN BASALT MAGMA', color: '#fee2e2', borderColor: '#dc2626' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'TEBING BATUAN BARAT', color: '#e2e8f0', borderColor: '#0284c7' },
+      { x: 500, y: 800, w: 120, h: 240, label: 'FORMASI STALAGMIT', color: '#e2e8f0', borderColor: '#0284c7' },
+      { x: 1550, y: 450, w: 120, h: 240, label: 'TEBING BATUAN TIMUR', color: '#ffe4e6', borderColor: '#e11d48' },
+      { x: 1550, y: 800, w: 120, h: 240, label: 'BONGKAHAN GRANIT', color: '#ffe4e6', borderColor: '#e11d48' },
     ],
     decorations: [
       { id: 'crys-1', type: 'crystal', x: 740, y: 220, size: 28, color: '#f59e0b', secondaryColor: '#fbbf24', rotation: 0.2 },
@@ -356,12 +356,12 @@ const MAP_THEMES_CONFIG: Record<
   lab: {
     name: 'Laboratorium Sci-Fi (Quantum Lab)',
     description: 'Pusat riset militer futuristik dengan reaktor kuantum, tabung spesimen kimia neon, dan konsol holografik.',
-    bgColor: '#060a12',
-    gridColor: 'rgba(56, 189, 248, 0.08)',
-    particleColor: 'rgba(56, 189, 248, 0.45)',
+    bgColor: '#eff6ff',
+    gridColor: 'rgba(29, 78, 216, 0.12)',
+    particleColor: 'rgba(29, 78, 216, 0.35)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 110, label: 'QUANTUM CORE REACTOR', color: '#0f172a', borderColor: '#38bdf8' },
-      { x: 500, y: 460, w: 110, h: 230, label: 'ENERGY CONDUIT A', color: '#0c1e30', borderColor: '#0ea5e9' },
+      { x: 950, y: 280, w: 220, h: 110, label: 'QUANTUM CORE REACTOR', color: '#dbeafe', borderColor: '#38bdf8' },
+      { x: 500, y: 460, w: 110, h: 230, label: 'ENERGY CONDUIT A', color: '#e0f2fe', borderColor: '#0ea5e9' },
     ],
     decorations: [
       { id: 'tube-1', type: 'lab_tube', x: 740, y: 240, size: 26, color: '#06b6d4', secondaryColor: '#38bdf8', label: 'BIO-SERUM 01' },
@@ -370,12 +370,12 @@ const MAP_THEMES_CONFIG: Record<
   forest: {
     name: 'Hutan Neon Alien (Bioluminescent Forest)',
     description: 'Hutan lebat misterius dengan pohon purba bercahaya, koloni jamur fluoresen, dan semak kamuflase.',
-    bgColor: '#05110d',
-    gridColor: 'rgba(16, 185, 129, 0.07)',
-    particleColor: 'rgba(52, 211, 153, 0.55)',
+    bgColor: '#f0fdf4',
+    gridColor: 'rgba(21, 128, 61, 0.12)',
+    particleColor: 'rgba(21, 128, 61, 0.35)',
     obstacles: [
-      { x: 950, y: 280, w: 220, h: 130, label: 'POHON PURBA BIOLUMINESCENT', color: '#092119', borderColor: '#10b981' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'RUMPUN AKAR KELAM', color: '#061c24', borderColor: '#06b6d4' },
+      { x: 950, y: 280, w: 220, h: 130, label: 'POHON PURBA BIOLUMINESCENT', color: '#dcfce7', borderColor: '#10b981' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'RUMPUN AKAR KELAM', color: '#cffafe', borderColor: '#06b6d4' },
     ],
     decorations: [
       { id: 'mush-1', type: 'mushroom', x: 740, y: 230, size: 36, color: '#a855f7', secondaryColor: '#d8b4fe' },
@@ -730,7 +730,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
   // Push to Kill Feed
   const addKillFeed = (killer: string, victim: string, team: TeamId) => {
     const id = `${Date.now()}-${Math.random()}`;
-    const text = `💥 ${killer} mengeliminasi ${victim} (+1 Skor)`;
+    const text = `${killer} mengeliminasi ${victim} (+1 Skor)`;
     setHudKillFeed((prev) => [{ id, text, team }, ...prev.slice(0, 3)]);
     setTimeout(() => {
       setHudKillFeed((prev) => prev.filter((item) => item.id !== id));
@@ -1986,7 +1986,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.save();
             ctx.shadowBlur = 18;
             ctx.shadowColor = dec.color;
-            ctx.fillStyle = '#0f172a';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.roundRect(dec.x - dec.size, dec.y - dec.size * 0.6, dec.size * 2, dec.size * 1.2, 8);
             ctx.fill();
@@ -2001,7 +2001,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             // Tech label underneath
             if (dec.label) {
               ctx.font = 'bold 9px monospace';
-              ctx.fillStyle = '#f8fafc';
+              ctx.fillStyle = '#334155';
               ctx.textAlign = 'center';
               ctx.fillText(dec.label, dec.x, dec.y + dec.size + 14);
             }
@@ -2011,7 +2011,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.save();
             ctx.shadowBlur = 24;
             ctx.shadowColor = dec.color;
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
             const bWidth = dec.size * 3.6;
             const bHeight = 32;
             ctx.beginPath();
@@ -2029,14 +2029,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.fillRect(dec.x + bWidth / 2 - 6, dec.y + bHeight / 2 - 6, 6, 6);
 
             ctx.font = '900 11px "Plus Jakarta Sans", monospace';
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#0f172a';
             ctx.textAlign = 'center';
             ctx.fillText(dec.label || 'PROMO MALL', dec.x, dec.y + 4);
             ctx.restore();
           } else if (dec.type === 'escalator') {
             // Mall escalator / travelator floor markings with animated chevron arrows
             ctx.save();
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.fillStyle = 'rgba(241, 245, 249, 0.94)';
             ctx.fillRect(dec.x - 24, dec.y - 40, 48, 80);
             ctx.strokeStyle = dec.color;
             ctx.lineWidth = 2;
@@ -2058,7 +2058,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             }
             if (dec.label) {
               ctx.font = 'bold 8px monospace';
-              ctx.fillStyle = '#94a3b8';
+              ctx.fillStyle = '#475569';
               ctx.textAlign = 'center';
               ctx.fillText(dec.label, dec.x, dec.y + 54);
             }
@@ -2066,7 +2066,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           } else if (dec.type === 'kiosk') {
             // Touchscreen mall info directory kiosk
             ctx.save();
-            ctx.fillStyle = '#1e293b';
+            ctx.fillStyle = '#f1f5f9';
             ctx.fillRect(dec.x - 16, dec.y - 20, 32, 40);
             ctx.strokeStyle = dec.color;
             ctx.lineWidth = 2;
@@ -2076,7 +2076,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.fillStyle = dec.color;
             ctx.fillRect(dec.x - 12, dec.y - 14, 24, 18);
             ctx.font = 'bold 8px monospace';
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#334155';
             ctx.textAlign = 'center';
             ctx.fillText(dec.label || 'INFO', dec.x, dec.y + 30);
             ctx.restore();
@@ -2125,7 +2125,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.save();
             ctx.shadowBlur = 25;
             ctx.shadowColor = dec.color;
-            ctx.fillStyle = 'rgba(10, 6, 20, 0.9)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
             const sW = dec.size * 5;
             const sH = 34;
             ctx.fillRect(dec.x - sW / 2, dec.y - sH / 2, sW, sH);
@@ -2163,7 +2163,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           } else if (dec.type === 'chiller_fan') {
             // Rotating HVAC ventilation chiller fan
             ctx.save();
-            ctx.fillStyle = '#1e293b';
+            ctx.fillStyle = '#f1f5f9';
             ctx.beginPath();
             ctx.arc(dec.x, dec.y, dec.size, 0, Math.PI * 2);
             ctx.fill();
@@ -2288,7 +2288,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.stroke();
 
             // Central pool basin
-            ctx.fillStyle = '#06281e';
+            ctx.fillStyle = '#ecfdf5';
             ctx.beginPath();
             ctx.arc(dec.x, dec.y, 22, 0, Math.PI * 2);
             ctx.fill();
@@ -2319,7 +2319,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           } else if (dec.type === 'planter_box') {
             // Modern geometric planter with glowing flowers
             ctx.save();
-            ctx.fillStyle = '#1e293b';
+            ctx.fillStyle = '#f1f5f9';
             ctx.fillRect(dec.x - dec.size / 2, dec.y - 12, dec.size, 24);
             ctx.strokeStyle = dec.color;
             ctx.lineWidth = 2;
@@ -2387,7 +2387,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.shadowColor = skill.color;
             ctx.strokeStyle = skill.color;
             ctx.lineWidth = 2.5;
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
             ctx.beginPath();
             ctx.arc(skill.x, skill.y, 24, 0, Math.PI * 2);
             ctx.fill();
@@ -2403,7 +2403,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           } else {
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 1.5;
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.4)';
+            ctx.fillStyle = 'rgba(241, 245, 249, 0.7)';
             ctx.beginPath();
             ctx.arc(skill.x, skill.y, 20, 0, Math.PI * 2);
             ctx.fill();
@@ -2427,7 +2427,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.fill();
           ctx.stroke();
 
-          ctx.fillStyle = '#94a3b8';
+          ctx.fillStyle = '#475569';
           ctx.font = 'bold 10px monospace';
           ctx.textAlign = 'center';
           ctx.fillText(obs.label, obs.x + obs.w / 2, obs.y + obs.h / 2 + 4);
@@ -2436,7 +2436,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         // G. Golden Deal Boss
         if (sim.boss && sim.boss.hp > 0) {
           const b = sim.boss;
-          ctx.fillStyle = '#0f172a';
+          ctx.fillStyle = '#e2e8f0';
           ctx.fillRect(b.x - 36, b.y - 44, 72, 8);
           ctx.fillStyle = '#fbbf24';
           ctx.fillRect(b.x - 36, b.y - 44, (b.hp / b.maxHp) * 72, 8);
@@ -2684,9 +2684,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           const barY = p.y - 32;
 
           // Health bar background & border
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
           ctx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.strokeStyle = 'rgba(71, 85, 105, 0.35)';
           ctx.lineWidth = 1;
           ctx.strokeRect(barX - 1, barY - 1, barW + 2, barH + 2);
 
@@ -2696,7 +2696,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Highly Visible Player Name Badge (High Contrast & Polished)
           const isLocal = isLocalPlayer(p.id);
-          const displayName = isLocal ? `⭐ ${p.name} (Kamu)` : p.name;
+          const displayName = isLocal ? `${p.name} (Kamu)` : p.name;
           ctx.font = isLocal ? 'bold 11px "Plus Jakarta Sans", sans-serif' : 'bold 10.5px "Plus Jakarta Sans", sans-serif';
           ctx.textAlign = 'center';
 
@@ -2706,8 +2706,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           const badgeX = p.x - badgeW / 2;
           const badgeY = barY - badgeH - 3;
 
-          // Dark solid pill background for crystal-clear readability
-          ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
           ctx.beginPath();
           if (typeof ctx.roundRect === 'function') {
             ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 4);
@@ -2727,9 +2726,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Text with contrast shadow
           ctx.save();
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.2)';
           ctx.shadowBlur = 4;
-          ctx.fillStyle = isLocal ? '#38bdf8' : p.team === 'blue' ? '#e0f2fe' : '#ffe4e6';
+          ctx.fillStyle = isLocal ? '#0369a1' : p.team === 'blue' ? '#0e7490' : '#be123c';
           ctx.fillText(displayName, p.x, badgeY + 12);
           ctx.restore();
 
@@ -2770,11 +2769,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           const mh = mCanvas.height;
 
           // Clear minimap background
-          mCtx.fillStyle = '#070b16';
+          mCtx.fillStyle = '#f8fafc';
           mCtx.fillRect(0, 0, mw, mh);
 
           // Subtle tactical grid
-          mCtx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+          mCtx.strokeStyle = 'rgba(71, 85, 105, 0.16)';
           mCtx.lineWidth = 1;
           for (let gx = mw / 4; gx < mw; gx += mw / 4) {
             mCtx.beginPath();
@@ -2819,7 +2818,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           mCtx.fillText(rightMinimapLabel, mw - 3, mh - 3);
 
           // Obstacles & Shelves
-          mCtx.fillStyle = 'rgba(71, 85, 105, 0.5)';
+          mCtx.fillStyle = 'rgba(71, 85, 105, 0.3)';
           for (const obs of themeConfig.obstacles) {
             const ox = (obs.x / WORLD_WIDTH) * mw;
             const oy = (obs.y / WORLD_HEIGHT) * mh;
@@ -2834,7 +2833,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             const camY = (sim.cameraY / WORLD_HEIGHT) * mh;
             const camW = (canvas.width / WORLD_WIDTH) * mw;
             const camH = (canvas.height / WORLD_HEIGHT) * mh;
-            mCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            mCtx.strokeStyle = 'rgba(15, 23, 42, 0.55)';
             mCtx.lineWidth = 1;
             mCtx.strokeRect(camX, camY, camW, camH);
           }
@@ -2868,7 +2867,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
             // Local player highlight ring
             if (isLocal) {
-              mCtx.strokeStyle = '#ffffff';
+              mCtx.strokeStyle = '#0f172a';
               mCtx.lineWidth = 1.5;
               mCtx.stroke();
             }
@@ -2915,21 +2914,21 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       ref={arenaContainerRef}
       className={`w-full flex flex-col transition-all ${
         isFullscreen
-          ? 'fixed inset-0 z-50 bg-slate-950 p-1 md:p-2 h-screen w-screen overflow-hidden'
-          : 'max-w-6xl mx-auto space-y-3'
+          ? 'fixed inset-0 z-50 bg-slate-50 p-1 md:p-2 h-screen w-screen overflow-hidden'
+          : 'h-full min-h-full w-full overflow-hidden'
       }`}
     >
       {/* Top TDM Scoreboard Header (Compact on Fullscreen/Mobile for Wider Field of View) */}
-      <div className={`bg-slate-950 border-2 border-slate-800 rounded-xl md:rounded-2xl ${isFullscreen ? 'p-1.5 md:p-3' : 'p-2.5 md:p-3'} text-white shadow-2xl flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
+      <div className={`bg-white border-2 border-slate-200 rounded-xl md:rounded-2xl ${isFullscreen ? 'p-1.5 md:p-3' : 'p-2.5 md:p-3'} text-slate-900 shadow-md flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
         {/* Team Blue Score */}
         <div className="flex items-center gap-1.5 md:gap-3">
-          <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-cyan-950 border-2 border-cyan-400 flex flex-col items-center justify-center font-black text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-            <span className="text-[8px] md:text-[10px] uppercase font-bold text-cyan-400">BIRU</span>
+          <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-cyan-50 border-2 border-cyan-400 flex flex-col items-center justify-center font-black text-cyan-700">
+            <span className="text-[8px] md:text-[10px] uppercase font-bold text-cyan-700">BIRU</span>
             <span className="text-base md:text-xl leading-none font-mono-numbers">{hudBlueScore}</span>
           </div>
           <div className="hidden md:block">
             <span className="text-xs font-bold text-cyan-400 block">TIM CYBER BIRU</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-500">
               Kills: {hudBlueScore}
             </span>
           </div>
@@ -2944,19 +2943,19 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             </span>
           </div>
 
-          <div className="text-lg md:text-3xl font-black font-mono-numbers text-white tracking-tight leading-tight">
+          <div className="text-lg md:text-3xl font-black font-mono-numbers text-slate-900 tracking-tight leading-tight">
             {hudTimeLeft}s
           </div>
 
           {/* Active Skill or Room Code */}
           {hudActiveSkill ? (
-            <div className="flex items-center gap-1 bg-amber-500/20 border border-amber-400/80 px-2 py-0.5 rounded-full text-[9px] md:text-[11px] font-bold text-amber-300 animate-pulse mt-0.5">
-              <span>⚡ {hudActiveSkill.label}</span>
+            <div className="flex items-center gap-1 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full text-[9px] md:text-[11px] font-bold text-amber-800 animate-pulse mt-0.5">
+              <span>{hudActiveSkill.label}</span>
               <span className="font-mono">({hudActiveSkill.timeLeft}s)</span>
             </div>
           ) : (
-            <span className="text-[8px] md:text-[10px] text-slate-400 block font-mono">
-              HP: <strong className={hudMyHp < 30 ? 'text-rose-400' : 'text-emerald-400'}>{hudMyHp}%</strong> · Kills: <strong>{hudMyKills}</strong>
+            <span className="text-[8px] md:text-[10px] text-slate-500 block font-mono">
+                HP: <strong className={hudMyHp < 30 ? 'text-rose-600' : 'text-emerald-700'}>{hudMyHp}%</strong> · Kills: <strong>{hudMyKills}</strong>
             </span>
           )}
         </div>
@@ -2964,20 +2963,20 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         {/* Team Red Score & Controls */}
         <div className="flex items-center gap-1.5 md:gap-3">
           <div className="hidden md:block text-right">
-            <span className="text-xs font-bold text-rose-400 block">TIM PLASMA MERAH</span>
+            <span className="text-xs font-bold text-rose-700 block">TIM PLASMA MERAH</span>
             <span className="text-[11px] text-slate-400">
               Kills: {hudRedScore}
             </span>
           </div>
-          <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-rose-950 border-2 border-rose-500 flex flex-col items-center justify-center font-black text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
-            <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-400">MERAH</span>
+          <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-rose-50 border-2 border-rose-400 flex flex-col items-center justify-center font-black text-rose-700">
+            <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-700">MERAH</span>
             <span className="text-base md:text-xl leading-none font-mono-numbers">{hudRedScore}</span>
           </div>
 
           {/* Customizer Button in Header */}
           <button
             onClick={() => setShowCustomizerModal(true)}
-            className="p-1.5 md:p-2.5 rounded-xl bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 transition-colors"
+            className="p-1.5 md:p-2.5 rounded-xl bg-amber-50 border border-amber-300 hover:bg-amber-100 text-amber-700 transition-colors"
             title="Kustomisasi Karakter"
             aria-label="Kustomisasi Karakter"
           >
@@ -2987,7 +2986,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="p-1.5 md:p-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 transition-colors"
+            className="p-1.5 md:p-2.5 rounded-xl bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 transition-colors"
             title={isFullscreen ? 'Keluar Fullscreen (F)' : 'Layar Penuh / Fullscreen (F)'}
             aria-label="Toggle Fullscreen"
           >
@@ -2998,7 +2997,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           {!inLobby && (
             <button
               onClick={handleLeaveMatch}
-              className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl bg-rose-500/20 border border-rose-500/50 hover:bg-rose-500/30 text-rose-300 transition-colors flex items-center gap-1 text-xs font-bold"
+              className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 transition-colors flex items-center gap-1 text-xs font-bold"
               title="Tinggalkan Match"
             >
               <LogOut className="w-4 h-4" />
@@ -3011,7 +3010,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       {/* Main Game Battlefield Container with Canvas */}
       <div
         className={`relative w-full ${
-          isFullscreen ? 'flex-1 h-0 min-h-0' : 'h-[500px] md:h-[640px]'
+          isFullscreen ? 'flex-1 h-0 min-h-0' : 'flex-1 min-h-[320px]'
         } bg-[#060a12] rounded-xl md:rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl select-none touch-none`}
       >
         {/* Hardware-Accelerated 60 FPS HTML5 Canvas */}
@@ -3024,17 +3023,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         />
 
         {/* Tactical Minimap Radar in Top-Left (Visible on match, 60fps canvas with clear player names) */}
-        <div className="absolute top-3 left-3 z-30 w-44 h-28 sm:w-52 sm:h-32 md:w-60 md:h-36 bg-slate-950/90 backdrop-blur-md rounded-xl border border-cyan-500/40 p-1.5 pointer-events-none shadow-[0_0_20px_rgba(0,0,0,0.7)] flex flex-col">
-          <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-800/80 mb-1">
-            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-400 flex items-center gap-1 uppercase tracking-wider">
+        <div className="absolute top-3 left-3 z-30 w-44 h-28 sm:w-52 sm:h-32 md:w-60 md:h-36 bg-white/95 backdrop-blur-md rounded-xl border border-cyan-200 p-1.5 pointer-events-none shadow-lg flex flex-col">
+          <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-200 mb-1">
+            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-800 flex items-center gap-1 uppercase tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              📡 RADAR ARENA
+              RADAR ARENA
             </span>
-            <span className="text-[7.5px] sm:text-[8px] text-slate-400 font-mono">
+            <span className="text-[7.5px] sm:text-[8px] text-slate-500 font-mono">
               Posisi &amp; Nama Player
             </span>
           </div>
-          <div className="relative flex-1 w-full bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+          <div className="relative flex-1 w-full bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
             <canvas
               ref={minimapCanvasRef}
               width={240}
@@ -3051,8 +3050,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               key={kf.id}
               className={`text-[10px] md:text-[11px] font-bold px-2 py-0.5 md:py-1 rounded-md border backdrop-blur-md animate-in slide-in-from-left-2 ${
                 kf.team === 'blue'
-                  ? 'bg-cyan-950/80 text-cyan-200 border-cyan-500/50'
-                  : 'bg-rose-950/80 text-rose-200 border-rose-500/50'
+                  ? 'bg-cyan-50 text-cyan-800 border-cyan-200'
+                  : 'bg-rose-50 text-rose-800 border-rose-200'
               }`}
             >
               {kf.text}
@@ -3062,27 +3061,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* RESPAWN BANNER / OVERLAY WHEN HUMAN PLAYER DIES */}
         {hudRespawnTimer > 0 && (
-          <div className="absolute inset-0 z-40 bg-slate-950/75 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-in fade-in duration-150">
-            <div className="bg-slate-900 border-2 border-rose-500/80 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl">
-              <div className="w-16 h-16 rounded-2xl bg-rose-950 border-2 border-rose-500 flex items-center justify-center mx-auto mb-3 animate-pulse">
-                <Skull className="w-9 h-9 text-rose-400" />
+          <div className="absolute inset-0 z-40 bg-white/75 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-in fade-in duration-150">
+            <div className="bg-white border-2 border-rose-300 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl">
+              <div className="w-16 h-16 rounded-2xl bg-rose-50 border-2 border-rose-300 flex items-center justify-center mx-auto mb-3 animate-pulse">
+                <Skull className="w-9 h-9 text-rose-600" />
               </div>
-              <h3 className="text-xl md:text-2xl font-black text-white mb-1">
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-1">
                 KAMU TERELIMINASI!
               </h3>
-              <p className="text-xs text-slate-400 mb-4">
+              <p className="text-xs text-slate-600 mb-4">
                 Mempersiapkan respawn kembali ke markas tim...
               </p>
 
               {/* Progress Countdown Bar */}
-              <div className="w-full bg-slate-800 rounded-full h-3 mb-4 overflow-hidden border border-slate-700">
+              <div className="w-full bg-slate-100 rounded-full h-3 mb-4 overflow-hidden border border-slate-300">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-rose-500 h-full transition-all duration-100 ease-linear"
                   style={{ width: `${Math.max(0, 100 - (hudRespawnTimer / 3.5) * 100)}%` }}
                 />
               </div>
 
-              <div className="text-3xl font-black font-mono-numbers text-amber-400 mb-5">
+              <div className="text-3xl font-black font-mono-numbers text-amber-700 mb-5">
                 {hudRespawnTimer.toFixed(1)}s
               </div>
 
@@ -3092,7 +3091,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <Zap className="w-4 h-4 fill-white" />
-                ⚡ Respawn Sekarang (Instan)
+                Respawn Sekarang (Instan)
               </button>
             </div>
           </div>
@@ -3107,10 +3106,10 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 onTouchStart={handleJoyTouchStart}
                 onTouchMove={handleJoyTouchMove}
                 onTouchEnd={handleJoyTouchEnd}
-                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-slate-900/70 backdrop-blur-md border-2 border-slate-700 flex items-center justify-center touch-none shadow-xl active:border-cyan-400"
+                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/80 backdrop-blur-md border-2 border-slate-300 flex items-center justify-center touch-none shadow-xl active:border-cyan-500"
               >
                 {/* Center crosshair mark */}
-                <div className="w-2 h-2 rounded-full bg-slate-600" />
+                <div className="w-2 h-2 rounded-full bg-slate-400" />
                 {/* Floating Knob */}
                 <div
                   className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
@@ -3121,8 +3120,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   <Compass className="w-5 h-5 text-white/90" />
                 </div>
               </div>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 bg-slate-950/70 px-2 py-0.5 rounded-full border border-slate-800">
-                🕹️ Gerak 360°
+              <span className="text-[9px] font-bold text-slate-700 uppercase tracking-wider mt-1 bg-white/90 px-2 py-0.5 rounded-full border border-slate-200">
+                Gerak 360°
               </span>
             </div>
 
@@ -3132,7 +3131,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 {/* Dash / Evade Button */}
                 <button
                   onClick={handleMobileDash}
-                  className="px-3 py-1.5 rounded-xl text-[10px] font-bold bg-emerald-500/20 border border-emerald-400 text-emerald-300 active:scale-90 transition-transform flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-xl text-[10px] font-bold bg-emerald-50 border border-emerald-300 text-emerald-700 active:scale-90 transition-transform flex items-center gap-1"
                 >
                   <Wind className="w-3.5 h-3.5" />
                   <span>DASH</span>
@@ -3144,9 +3143,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 {/* Touch Aim Wheel */}
                 <div
                   onTouchMove={handleAimTouchMove}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900/70 backdrop-blur-md border-2 border-slate-700 flex items-center justify-center touch-none text-slate-400 active:border-rose-400"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/80 backdrop-blur-md border-2 border-slate-300 flex items-center justify-center touch-none text-slate-500 active:border-rose-400"
                 >
-                  <Crosshair className="w-6 h-6 text-slate-400" />
+                  <Crosshair className="w-6 h-6 text-slate-500" />
                 </div>
 
                 {/* Big Ergonomic FIRE Button */}
@@ -3180,15 +3179,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* Lobby Overlay */}
         {inLobby && (
-          <div className="absolute inset-0 z-40 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-6 text-center overflow-y-auto">
+          <div className="shop-shooter-lobby absolute inset-0 z-40 bg-slate-50/95 backdrop-blur-md flex flex-col items-center justify-start p-4 md:p-6 text-center overflow-y-auto">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-amber-500 to-rose-600 flex items-center justify-center mb-2 md:mb-3 shadow-xl shrink-0">
               <Swords className="w-6 h-6 md:w-7 md:h-7 text-white" />
             </div>
 
-            <h2 className="text-xl md:text-3xl font-black text-white mb-1">
+            <h2 className="text-xl md:text-3xl font-black text-slate-900 mb-1">
               Shop Shooter Arena: Team Deathmatch
             </h2>
-            <p className="text-xs md:text-sm text-slate-300 max-w-lg mb-3 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-600 max-w-lg mb-3 leading-relaxed">
               2 Tim saling bertarung! Main di PC atau HP dengan joystick layar sentuh. Ambil skill &amp; kustomisasi karaktermu.
             </p>
 
@@ -3199,7 +3198,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
                   gameModeType === 'multiplayer'
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-300 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -3216,7 +3215,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
                   gameModeType === 'bot'
                     ? 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-300 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -3230,9 +3229,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             </div>
 
             {/* Player Name Change Bar */}
-            <div className="max-w-lg w-full mb-3 bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3 text-left shadow-lg">
+            <div className="max-w-lg w-full mb-3 bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 text-left shadow-md">
               <div className="flex-1 flex flex-col gap-1">
-                <span className="text-[9px] uppercase text-cyan-400 font-bold flex items-center gap-1">
+                <span className="text-[9px] uppercase text-cyan-700 font-bold flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Ubah Nama Pemain Kamu:
                 </span>
@@ -3241,11 +3240,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   value={playerName}
                   onChange={(e) => handlePlayerNameChange(e.target.value)}
                   placeholder="Ketik Nama Kamu..."
-                  className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-cyan-400"
+                  className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-cyan-500"
                   maxLength={20}
                 />
               </div>
-              <span className="text-[9px] text-emerald-400 font-mono self-end pb-1.5">
+              <span className="text-[9px] text-emerald-700 font-mono self-end pb-1.5">
                 ✓ Tersimpan
               </span>
             </div>
@@ -3257,11 +3256,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 className="w-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 rounded-xl px-3 py-2 flex items-center justify-between text-left group transition-all"
               >
                 <div>
-                  <span className="text-[9px] uppercase text-amber-400 font-bold block flex items-center gap-1">
+                  <span className="text-[9px] uppercase text-amber-700 font-bold block flex items-center gap-1">
                     <Palette className="w-3 h-3" />
                     Karakter Avatar Kamu:
                   </span>
-                  <span className="text-xs font-bold text-white capitalize">
+                  <span className="text-xs font-bold text-slate-900 capitalize">
                     {characterCustomization.characterClass} · {characterCustomization.weaponSkin.replace('_', ' ')}
                   </span>
                 </div>
@@ -3274,27 +3273,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             {/* CONDITIONAL SECTION BASED ON MODE */}
             {gameModeType === 'multiplayer' ? (
               /* MULTIPLAYER / MAIN BARENG ROOM CODE */
-              <div className="bg-slate-900 border border-cyan-500/30 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-lg">
+              <div className="bg-white border border-cyan-200 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-md">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-cyan-700 flex items-center gap-1.5">
                     <Users className="w-4 h-4" />
                     <span>LOBBY MULTIPLAYER</span>
                   </span>
                 </div>
 
                 {/* Team Selection */}
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 block mb-1.5">PILIH TIM:</span>
+                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">PILIH TIM:</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setPlayerTeam('blue')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Biru
                     </button>
                     <button
                       onClick={() => setPlayerTeam('red')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Merah
                     </button>
@@ -3303,11 +3302,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* Host Section */}
-                  <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-400 mb-2">Host Room:</p>
-                    <div className="bg-slate-900 rounded p-2 mb-2 flex items-center justify-between">
-                      <span className="text-sm font-mono font-bold text-cyan-300">{currentRoomCode}</span>
-                      <button onClick={handleCopyRoomCode} className="text-[10px] text-slate-400">Salin</button>
+                  <div className="bg-white border border-slate-200 rounded-lg p-3">
+                    <p className="text-[10px] text-slate-600 mb-2">Host Room:</p>
+                    <div className="bg-slate-50 rounded p-2 mb-2 flex items-center justify-between">
+                      <span className="text-sm font-mono font-bold text-cyan-700">{currentRoomCode}</span>
+                      <button onClick={handleCopyRoomCode} className="text-[10px] text-slate-600">Salin</button>
                     </div>
                     <button onClick={() => handleJoinMultiplayerRoom(currentRoomCode, true)} className="w-full py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5" />
@@ -3316,18 +3315,18 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   </div>
 
                   {/* Join Section */}
-                  <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-400 mb-2">Gabung Room:</p>
+                  <div className="bg-white border border-slate-200 rounded-lg p-3">
+                    <p className="text-[10px] text-slate-600 mb-2">Gabung Room:</p>
                     <input
                       type="text"
                       value={roomCodeInput}
                       onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
                       placeholder="Ketik Kode..."
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-cyan-300 mb-2 font-mono font-bold"
+                      className="w-full bg-white border border-slate-300 rounded px-2 py-1.5 text-xs text-slate-900 mb-2 font-mono font-bold"
                     />
                     <button
                       onClick={() => handleJoinMultiplayerRoom(roomCodeInput, false)}
-                      className="w-full py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5"
+                      className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded text-xs font-bold shadow flex items-center justify-center gap-1.5"
                     >
                       <LogIn className="w-3.5 h-3.5" />
                       <span>{isJoinedRoom && !isEffectiveHost ? 'Terhubung (Pemain)' : 'Gabung'}</span>
@@ -3337,19 +3336,19 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
                 {/* Waiting Room Roster */}
                 {isJoinedRoom && (
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-600">
                       <span>DAFTAR PEMAIN ({roomPlayersList.length}/{totalPlayersConfig})</span>
-                      <span className="text-emerald-400 font-mono text-[10px] flex items-center gap-1.5">
+                      <span className="text-emerald-700 font-mono text-[10px] flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
                         <span>Terhubung {isEffectiveHost ? '(Host)' : ''}</span>
                       </span>
                     </div>
                     <div className="max-h-36 overflow-y-auto space-y-1">
                       {roomPlayersList.map((p, idx) => (
-                        <div key={p.id || idx} className="flex items-center justify-between bg-slate-900 p-1.5 rounded text-[10px] border border-slate-800">
-                          <span className="text-white flex items-center gap-1.5 font-bold">
-                             {p.isBot ? <Bot className="w-3.5 h-3.5 text-amber-400" /> : <Users className="w-3.5 h-3.5 text-cyan-400" />}
+                        <div key={p.id || idx} className="flex items-center justify-between bg-white p-1.5 rounded text-[10px] border border-slate-200">
+                          <span className="text-slate-800 flex items-center gap-1.5 font-bold">
+                             {p.isBot ? <Bot className="w-3.5 h-3.5 text-amber-600" /> : <Users className="w-3.5 h-3.5 text-cyan-700" />}
                              {p.username} {isLocalPlayer(p.id) ? '(Kamu)' : ''}
                           </span>
                           <div className="flex items-center gap-1.5">
@@ -3361,7 +3360,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                                   handleUpdateBotTeam(p.id, p.team === 'blue' ? 'red' : 'blue');
                                 }
                               }}
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold select-none ${(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:scale-105 active:scale-95 transition-all' : ''} ${p.team === 'blue' ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40' : 'bg-rose-950 text-rose-300 border border-rose-500/40'}`}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold select-none ${(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:scale-105 active:scale-95 transition-all' : ''} ${p.team === 'blue' ? 'bg-cyan-50 text-cyan-800 border border-cyan-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}
                               title={(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? "Klik untuk ganti tim" : undefined}
                             >
                               Tim {p.team === 'blue' ? 'Biru' : 'Merah'} {(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) && '(Ubah)'}
@@ -3369,7 +3368,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                             {isEffectiveHost && !isLocalPlayer(p.id) && (
                               <button
                                 onClick={() => handleKickPlayer(p.id)}
-                                className="bg-rose-950/80 hover:bg-rose-600 text-rose-300 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold transition-all border border-rose-500/40 flex items-center gap-1"
+                                className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold transition-all border border-rose-200 flex items-center gap-1"
                                 title={p.isBot ? "Keluarkan Bot" : "Keluarkan Pemain"}
                               >
                                 <X className="w-2.5 h-2.5" />
@@ -3401,7 +3400,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {isEffectiveHost ? (
                       <button
                         onClick={handleDeleteRoom}
-                        className="w-full py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Hapus Room (Host)</span>
@@ -3409,7 +3408,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     ) : (
                       <button
                         onClick={handleLeaveRoom}
-                        className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-600 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         <span>Tinggalkan Room</span>
@@ -3420,35 +3419,35 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               </div>
             ) : (
               /* BOT PRACTICE / MAIN VS BOT */
-              <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-lg">
+              <div className="bg-white border border-amber-200 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-md">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-amber-700 flex items-center gap-1.5">
                     <Bot className="w-4 h-4" />
                     <span>LOBBY SOLO (VS BOT)</span>
                   </span>
                 </div>
 
                 {/* Team Selection */}
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 block mb-1.5">PILIH TIM:</span>
+                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">PILIH TIM:</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setPlayerTeam('blue')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Biru
                     </button>
                     <button
                       onClick={() => setPlayerTeam('red')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-slate-900 text-slate-300 border-slate-700'}`}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300'}`}
                     >
                       Tim Merah
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-slate-950 border border-slate-700 rounded-lg p-3">
-                  <span className="text-[10px] font-bold text-slate-400 block mb-1.5">Pilih Total Pemain:</span>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">Pilih Total Pemain:</span>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[2, 4, 6, 8].map((count) => (
                       <button
@@ -3457,7 +3456,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                         className={`py-1.5 px-2 rounded-lg text-xs font-bold border ${
                           totalPlayersConfig === count
                             ? 'bg-amber-600 text-white border-amber-500'
-                            : 'bg-slate-900 text-slate-300 border-slate-700'
+                            : 'bg-white text-slate-700 border-slate-300'
                         }`}
                       >
                         {count}
@@ -3472,9 +3471,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
             {/* Map Selector (4 Futuristic Shopping-Inspired Arenas) */}
             <div className="mb-3 max-w-lg w-full text-left">
-              <span className="text-xs font-bold text-slate-300 block mb-1.5 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
                 <span>Pilih Arena Mall Futuristik:</span>
-                <span className="text-[10px] text-amber-400 font-normal">Identitas Tema Belanja</span>
+                <span className="text-[10px] text-amber-700 font-normal">Identitas Tema Belanja</span>
               </span>
               <div className="grid grid-cols-2 gap-2">
                 {/* 1. Shopping Mall */}
@@ -3483,14 +3482,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'mall'
                       ? 'border-cyan-400 bg-cyan-950/70 shadow-md ring-1 ring-cyan-400'
-                      : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800'
+                      : 'border-slate-200 bg-white hover:bg-slate-100'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-cyan-400 font-bold text-xs mb-0.5">
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Shopping Mall</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 block line-clamp-1">
+                  <span className="text-[9px] text-slate-600 block line-clamp-1">
                     Pusat Elektronik &amp; Etalase PC
                   </span>
                 </button>
@@ -3501,14 +3500,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'rooftop'
                       ? 'border-rose-400 bg-rose-950/70 shadow-md ring-1 ring-rose-400'
-                      : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800'
+                      : 'border-slate-200 bg-white hover:bg-slate-100'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs mb-0.5">
                     <Building2 className="w-3.5 h-3.5" />
                     <span>Neon Rooftop</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 block line-clamp-1">
+                  <span className="text-[9px] text-slate-600 block line-clamp-1">
                     Atap Mall &amp; Helipad Cepat
                   </span>
                 </button>
@@ -3519,14 +3518,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'warehouse'
                       ? 'border-amber-400 bg-amber-950/70 shadow-md ring-1 ring-amber-400'
-                      : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800'
+                      : 'border-slate-200 bg-white hover:bg-slate-100'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs mb-0.5">
                     <Boxes className="w-3.5 h-3.5" />
                     <span>Tech Warehouse</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 block line-clamp-1">
+                  <span className="text-[9px] text-slate-600 block line-clamp-1">
                     Gudang Logistik &amp; Taktis Tim
                   </span>
                 </button>
@@ -3537,14 +3536,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'garden'
                       ? 'border-emerald-400 bg-emerald-950/70 shadow-md ring-1 ring-emerald-400'
-                      : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800'
+                      : 'border-slate-200 bg-white hover:bg-slate-100'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mb-0.5">
                     <Flower2 className="w-3.5 h-3.5" />
                     <span>Sky Garden</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 block line-clamp-1">
+                  <span className="text-[9px] text-slate-600 block line-clamp-1">
                     Taman Atrium &amp; Jalur Melingkar
                   </span>
                 </button>
@@ -3567,7 +3566,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
       {/* Match Ended Victory Screen */}
       {matchStatus === 'ended' && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-white/75 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-200 text-center animate-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-600">
               <Trophy className="w-9 h-9" />
@@ -3577,7 +3576,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               {hudBlueScore === hudRedScore
                 ? 'Hasil Pertandingan: SERI (DRAW)!'
                 : (hudBlueScore > hudRedScore && playerTeam === 'blue') || (hudRedScore > hudBlueScore && playerTeam === 'red')
-                ? '🏆 TIM KAMU MENANG! VICTORY!'
+                ? 'TIM KAMU MENANG! VICTORY!'
                 : 'Pertandingan Berakhir! DEFEAT!'}
             </h3>
             <p className="text-xs text-slate-500 mb-5">
@@ -3627,7 +3626,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   setMatchStatus('lobby');
                   setInLobby(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-xs transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-semibold rounded-xl text-xs transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 Tanding Ulang TDM (Rematch)

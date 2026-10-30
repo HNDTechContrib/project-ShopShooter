@@ -22,12 +22,17 @@ export function mountShopShooter(
 
   const host = document.createElement('div');
   host.dataset.shopShooter = '';
+  host.style.display = 'block';
+  host.style.width = '100%';
+  host.style.height = target.clientHeight > 0 ? '100%' : '100dvh';
   target.append(host);
 
   const shadowRoot = host.attachShadow({mode: 'open'});
   const style = document.createElement('style');
   style.textContent = stylesheet;
   const rootElement = document.createElement('div');
+  rootElement.style.width = '100%';
+  rootElement.style.height = '100%';
   shadowRoot.append(style, rootElement);
 
   const root = createRoot(rootElement);

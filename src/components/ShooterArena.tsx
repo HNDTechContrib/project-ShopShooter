@@ -173,16 +173,16 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
     soundEngine.playPowerUp();
     if (type === 'freeze') {
       setActiveFreezeTime(6);
-      addFloatingText('❄️ MATRIX SLOW-MO!', mousePos.x, mousePos.y, '#38bdf8', true);
+      addFloatingText('MATRIX SLOW-MO!', mousePos.x, mousePos.y, '#38bdf8', true);
     } else if (type === 'multishot') {
       setActiveMultishotTime(8);
-      addFloatingText('💥 CLUSTER MULTI-SHOT!', mousePos.x, mousePos.y, '#fbbf24', true);
+      addFloatingText('CLUSTER MULTI-SHOT!', mousePos.x, mousePos.y, '#fbbf24', true);
     } else if (type === 'double_points') {
       setActiveDoubleTime(10);
-      addFloatingText('⚡ 2X DOUBLE POIN!', mousePos.x, mousePos.y, '#34d399', true);
+      addFloatingText('2X DOUBLE POIN!', mousePos.x, mousePos.y, '#34d399', true);
     } else if (type === 'magnet') {
       // Golden magnet absorbs all non-bomb targets immediately!
-      addFloatingText('🧲 MAGNET DISKON!', mousePos.x, mousePos.y, '#c084fc', true);
+      addFloatingText('MAGNET DISKON!', mousePos.x, mousePos.y, '#c084fc', true);
       soundEngine.playHit(true);
 
       setTargets((prevTargets) => {
@@ -518,7 +518,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
               if (target.type === 'powerup_orb') {
                 soundEngine.playPowerUp();
                 setActiveDoubleTime(6);
-                addFloatingText('⚡ BONUS DOUBLE POIN 6s!', target.x, target.y - 4, '#10b981', true);
+                addFloatingText('BONUS DOUBLE POIN 6s!', target.x, target.y - 4, '#10b981', true);
               }
             }
           }
@@ -547,27 +547,27 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className="flex h-full min-h-full w-full flex-col gap-3 overflow-y-auto p-2 md:p-4">
       {/* Top HUD Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-6 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 text-slate-900 shadow-md flex flex-wrap items-center justify-between gap-4 shrink-0">
         {/* Left: Round Timer & Status */}
         <div className="flex items-center gap-6">
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Sisa Waktu</span>
-            <span className={`text-3xl font-extrabold font-mono-numbers ${roundTimeLeft <= 10 && isPlaying ? 'text-red-500 animate-pulse' : 'text-amber-400'}`}>
+            <span className="text-xs uppercase tracking-wider text-slate-600 font-semibold">Sisa Waktu</span>
+            <span className={`text-3xl font-extrabold font-mono-numbers ${roundTimeLeft <= 10 && isPlaying ? 'text-red-600 animate-pulse' : 'text-amber-700'}`}>
               {roundTimeLeft}s
             </span>
           </div>
 
-          <div className="h-10 w-px bg-slate-800" />
+          <div className="h-10 w-px bg-slate-200" />
 
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Skor Ronde Ini</span>
+            <span className="text-xs uppercase tracking-wider text-slate-600 font-semibold">Skor Ronde Ini</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-emerald-400 font-mono-numbers">
+              <span className="text-3xl font-extrabold text-emerald-700 font-mono-numbers">
                 +{roundScore}
               </span>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-slate-600">
                 (≈ {formatRupiah(roundScore * POINT_TO_RUPIAH_RATIO)})
               </span>
             </div>
@@ -575,14 +575,14 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         </div>
 
         {/* Center: Combo Streak Indicator */}
-        <div className="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+        <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
           <Flame className={`w-5 h-5 ${comboCount > 0 ? 'text-orange-500 animate-bounce' : 'text-slate-500'}`} />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-300 font-medium">Combo Streak:</span>
-              <span className="font-bold text-orange-400 font-mono-numbers">{comboCount} Hits</span>
+              <span className="text-xs text-slate-700 font-medium">Combo Streak:</span>
+              <span className="font-bold text-orange-700 font-mono-numbers">{comboCount} Hits</span>
             </div>
-            <span className="text-xs font-semibold text-emerald-400">
+            <span className="text-xs font-semibold text-emerald-700">
               Pengali: x{comboMultiplier.toFixed(1)}
             </span>
           </div>
@@ -592,7 +592,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={toggleMute}
-            className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+            className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
             title={isMuted ? 'Nyalakan Suara' : 'Bisukan Suara'}
             aria-label="Toggle Sound"
           >
@@ -610,7 +610,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
           ) : (
             <button
               onClick={() => setIsPaused(!isPaused)}
-              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 text-sm transition-colors"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-medium rounded-xl border border-slate-300 text-sm transition-colors"
             >
               {isPaused ? 'Lanjut' : 'Jeda'}
             </button>
@@ -623,7 +623,7 @@ export const ShooterArena: React.FC<ShooterArenaProps> = ({
         ref={arenaRef}
         onClick={handleArenaClick}
         onMouseMove={handleMouseMove}
-        className={`relative w-full h-[520px] md:h-[600px] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
+        className={`relative w-full flex-1 min-h-[320px] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 select-none cursor-crosshair-custom shadow-2xl transition-transform ${
           screenShake ? 'translate-x-1.5 -translate-y-1.5' : ''
         }`}
         style={{

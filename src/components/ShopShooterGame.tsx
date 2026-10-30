@@ -37,7 +37,7 @@ export default function ShopShooterGame(options: ShopShooterOptions) {
   }, []);
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="h-full min-h-full w-full">
       {options.mode === 'multiplayer' ? (
         <MultiplayerArena
           userDiscountPoints={points}
