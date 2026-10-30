@@ -208,18 +208,22 @@ const MAP_THEMES_CONFIG: Record<
   mall: {
     name: 'Shopping Mall (Pusat Elektronik & Komputer)',
     description: 'Arena di dalam pusat perbelanjaan futuristik dengan lorong belanja, etalase laptop & PC gaming, area tengah terbuka, serta papan promosi diskon.',
-    bgColor: '#f4f2ed',
-    gridColor: 'rgba(120, 113, 108, 0.1)',
+    bgColor: '#eef0e7',
+    gridColor: 'rgba(92, 111, 87, 0.085)',
     particleColor: 'rgba(180, 130, 75, 0.24)',
     obstacles: [
-      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#e8e5df', borderColor: '#56889a' },
-      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#e8e5df', borderColor: '#64899a' },
-      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#e8e5df', borderColor: '#ba8b43' },
-      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#e8e5df', borderColor: '#ad718c' },
-      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#ebe9e4', borderColor: '#6486aa' },
-      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMARTPHONE HUB', color: '#ebe9e4', borderColor: '#b77683' },
+      { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#e4e3d8', borderColor: '#738b78' },
+      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#e4e3d8', borderColor: '#7f9280' },
+      { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#e5e0d2', borderColor: '#a18458' },
+      { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#e5e0d2', borderColor: '#9a7771' },
+      { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#dfe5da', borderColor: '#7d947d' },
+      { x: 1590, y: 480, w: 130, h: 240, label: 'AISLE B: SMARTPHONE HUB', color: '#e6ded6', borderColor: '#a47b73' },
     ],
     decorations: [
+      { id: 'mall-plant-west-a', type: 'planter_box', x: 680, y: 420, size: 38, color: '#827a68', secondaryColor: '#78916d' },
+      { id: 'mall-plant-east-a', type: 'planter_box', x: 1520, y: 420, size: 38, color: '#827a68', secondaryColor: '#78916d' },
+      { id: 'mall-plant-west-b', type: 'planter_box', x: 680, y: 850, size: 38, color: '#827a68', secondaryColor: '#78916d' },
+      { id: 'mall-plant-east-b', type: 'planter_box', x: 1520, y: 850, size: 38, color: '#827a68', secondaryColor: '#78916d' },
       // PC & Gadget Showcases
       { id: 'sc-1', type: 'showcase', x: 680, y: 240, size: 28, color: '#56889a', secondaryColor: '#a9cad2', label: 'LAPTOP RTX 5090' },
       { id: 'sc-2', type: 'showcase', x: 1520, y: 240, size: 28, color: '#ba8b43', secondaryColor: '#dfc58e', label: 'RGB KEYBOARD' },
@@ -242,10 +246,10 @@ const MAP_THEMES_CONFIG: Record<
     ],
   },
   rooftop: {
-    name: 'Neon Rooftop (Atap Mall & Helipad)',
-    description: 'Arena atap gedung dengan lampu neon malam hari, helipad terbuka untuk duel cepat, platform bertingkat, dan lorong sempit.',
+    name: 'Mall Rooftop (Atap Mall & Helipad)',
+    description: 'Arena atap pusat perbelanjaan dengan helipad terbuka, area servis, dan jalur sempit.',
     bgColor: '#f1f0ee',
-    gridColor: 'rgba(120, 113, 108, 0.1)',
+    gridColor: 'rgba(120, 113, 108, 0.055)',
     particleColor: 'rgba(148, 112, 91, 0.24)',
     obstacles: [
       { x: 920, y: 280, w: 200, h: 120, label: 'HVAC CHILLER TOWER 01', color: '#e2e8f0', borderColor: '#f43f5e' },
@@ -277,7 +281,7 @@ const MAP_THEMES_CONFIG: Record<
     name: 'Tech Warehouse (Gudang Logistik E-Commerce)',
     description: 'Gudang logistik belanja otomatis dengan rak kargo bertingkat, peti kemas dekoratif berlindung, dan variasi lorong strategis untuk tim.',
     bgColor: '#f1eee8',
-    gridColor: 'rgba(120, 113, 108, 0.1)',
+    gridColor: 'rgba(120, 113, 108, 0.055)',
     particleColor: 'rgba(160, 120, 74, 0.24)',
     obstacles: [
       { x: 860, y: 240, w: 220, h: 120, label: 'RAK KARGO A1: GADGETS', color: '#fef3c7', borderColor: '#f59e0b' },
@@ -308,7 +312,7 @@ const MAP_THEMES_CONFIG: Record<
     name: 'Sky Garden (Taman Atrium Futuristik)',
     description: 'Taman atap futuristik mall dengan jembatan layang kaca, air mancur cyber lotus, tanaman bercahaya, dan platform melingkar santai.',
     bgColor: '#eef2ea',
-    gridColor: 'rgba(100, 116, 95, 0.1)',
+    gridColor: 'rgba(100, 116, 95, 0.055)',
     particleColor: 'rgba(79, 125, 86, 0.22)',
     obstacles: [
       { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#dcfce7', borderColor: '#10b981' },
@@ -338,7 +342,7 @@ const MAP_THEMES_CONFIG: Record<
     name: 'Gua Batuan Kristal (Rocky Cavern)',
     description: 'Medan batuan basalt terjal dengan pilar kristal bercahaya, celah lava pijar, dan fosil purba.',
     bgColor: '#f0efed',
-    gridColor: 'rgba(120, 113, 108, 0.1)',
+    gridColor: 'rgba(120, 113, 108, 0.055)',
     particleColor: 'rgba(160, 120, 74, 0.24)',
     obstacles: [
       { x: 950, y: 280, w: 220, h: 120, label: 'PILAR KRISTAL EMAS', color: '#fef3c7', borderColor: '#d97706' },
@@ -357,7 +361,7 @@ const MAP_THEMES_CONFIG: Record<
     name: 'Laboratorium Sci-Fi (Quantum Lab)',
     description: 'Pusat riset militer futuristik dengan reaktor kuantum, tabung spesimen kimia neon, dan konsol holografik.',
     bgColor: '#eef1f3',
-    gridColor: 'rgba(100, 116, 139, 0.1)',
+    gridColor: 'rgba(100, 116, 139, 0.055)',
     particleColor: 'rgba(91, 136, 158, 0.22)',
     obstacles: [
       { x: 950, y: 280, w: 220, h: 110, label: 'QUANTUM CORE REACTOR', color: '#dbeafe', borderColor: '#38bdf8' },
@@ -371,7 +375,7 @@ const MAP_THEMES_CONFIG: Record<
     name: 'Hutan Neon Alien (Bioluminescent Forest)',
     description: 'Hutan lebat misterius dengan pohon purba bercahaya, koloni jamur fluoresen, dan semak kamuflase.',
     bgColor: '#edf1e9',
-    gridColor: 'rgba(100, 116, 95, 0.1)',
+    gridColor: 'rgba(100, 116, 95, 0.055)',
     particleColor: 'rgba(79, 125, 86, 0.22)',
     obstacles: [
       { x: 950, y: 280, w: 220, h: 130, label: 'POHON PURBA BIOLUMINESCENT', color: '#dcfce7', borderColor: '#10b981' },
@@ -385,11 +389,11 @@ const MAP_THEMES_CONFIG: Record<
 
 // Skill Pickup Locations (Spread across battlefield)
 const INITIAL_SKILLS: CollectibleSkill[] = [
-  { id: 'skill-triple-1', type: 'tripleshot', x: 1100, y: 160, label: 'TRIPLE SHOT', icon: '💥', color: '#f59e0b', duration: 12, isAvailable: true, respawnCooldown: 0 },
-  { id: 'skill-rapid-1', type: 'rapidfire', x: 1100, y: 1120, label: 'RAPID FIRE', icon: '⚡', color: '#38bdf8', duration: 10, isAvailable: true, respawnCooldown: 0 },
-  { id: 'skill-shield-blue', type: 'shield', x: 720, y: 640, label: 'SHIELD MATRIX', icon: '🛡️', color: '#3b82f6', duration: 8, isAvailable: true, respawnCooldown: 0 },
-  { id: 'skill-speed-red', type: 'speed', x: 1400, y: 640, label: 'SPEED BOOST', icon: '💨', color: '#10b981', duration: 12, isAvailable: true, respawnCooldown: 0 },
-  { id: 'skill-heal-mid', type: 'heal', x: 1100, y: 640, label: 'NANITE HEAL', icon: '💚', color: '#22c55e', duration: 0, isAvailable: true, respawnCooldown: 0 },
+  { id: 'skill-triple-1', type: 'tripleshot', x: 1100, y: 160, label: 'TRIPLE SHOT', icon: 'TRI', color: '#a97637', duration: 12, isAvailable: true, respawnCooldown: 0 },
+  { id: 'skill-rapid-1', type: 'rapidfire', x: 1100, y: 1120, label: 'RAPID FIRE', icon: 'RAPID', color: '#62899a', duration: 10, isAvailable: true, respawnCooldown: 0 },
+  { id: 'skill-shield-blue', type: 'shield', x: 720, y: 640, label: 'SHIELD MATRIX', icon: 'SHIELD', color: '#66849a', duration: 8, isAvailable: true, respawnCooldown: 0 },
+  { id: 'skill-speed-red', type: 'speed', x: 1400, y: 640, label: 'SPEED BOOST', icon: 'SPEED', color: '#68846b', duration: 12, isAvailable: true, respawnCooldown: 0 },
+  { id: 'skill-heal-mid', type: 'heal', x: 1100, y: 640, label: 'NANITE HEAL', icon: 'HEAL', color: '#78935e', duration: 0, isAvailable: true, respawnCooldown: 0 },
 ];
 
 export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
@@ -1762,13 +1766,13 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
             if (skill.type === 'heal') {
               p.hp = Math.min(p.maxHp, p.hp + 50);
-              addDamageText('+50 HEAL!', p.x, p.y - 25, '#22c55e');
+              addDamageText('+50 HEAL!', p.x, p.y - 25, '#78935e');
             } else {
               p.activeSkill = {
                 type: skill.type,
                 timeLeft: skill.duration,
               };
-              addDamageText(`${skill.icon} ${skill.label}!`, p.x, p.y - 25, skill.color);
+              addDamageText(`${skill.label}!`, p.x, p.y - 25, skill.color);
             }
 
             if (isLocalPlayer(p.id)) {
@@ -1926,8 +1930,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         // Subtle stone floor tiles keep the arena grounded without overpowering play.
-        const tileSize = 120;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+        const tileSize = 160;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
         for (let x = 0; x < WORLD_WIDTH; x += tileSize * 2) {
           for (let y = 0; y < WORLD_HEIGHT; y += tileSize * 2) {
             ctx.fillRect(x, y, tileSize, tileSize);
@@ -2318,18 +2322,53 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.fill();
             ctx.restore();
           } else if (dec.type === 'planter_box') {
-            // Modern geometric planter with glowing flowers
+            const planterWidth = dec.size * 2;
+            const planterHeight = 28;
+            const planterX = dec.x - planterWidth / 2;
+            const planterY = dec.y - planterHeight / 2;
+
             ctx.save();
-            ctx.fillStyle = '#f1f5f9';
-            ctx.fillRect(dec.x - dec.size / 2, dec.y - 12, dec.size, 24);
-            ctx.strokeStyle = dec.color;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(dec.x - dec.size / 2, dec.y - 12, dec.size, 24);
-            ctx.fillStyle = dec.secondaryColor || '#f43f5e';
+            ctx.shadowColor = 'rgba(41, 37, 36, 0.18)';
+            ctx.shadowBlur = 7;
+            ctx.shadowOffsetY = 3;
+            ctx.fillStyle = dec.color;
             ctx.beginPath();
-            ctx.arc(dec.x - 6, dec.y, 4, 0, Math.PI * 2);
-            ctx.arc(dec.x + 6, dec.y, 4, 0, Math.PI * 2);
+            ctx.roundRect(planterX, planterY, planterWidth, planterHeight, 6);
             ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            ctx.fillStyle = '#554f42';
+            ctx.beginPath();
+            ctx.roundRect(planterX + 4, planterY + 3, planterWidth - 8, planterHeight - 8, 4);
+            ctx.fill();
+
+            const leafColor = dec.secondaryColor || '#78916d';
+            for (let index = 0; index < 5; index += 1) {
+              const plantX = planterX + 9 + (index * (planterWidth - 18)) / 4;
+              const direction = index % 2 === 0 ? -1 : 1;
+              const leafY = dec.y - 10 - (index % 2) * 2;
+              ctx.strokeStyle = 'rgba(89, 112, 78, 0.8)';
+              ctx.lineWidth = 1.4;
+              ctx.beginPath();
+              ctx.moveTo(plantX, dec.y + 2);
+              ctx.quadraticCurveTo(plantX + direction * 2, leafY + 5, plantX + direction * 4, leafY);
+              ctx.stroke();
+              ctx.fillStyle = leafColor;
+              ctx.beginPath();
+              ctx.ellipse(plantX + direction * 4, leafY, 5, 2.4, direction * -0.5, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+              ctx.beginPath();
+              ctx.ellipse(plantX + direction * 3, leafY - 0.8, 2.2, 0.9, direction * -0.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            ctx.strokeStyle = 'rgba(64, 59, 49, 0.38)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(planterX + 0.5, planterY + 0.5, planterWidth - 1, planterHeight - 1, 6);
+            ctx.stroke();
             ctx.restore();
           } else if (dec.type === 'glass_skywalk') {
             // Glass skywalk bridge
@@ -2384,33 +2423,72 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         sim.skills.forEach((skill) => {
           ctx.save();
           if (skill.isAvailable) {
-            ctx.shadowBlur = 3;
-            ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
+            ctx.shadowColor = 'rgba(41, 37, 36, 0.18)';
+            ctx.shadowBlur = 9;
+            ctx.shadowOffsetY = 3;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+            ctx.beginPath();
+            ctx.roundRect(skill.x - 19, skill.y - 19, 38, 38, 12);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            ctx.fillStyle = `${skill.color}20`;
+            ctx.beginPath();
+            ctx.roundRect(skill.x - 15, skill.y - 15, 30, 30, 9);
+            ctx.fill();
             ctx.strokeStyle = skill.color;
             ctx.lineWidth = 1.5;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             ctx.beginPath();
-            ctx.arc(skill.x, skill.y, 24, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            if (skill.type === 'heal') {
+              ctx.moveTo(skill.x - 7, skill.y);
+              ctx.lineTo(skill.x + 7, skill.y);
+              ctx.moveTo(skill.x, skill.y - 7);
+              ctx.lineTo(skill.x, skill.y + 7);
+              ctx.stroke();
+            } else if (skill.type === 'shield') {
+              ctx.moveTo(skill.x, skill.y - 9);
+              ctx.lineTo(skill.x + 7, skill.y - 6);
+              ctx.lineTo(skill.x + 6, skill.y + 2);
+              ctx.quadraticCurveTo(skill.x + 4, skill.y + 7, skill.x, skill.y + 9);
+              ctx.quadraticCurveTo(skill.x - 4, skill.y + 7, skill.x - 6, skill.y + 2);
+              ctx.lineTo(skill.x - 7, skill.y - 6);
+              ctx.closePath();
+              ctx.stroke();
+            } else if (skill.type === 'rapidfire') {
+              ctx.moveTo(skill.x - 2, skill.y - 9);
+              ctx.lineTo(skill.x + 5, skill.y - 2);
+              ctx.lineTo(skill.x + 1, skill.y - 1);
+              ctx.lineTo(skill.x + 4, skill.y + 8);
+              ctx.lineTo(skill.x - 5, skill.y + 1);
+              ctx.lineTo(skill.x - 1, skill.y);
+              ctx.closePath();
+              ctx.fillStyle = skill.color;
+              ctx.fill();
+            } else {
+              ctx.moveTo(skill.x - 8, skill.y - 6);
+              ctx.lineTo(skill.x + 7, skill.y);
+              ctx.lineTo(skill.x - 8, skill.y + 6);
+              ctx.moveTo(skill.x + 2, skill.y - 10);
+              ctx.lineTo(skill.x + 9, skill.y - 7);
+              ctx.moveTo(skill.x + 2, skill.y + 10);
+              ctx.lineTo(skill.x + 9, skill.y + 7);
+              ctx.stroke();
+            }
 
-            ctx.font = '18px sans-serif';
+            ctx.font = '600 8px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#475569';
             ctx.textAlign = 'center';
-            ctx.fillText(skill.icon, skill.x, skill.y + 6);
-
-            ctx.font = 'bold 9px monospace';
-            ctx.fillStyle = skill.color;
             ctx.fillText(skill.label, skill.x, skill.y + 36);
           } else {
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 1.5;
-            ctx.fillStyle = 'rgba(241, 245, 249, 0.7)';
+            ctx.fillStyle = 'rgba(248, 250, 252, 0.88)';
             ctx.beginPath();
-            ctx.arc(skill.x, skill.y, 20, 0, Math.PI * 2);
+            ctx.roundRect(skill.x - 16, skill.y - 16, 32, 32, 10);
             ctx.fill();
-            ctx.stroke();
 
-            ctx.font = 'bold 9px monospace';
+            ctx.font = '600 9px "Plus Jakarta Sans", sans-serif';
             ctx.fillStyle = '#64748b';
             ctx.textAlign = 'center';
             ctx.fillText(`${Math.ceil(skill.respawnCooldown)}s`, skill.x, skill.y + 3);
@@ -2420,28 +2498,151 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         // F. Themed Obstacles
         themeConfig.obstacles.forEach((obs) => {
+          const isIndustrial = /RAK|CONTAINER|CARGO|HVAC|GENERATOR|VENTILASI|REACTOR|CONDUIT|DUCT/i.test(obs.label);
+          const isNatural = /POHON|TEBING|BATUAN|BONGKAHAN|STALAGMIT|ORCHID|FLORA|GAZEBO|RUMPUN/i.test(obs.label);
+          const isRetail = /STORE|AISLE/i.test(obs.label);
+          const horizontal = obs.w >= obs.h;
+          const panelCount = horizontal
+            ? Math.max(2, Math.floor(obs.w / 96))
+            : Math.max(1, Math.floor(obs.w / 82));
+          const faceGradient = ctx.createLinearGradient(obs.x, obs.y, obs.x, obs.y + obs.h);
+          faceGradient.addColorStop(0, 'rgba(255, 255, 255, 0.34)');
+          faceGradient.addColorStop(0.55, 'rgba(255, 255, 255, 0.08)');
+          faceGradient.addColorStop(1, 'rgba(15, 23, 42, 0.10)');
+
           ctx.save();
-          ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
-          ctx.shadowBlur = 7;
-          ctx.shadowOffsetY = 3;
-          ctx.fillStyle = obs.color;
-          ctx.strokeStyle = obs.borderColor;
-          ctx.lineWidth = 1.5;
+          ctx.shadowColor = 'rgba(41, 37, 36, 0.2)';
+          ctx.shadowBlur = 14;
+          ctx.shadowOffsetY = 7;
+          ctx.fillStyle = 'rgba(41, 37, 36, 0.22)';
           ctx.beginPath();
-          ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 14);
+          ctx.roundRect(obs.x + 2, obs.y + 3, obs.w, obs.h, 9);
           ctx.fill();
-          ctx.stroke();
           ctx.restore();
 
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.36)';
-          ctx.fillRect(obs.x + 8, obs.y + 8, obs.w - 16, 3);
-          ctx.fillStyle = 'rgba(71, 85, 105, 0.12)';
-          ctx.fillRect(obs.x + 8, obs.y + obs.h - 7, obs.w - 16, 2);
+          ctx.fillStyle = 'rgba(53, 49, 44, 0.2)';
+          ctx.beginPath();
+          ctx.moveTo(obs.x + 8, obs.y + obs.h - 4);
+          ctx.lineTo(obs.x + obs.w - 6, obs.y + obs.h - 4);
+          ctx.lineTo(obs.x + obs.w + 4, obs.y + obs.h + 3);
+          ctx.lineTo(obs.x + 14, obs.y + obs.h + 3);
+          ctx.closePath();
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(obs.x + obs.w - 5, obs.y + 7);
+          ctx.lineTo(obs.x + obs.w + 4, obs.y + 12);
+          ctx.lineTo(obs.x + obs.w + 4, obs.y + obs.h + 3);
+          ctx.lineTo(obs.x + obs.w - 5, obs.y + obs.h - 4);
+          ctx.closePath();
+          ctx.fill();
 
-          ctx.fillStyle = '#475569';
-          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(obs.label, obs.x + obs.w / 2, obs.y + obs.h / 2 + 4);
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 9);
+          ctx.clip();
+          ctx.fillStyle = obs.color;
+          ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+          ctx.fillStyle = faceGradient;
+          ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+
+          const panelTop = obs.y + Math.min(42, obs.h * 0.28);
+          const panelBottom = obs.y + obs.h - 14;
+          const panelWidth = (obs.w - 24) / panelCount;
+          for (let index = 0; index < panelCount; index += 1) {
+            const panelX = obs.x + 12 + index * panelWidth;
+            ctx.fillStyle = isNatural
+              ? 'rgba(71, 85, 61, 0.10)'
+              : isIndustrial
+                ? 'rgba(51, 65, 85, 0.08)'
+                : 'rgba(255, 255, 255, 0.15)';
+            ctx.fillRect(panelX + 3, panelTop, panelWidth - 7, panelBottom - panelTop);
+            ctx.strokeStyle = 'rgba(71, 85, 105, 0.16)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(panelX + 3.5, panelTop + 0.5, panelWidth - 8, panelBottom - panelTop - 1);
+          }
+
+          if (isRetail) {
+            for (let index = 0; index < panelCount; index += 1) {
+              const displayX = obs.x + 17 + index * panelWidth;
+              const displayWidth = panelWidth - 14;
+              const displayY = panelTop + 4;
+              const displayHeight = panelBottom - panelTop - 8;
+              ctx.fillStyle = 'rgba(145, 171, 177, 0.24)';
+              ctx.fillRect(displayX, displayY, displayWidth, displayHeight);
+              ctx.strokeStyle = 'rgba(71, 93, 101, 0.36)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(displayX + 0.5, displayY + 0.5, displayWidth - 1, displayHeight - 1);
+
+              const shelfCount = Math.max(1, Math.floor(displayHeight / 38));
+              for (let shelf = 1; shelf <= shelfCount; shelf += 1) {
+                const shelfY = displayY + (displayHeight * shelf) / (shelfCount + 1);
+                ctx.fillStyle = 'rgba(247, 246, 239, 0.78)';
+                ctx.fillRect(displayX + 3, shelfY - 1, displayWidth - 6, 2);
+                ctx.fillStyle = 'rgba(61, 78, 82, 0.32)';
+                ctx.fillRect(displayX + 3, shelfY + 1, displayWidth - 6, 1);
+                for (let item = 0; item < 3; item += 1) {
+                  const itemX = displayX + 8 + item * ((displayWidth - 24) / 2);
+                  ctx.fillStyle = item === 1
+                    ? 'rgba(180, 139, 77, 0.66)'
+                    : 'rgba(97, 139, 149, 0.58)';
+                  ctx.fillRect(itemX, shelfY - 8, 6, 7);
+                }
+              }
+            }
+          } else if (isIndustrial) {
+            const slatCount = horizontal ? 3 : 5;
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.22)';
+            ctx.lineWidth = 1;
+            for (let index = 1; index <= slatCount; index += 1) {
+              const slatY = panelTop + ((panelBottom - panelTop) * index) / (slatCount + 1);
+              ctx.beginPath();
+              ctx.moveTo(obs.x + 16, slatY);
+              ctx.lineTo(obs.x + obs.w - 16, slatY);
+              ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(71, 85, 105, 0.45)';
+            ctx.fillRect(obs.x + 9, obs.y + obs.h - 8, obs.w - 18, 3);
+          } else if (isNatural) {
+            ctx.fillStyle = 'rgba(71, 85, 61, 0.14)';
+            ctx.fillRect(obs.x + 8, obs.y + obs.h - 12, obs.w - 16, 5);
+            for (let index = 0; index < panelCount; index += 1) {
+              const centerX = obs.x + 12 + (index + 0.5) * panelWidth;
+              ctx.fillStyle = 'rgba(71, 85, 61, 0.22)';
+              ctx.beginPath();
+              ctx.ellipse(centerX, panelTop + 14, Math.min(12, panelWidth / 5), 6, -0.3, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.34)';
+              ctx.beginPath();
+              ctx.ellipse(centerX - 2, panelTop + 12, Math.min(7, panelWidth / 7), 3, -0.3, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          } else {
+            ctx.fillStyle = 'rgba(71, 85, 105, 0.16)';
+            ctx.fillRect(obs.x + 10, obs.y + obs.h - 12, obs.w - 20, 4);
+          }
+
+          if (!isNatural) {
+            const signWidth = obs.w - 24;
+            ctx.fillStyle = 'rgba(250, 250, 249, 0.9)';
+            ctx.fillRect(obs.x + 12, obs.y + 10, signWidth, 20);
+            ctx.fillStyle = obs.borderColor;
+            ctx.fillRect(obs.x + 12, obs.y + 10, 3, 20);
+            ctx.font = `600 ${obs.w < 150 ? 9 : 10}px "Plus Jakarta Sans", sans-serif`;
+            ctx.fillStyle = '#3f4548';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(obs.label, obs.x + obs.w / 2, obs.y + 20, signWidth - 12);
+            ctx.textBaseline = 'alphabetic';
+          }
+
+          ctx.strokeStyle = 'rgba(71, 85, 105, 0.24)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(obs.x + 0.5, obs.y + 0.5, obs.w - 1, obs.h - 1, 9);
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.62)';
+          ctx.fillRect(obs.x + 8, obs.y + 4, obs.w - 16, 2);
+          ctx.restore();
         });
 
         // G. Golden Deal Boss
@@ -2483,25 +2684,18 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           ctx.save();
 
-          // Subtle team marker keeps players easy to track without a neon halo.
-          const hexRadius = 32;
+          // A restrained ground marker separates the character from floor detail.
+          const teamColor = p.team === 'blue' ? '#416f88' : '#a95463';
           ctx.save();
-          ctx.shadowBlur = 3;
-          ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
-          ctx.strokeStyle = p.team === 'blue' ? '#4e86a8' : '#bc6877';
-          ctx.fillStyle = p.team === 'blue' ? 'rgba(78, 134, 168, 0.12)' : 'rgba(188, 104, 119, 0.12)';
-          ctx.lineWidth = 2;
-
+          ctx.fillStyle = 'rgba(41, 37, 36, 0.22)';
           ctx.beginPath();
-          for (let s = 0; s < 6; s++) {
-            const hAngle = (Math.PI / 3) * s;
-            const hx = p.x + hexRadius * Math.cos(hAngle);
-            const hy = p.y + hexRadius * Math.sin(hAngle);
-            if (s === 0) ctx.moveTo(hx, hy);
-            else ctx.lineTo(hx, hy);
-          }
-          ctx.closePath();
+          ctx.ellipse(p.x, p.y + 5, 24, 16, 0, 0, Math.PI * 2);
           ctx.fill();
+          ctx.strokeStyle = teamColor;
+          ctx.globalAlpha = 0.72;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 2, 24, 15, 0, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
 
@@ -2554,115 +2748,172 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             trailEffect: 'sparks',
           };
 
-          // Weapon Barrel Drawing
-          ctx.save();
-          ctx.fillStyle = '#f8fafc';
-          if (custom.weaponSkin === 'dual_blaster') {
-            ctx.fillRect(10, -7, 20, 5);
-            ctx.fillRect(10, 2, 20, 5);
-            ctx.fillStyle = custom.visorColor;
-            ctx.fillRect(26, -6, 5, 3);
-            ctx.fillRect(26, 3, 5, 3);
-          } else if (custom.weaponSkin === 'laser_cannon') {
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(10, -6, 24, 12);
-            ctx.fillStyle = custom.visorColor;
-            ctx.fillRect(30, -4, 6, 8);
-          } else if (custom.weaponSkin === 'plasma_rifle') {
-            ctx.fillRect(8, -3, 26, 6);
-            ctx.fillStyle = custom.visorColor;
-            ctx.fillRect(14, -5, 6, 2);
-          } else {
-            // Shotgun
-            ctx.fillRect(8, -6, 16, 12);
-            ctx.fillStyle = custom.visorColor;
-            ctx.fillRect(20, -7, 6, 14);
-          }
-          ctx.restore();
+          const isHeavy = custom.characterClass === 'tanker';
+          const bodyWidth = isHeavy ? 30 : 25;
 
-          // Class-specific body
+          // Compact top-down soldier silhouette: pack, boots, limbs, armor, helmet.
+          ctx.save();
           if (custom.characterClass === 'phantom') {
-            // Hooded cloak
             ctx.fillStyle = custom.primaryColor;
             ctx.beginPath();
-            ctx.arc(-4, 0, 24, -Math.PI * 0.7, Math.PI * 0.7);
+            ctx.moveTo(-10, -8);
+            ctx.lineTo(-23, -10);
             ctx.lineTo(-20, 0);
+            ctx.lineTo(-23, 10);
+            ctx.lineTo(-10, 8);
             ctx.closePath();
             ctx.fill();
-
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath();
-            ctx.arc(0, 0, 18, 0, Math.PI * 2);
-            ctx.fill();
-          } else if (custom.characterClass === 'tanker') {
-            // Heavy armor pauldrons
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(-18, -20, 14, 10);
-            ctx.fillRect(-18, 10, 14, 10);
-
-            ctx.fillStyle = custom.primaryColor;
-            ctx.beginPath();
-            ctx.roundRect(-16, -16, 32, 32, 6);
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
           } else if (custom.characterClass === 'ninja') {
-            // Katana scabbard
-            ctx.fillStyle = custom.visorColor;
-            ctx.save();
-            ctx.rotate(-Math.PI / 4);
-            ctx.fillRect(-28, -2.5, 30, 4);
-            ctx.restore();
-
-            ctx.fillStyle = custom.primaryColor;
+            ctx.strokeStyle = custom.visorColor;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.ellipse(0, 0, 20, 15, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
+            ctx.moveTo(-8, -5);
+            ctx.quadraticCurveTo(-20, -10, -24, -4);
             ctx.stroke();
+          } else if (custom.characterClass === 'mecha') {
+            ctx.fillStyle = '#7b8587';
+            ctx.fillRect(-18, -12, 4, 5);
+            ctx.fillRect(-18, 7, 4, 5);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-19, -13, 6, 7);
+            ctx.strokeRect(-19, 6, 6, 7);
           } else if (custom.characterClass === 'commando') {
-            ctx.fillStyle = '#1e293b';
+            ctx.fillStyle = '#b6a77d';
             ctx.beginPath();
-            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.roundRect(-5, -12, 7, 5, 2);
+            ctx.roundRect(-5, 7, 7, 5, 2);
             ctx.fill();
-
-            ctx.fillStyle = custom.primaryColor;
-            ctx.fillRect(-10, -14, 20, 28);
-            ctx.strokeStyle = '#94a3b8';
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect(-10, -14, 20, 28);
-          } else {
-            // Mecha Android
-            ctx.fillStyle = custom.primaryColor;
-            ctx.beginPath();
-            ctx.arc(0, 0, 19, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(-14, -22, 3, 8);
-            ctx.fillRect(-14, 14, 3, 8);
           }
 
-          // Visor Glow
-          ctx.save();
-          ctx.shadowBlur = 2;
-          ctx.shadowColor = custom.visorColor;
-          ctx.fillStyle = custom.visorColor;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
           ctx.beginPath();
-          ctx.arc(6, 0, 6.5, -Math.PI / 2, Math.PI / 2);
+          ctx.roundRect(-18, -8, 12, 16, 4);
           ctx.fill();
+          ctx.fillStyle = '#202a30';
+          ctx.beginPath();
+          ctx.roundRect(-17, -11, 9, 6, 2);
+          ctx.roundRect(-17, 5, 9, 6, 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#202a30';
+          ctx.lineWidth = isHeavy ? 7 : 5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(-8, -6);
+          ctx.lineTo(-15, -10);
+          ctx.moveTo(-8, 6);
+          ctx.lineTo(-15, 10);
+          ctx.stroke();
+          ctx.fillStyle = '#11191e';
+          ctx.beginPath();
+          ctx.ellipse(-16, -10, 4, 2.5, -0.3, 0, Math.PI * 2);
+          ctx.ellipse(-16, 10, 4, 2.5, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = custom.primaryColor;
+          ctx.lineWidth = isHeavy ? 8 : 6;
+          ctx.beginPath();
+          ctx.moveTo(2, -7);
+          ctx.lineTo(10, -7);
+          ctx.moveTo(2, 7);
+          ctx.lineTo(10, 7);
+          ctx.stroke();
+          ctx.strokeStyle = '#27343a';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(9, -7);
+          ctx.lineTo(15, -7);
+          ctx.moveTo(9, 7);
+          ctx.lineTo(15, 7);
+          ctx.stroke();
+
+          ctx.fillStyle = '#182329';
+          ctx.beginPath();
+          ctx.roundRect(-10, -10, bodyWidth, 20, isHeavy ? 7 : 8);
+          ctx.fill();
+          ctx.fillStyle = custom.primaryColor;
+          ctx.beginPath();
+          ctx.roundRect(-8, -8, bodyWidth - 5, 16, isHeavy ? 5 : 6);
+          ctx.fill();
+
+          const armorShade = ctx.createLinearGradient(-7, -8, 10, 8);
+          armorShade.addColorStop(0, 'rgba(255, 255, 255, 0.34)');
+          armorShade.addColorStop(0.45, 'rgba(255, 255, 255, 0.04)');
+          armorShade.addColorStop(1, 'rgba(15, 23, 42, 0.38)');
+          ctx.fillStyle = armorShade;
+          ctx.beginPath();
+          ctx.roundRect(-8, -8, bodyWidth - 5, 16, isHeavy ? 5 : 6);
+          ctx.fill();
+
+          ctx.fillStyle = 'rgba(20, 31, 37, 0.68)';
+          ctx.beginPath();
+          ctx.roundRect(-4, -5, 10, 10, 3);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(226, 232, 230, 0.68)';
+          ctx.fillRect(-2, -3, 5, 2);
+          ctx.fillStyle = teamColor;
+          ctx.fillRect(-5, 4, 6, 2);
+
+          ctx.fillStyle = '#253239';
+          ctx.beginPath();
+          ctx.ellipse(10, 0, 9, 8, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = custom.primaryColor;
+          ctx.beginPath();
+          ctx.ellipse(10, 0, 7.5, 6.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.beginPath();
+          ctx.ellipse(9, -3, 4.5, 2, -0.1, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#26363d';
+          ctx.beginPath();
+          ctx.roundRect(13, -4.5, 4, 9, 2);
+          ctx.fill();
+          ctx.fillStyle = custom.visorColor;
+          ctx.fillRect(15, -3, 2, 6);
+
+          // Weapon model remains visually distinct by selected loadout.
+          ctx.fillStyle = '#253239';
+          if (custom.weaponSkin === 'dual_blaster') {
+            ctx.fillRect(14, -8, 18, 4);
+            ctx.fillRect(14, 4, 18, 4);
+            ctx.fillStyle = custom.visorColor;
+            ctx.fillRect(29, -7, 3, 2);
+            ctx.fillRect(29, 5, 3, 2);
+          } else if (custom.weaponSkin === 'laser_cannon') {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(13, -5, 22, 10);
+            ctx.fillStyle = custom.visorColor;
+            ctx.fillRect(32, -3, 4, 6);
+          } else if (custom.weaponSkin === 'plasma_rifle') {
+            ctx.fillRect(12, -3, 23, 6);
+            ctx.fillStyle = custom.visorColor;
+            ctx.fillRect(20, -5, 5, 2);
+          } else {
+            ctx.fillRect(12, -5, 17, 10);
+            ctx.fillStyle = custom.visorColor;
+            ctx.fillRect(25, -6, 4, 12);
+          }
           ctx.restore();
 
           // Accessories
           if (custom.accessory === 'crown') {
-            ctx.font = '18px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('👑', -2, -14);
+            ctx.fillStyle = '#b08b45';
+            ctx.beginPath();
+            ctx.moveTo(-2, -11);
+            ctx.lineTo(1, -17);
+            ctx.lineTo(5, -12);
+            ctx.lineTo(9, -17);
+            ctx.lineTo(12, -11);
+            ctx.lineTo(10, -8);
+            ctx.lineTo(0, -8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillRect(0, -7, 11, 2);
           } else if (custom.accessory === 'halo') {
             ctx.strokeStyle = '#fef08a';
             ctx.lineWidth = 2.5;
@@ -2707,13 +2958,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Highly Visible Player Name Badge (High Contrast & Polished)
           const isLocal = isLocalPlayer(p.id);
-          const displayName = isLocal ? `${p.name} (Kamu)` : p.name;
-          ctx.font = isLocal ? 'bold 11px "Plus Jakarta Sans", sans-serif' : 'bold 10.5px "Plus Jakarta Sans", sans-serif';
+          const playerName = p.name || 'Pemain';
+          const shortName = playerName.length > 13 ? `${playerName.slice(0, 12)}…` : playerName;
+          const displayName = isLocal ? `${shortName} (Kamu)` : shortName;
+          ctx.font = isLocal ? '600 10px "Plus Jakarta Sans", sans-serif' : '500 9px "Plus Jakarta Sans", sans-serif';
           ctx.textAlign = 'center';
 
           const nameMetrics = ctx.measureText(displayName);
           const badgeW = nameMetrics.width + 12;
-          const badgeH = 17;
+          const badgeH = 15;
           const badgeX = p.x - badgeW / 2;
           const badgeY = barY - badgeH - 3;
 
@@ -2740,7 +2993,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           ctx.shadowColor = 'rgba(15, 23, 42, 0.2)';
           ctx.shadowBlur = 4;
           ctx.fillStyle = isLocal ? '#0369a1' : p.team === 'blue' ? '#0e7490' : '#be123c';
-          ctx.fillText(displayName, p.x, badgeY + 12);
+          ctx.fillText(displayName, p.x, badgeY + 10.5);
           ctx.restore();
 
           ctx.restore();
@@ -2928,95 +3181,65 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           : 'h-full min-h-full w-full overflow-hidden'
       }`}
     >
-      {/* Top TDM Scoreboard Header (Compact on Fullscreen/Mobile for Wider Field of View) */}
-      <div className={`bg-white border-b border-slate-200 ${isFullscreen ? 'px-2 py-1 md:px-4 md:py-1.5' : 'px-2 py-1.5 md:px-4 md:py-2'} text-slate-900 flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
-        {/* Team Blue Score */}
-        <div className="flex items-center gap-1.5 md:gap-3">
-          <div className="min-w-9 md:min-w-10 text-center font-semibold text-sky-800">
-            <span className="text-[8px] md:text-[9px] uppercase text-sky-700 block">Biru</span>
-            <span className="text-lg md:text-xl leading-none font-mono-numbers tabular-nums">{hudBlueScore}</span>
-          </div>
-          <div className="hidden md:block">
-            <span className="text-xs font-medium text-slate-700 block">Tim Biru</span>
-            <span className="text-[10px] text-slate-500">
-              Kills: {hudBlueScore}
-            </span>
+      <div className="grid h-[58px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b border-slate-200 bg-[#fbfbfa] px-2 text-slate-900 select-none sm:h-[64px] sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <span className="h-8 w-[3px] shrink-0 rounded-full bg-[#66899a]" />
+          <div className="min-w-0">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[9px]">Tim Biru</div>
+            <div className="font-mono-numbers tabular-nums text-lg font-semibold leading-none text-slate-800 sm:text-xl">{hudBlueScore}</div>
           </div>
         </div>
 
-        {/* Center: Match Timer, Active Skill, Customizer Button */}
-        <div className="text-center flex flex-col items-center">
-          <div className="flex items-center justify-center gap-1 text-[8px] md:text-[9px] font-medium tracking-[0.08em] uppercase text-slate-500">
-            <Swords className="w-3 h-3 text-slate-400" />
-            <span className="truncate max-w-[130px] md:max-w-none">
-              TDM · {MAP_THEMES_CONFIG[selectedMapTheme].name.split('(')[0]}
-            </span>
-          </div>
-
+        <div className="flex min-w-[112px] flex-col items-center text-center sm:min-w-[180px]">
+          <span className="max-w-[150px] truncate text-[8px] font-medium uppercase tracking-[0.12em] text-slate-500 sm:max-w-none sm:text-[9px]">
+            Team Deathmatch · {MAP_THEMES_CONFIG[selectedMapTheme].name.split('(')[0]}
+          </span>
           <div
             aria-label={`Sisa waktu ${Math.floor(hudTimeLeft / 60)} menit ${hudTimeLeft % 60} detik`}
-            className={`w-[4.25rem] text-center text-xl md:text-2xl font-medium font-mono-numbers tabular-nums tracking-tight leading-tight transition-colors duration-300 ${
+            className={`font-mono-numbers tabular-nums text-xl font-semibold leading-none tracking-tight sm:text-2xl ${
               hudTimeLeft <= 10 ? 'text-rose-700' : 'text-slate-900'
             }`}
           >
             {Math.floor(hudTimeLeft / 60).toString().padStart(2, '0')}:{(hudTimeLeft % 60).toString().padStart(2, '0')}
           </div>
-
-          {/* Active Skill or Room Code */}
-          {hudActiveSkill ? (
-            <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md text-[9px] md:text-[10px] font-medium text-amber-800 mt-0.5">
-              <span>{hudActiveSkill.label}</span>
-              <span className="font-mono">({hudActiveSkill.timeLeft}s)</span>
-            </div>
-          ) : (
-            <span className="text-[8px] md:text-[10px] text-slate-500 block font-mono">
-                HP: <strong className={hudMyHp < 30 ? 'text-rose-600' : 'text-emerald-700'}>{hudMyHp}%</strong> · Kills: <strong>{hudMyKills}</strong>
-            </span>
-          )}
+          <span className="max-w-[160px] truncate text-[8px] leading-none text-slate-500 sm:text-[9px]">
+            {hudActiveSkill
+              ? `${hudActiveSkill.label} · ${hudActiveSkill.timeLeft}s`
+              : <>HP <strong className={hudMyHp < 30 ? 'text-rose-600' : 'text-emerald-700'}>{hudMyHp}%</strong><span className="mx-1.5 text-slate-300">|</span>Eliminasi <strong className="text-slate-700">{hudMyKills}</strong></>}
+          </span>
         </div>
 
-        {/* Team Red Score & Controls */}
-        <div className="flex items-center gap-1.5 md:gap-3">
-          <div className="hidden md:block text-right">
-            <span className="text-xs font-medium text-slate-700 block">Tim Merah</span>
-            <span className="text-[10px] text-slate-500">
-              Kills: {hudRedScore}
-            </span>
+        <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
+          <div className="mr-0.5 min-w-0 text-right sm:mr-2">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[9px]">Tim Merah</div>
+            <div className="font-mono-numbers tabular-nums text-lg font-semibold leading-none text-slate-800 sm:text-xl">{hudRedScore}</div>
           </div>
-          <div className="min-w-9 md:min-w-10 text-center font-semibold text-rose-800">
-            <span className="text-[8px] md:text-[9px] uppercase text-rose-700 block">Merah</span>
-            <span className="text-lg md:text-xl leading-none font-mono-numbers tabular-nums">{hudRedScore}</span>
-          </div>
-
-          {/* Customizer Button in Header */}
+          <span className="h-8 w-[3px] shrink-0 rounded-full bg-[#b8757e]" />
           <button
             onClick={() => setShowCustomizerModal(true)}
-            className="p-2 md:p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
             title="Kustomisasi Karakter"
             aria-label="Kustomisasi Karakter"
           >
-            <Palette className="w-4 h-4 md:w-5 md:h-5" />
+            <Palette className="h-4 w-4" />
           </button>
-
-          {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 md:p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
             title={isFullscreen ? 'Keluar Fullscreen (F)' : 'Layar Penuh / Fullscreen (F)'}
             aria-label="Toggle Fullscreen"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4 md:w-5 md:h-5" /> : <Maximize2 className="w-4 h-4 md:w-5 md:h-5" />}
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </button>
-
-          {/* Leave Match Button */}
           {!inLobby && (
             <button
               onClick={handleLeaveMatch}
-              className="px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-rose-700 transition-colors flex items-center gap-1 text-xs font-semibold"
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-700 sm:px-2.5"
               title="Tinggalkan Match"
+              aria-label="Keluar dari pertandingan"
             >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Keluar</span>
+              <LogOut className="h-4 w-4" />
+              <span className="sr-only">Keluar</span>
             </button>
           )}
         </div>
@@ -3513,7 +3736,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   </span>
                 </button>
 
-                {/* 2. Neon Rooftop */}
+                {/* 2. Mall Rooftop */}
                 <button
                   onClick={() => setSelectedMapTheme('rooftop')}
                   className={`p-2 rounded-xl border text-left transition-all ${
@@ -3524,7 +3747,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 >
                   <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-xs mb-0.5">
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>Neon Rooftop</span>
+                    <span>Mall Rooftop</span>
                   </div>
                   <span className="text-[9px] text-slate-600 block line-clamp-1">
                     Atap Mall &amp; Helipad Cepat
