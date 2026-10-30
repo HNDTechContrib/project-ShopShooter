@@ -2372,7 +2372,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         // D. Ambient Themed Floating Particles
         sim.ambientParticles.forEach((part) => {
           ctx.save();
-          ctx.globalAlpha = part.alpha;
+          ctx.globalAlpha = part.alpha * 0.25;
           ctx.fillStyle = part.color;
           ctx.beginPath();
           ctx.arc(part.x, part.y, part.size, 0, Math.PI * 2);
@@ -2650,7 +2650,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           // Visor Glow
           ctx.save();
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 2;
           ctx.shadowColor = custom.visorColor;
           ctx.fillStyle = custom.visorColor;
           ctx.beginPath();
@@ -2929,15 +2929,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
       }`}
     >
       {/* Top TDM Scoreboard Header (Compact on Fullscreen/Mobile for Wider Field of View) */}
-      <div className={`bg-white/95 border border-slate-200 rounded-2xl ${isFullscreen ? 'p-1.5 md:p-2.5' : 'p-2 md:p-2.5'} text-slate-900 shadow-sm flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
+      <div className={`bg-white border-b border-slate-200 ${isFullscreen ? 'px-2 py-1 md:px-4 md:py-1.5' : 'px-2 py-1.5 md:px-4 md:py-2'} text-slate-900 flex items-center justify-between gap-1.5 md:gap-4 select-none shrink-0`}>
         {/* Team Blue Score */}
         <div className="flex items-center gap-1.5 md:gap-3">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-sky-50 flex flex-col items-center justify-center font-bold text-sky-800">
-            <span className="text-[8px] md:text-[9px] uppercase font-semibold text-sky-700">Biru</span>
-            <span className="text-lg md:text-xl leading-none font-mono-numbers">{hudBlueScore}</span>
+          <div className="min-w-9 md:min-w-10 text-center font-semibold text-sky-800">
+            <span className="text-[8px] md:text-[9px] uppercase text-sky-700 block">Biru</span>
+            <span className="text-lg md:text-xl leading-none font-mono-numbers tabular-nums">{hudBlueScore}</span>
           </div>
           <div className="hidden md:block">
-            <span className="text-xs font-semibold text-slate-700 block">Tim Biru</span>
+            <span className="text-xs font-medium text-slate-700 block">Tim Biru</span>
             <span className="text-[10px] text-slate-500">
               Kills: {hudBlueScore}
             </span>
@@ -2946,20 +2946,25 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* Center: Match Timer, Active Skill, Customizer Button */}
         <div className="text-center flex flex-col items-center">
-          <div className="flex items-center justify-center gap-1 text-[9px] md:text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-500">
-            <Swords className="w-3 h-3 md:w-3.5 md:h-3.5 text-slate-500" />
+          <div className="flex items-center justify-center gap-1 text-[8px] md:text-[9px] font-medium tracking-[0.08em] uppercase text-slate-500">
+            <Swords className="w-3 h-3 text-slate-400" />
             <span className="truncate max-w-[130px] md:max-w-none">
               TDM · {MAP_THEMES_CONFIG[selectedMapTheme].name.split('(')[0]}
             </span>
           </div>
 
-          <div className="text-xl md:text-2xl font-semibold font-mono-numbers text-slate-900 tracking-tight leading-tight">
-            {hudTimeLeft}s
+          <div
+            aria-label={`Sisa waktu ${Math.floor(hudTimeLeft / 60)} menit ${hudTimeLeft % 60} detik`}
+            className={`w-[4.25rem] text-center text-xl md:text-2xl font-medium font-mono-numbers tabular-nums tracking-tight leading-tight transition-colors duration-300 ${
+              hudTimeLeft <= 10 ? 'text-rose-700' : 'text-slate-900'
+            }`}
+          >
+            {Math.floor(hudTimeLeft / 60).toString().padStart(2, '0')}:{(hudTimeLeft % 60).toString().padStart(2, '0')}
           </div>
 
           {/* Active Skill or Room Code */}
           {hudActiveSkill ? (
-            <div className="flex items-center gap-1 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full text-[9px] md:text-[11px] font-bold text-amber-800 animate-pulse mt-0.5">
+            <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md text-[9px] md:text-[10px] font-medium text-amber-800 mt-0.5">
               <span>{hudActiveSkill.label}</span>
               <span className="font-mono">({hudActiveSkill.timeLeft}s)</span>
             </div>
@@ -2973,14 +2978,14 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         {/* Team Red Score & Controls */}
         <div className="flex items-center gap-1.5 md:gap-3">
           <div className="hidden md:block text-right">
-            <span className="text-xs font-bold text-rose-700 block">TIM PLASMA MERAH</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-xs font-medium text-slate-700 block">Tim Merah</span>
+            <span className="text-[10px] text-slate-500">
               Kills: {hudRedScore}
             </span>
           </div>
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-rose-50 flex flex-col items-center justify-center font-bold text-rose-800">
-            <span className="text-[8px] md:text-[9px] uppercase font-semibold text-rose-700">Merah</span>
-            <span className="text-lg md:text-xl leading-none font-mono-numbers">{hudRedScore}</span>
+          <div className="min-w-9 md:min-w-10 text-center font-semibold text-rose-800">
+            <span className="text-[8px] md:text-[9px] uppercase text-rose-700 block">Merah</span>
+            <span className="text-lg md:text-xl leading-none font-mono-numbers tabular-nums">{hudRedScore}</span>
           </div>
 
           {/* Customizer Button in Header */}
@@ -3033,17 +3038,17 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         />
 
         {/* Tactical Minimap Radar in Top-Left (Visible on match, 60fps canvas with clear player names) */}
-        <div className="absolute top-3 left-3 z-30 w-44 h-28 sm:w-52 sm:h-32 md:w-60 md:h-36 bg-white/95 backdrop-blur-md rounded-xl border border-cyan-200 p-1.5 pointer-events-none shadow-lg flex flex-col">
+        <div className="absolute top-3 left-3 z-30 w-44 h-28 sm:w-52 sm:h-32 md:w-60 md:h-36 bg-white/95 rounded-lg border border-slate-200 p-1.5 pointer-events-none shadow-md flex flex-col">
           <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-200 mb-1">
-            <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-800 flex items-center gap-1 uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+            <span className="text-[8px] sm:text-[9px] font-mono font-semibold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block" />
               RADAR ARENA
             </span>
             <span className="text-[7.5px] sm:text-[8px] text-slate-500 font-mono">
               Posisi &amp; Nama Player
             </span>
           </div>
-          <div className="relative flex-1 w-full bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
+          <div className="relative flex-1 w-full bg-slate-50 rounded-md overflow-hidden border border-slate-200">
             <canvas
               ref={minimapCanvasRef}
               width={240}
@@ -3072,9 +3077,9 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         {/* RESPAWN BANNER / OVERLAY WHEN HUMAN PLAYER DIES */}
         {hudRespawnTimer > 0 && (
           <div className="absolute inset-0 z-40 bg-white/75 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-in fade-in duration-150">
-            <div className="bg-white border-2 border-rose-300 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl">
-              <div className="w-16 h-16 rounded-2xl bg-rose-50 border-2 border-rose-300 flex items-center justify-center mx-auto mb-3 animate-pulse">
-                <Skull className="w-9 h-9 text-rose-600" />
+            <div className="bg-white border border-slate-200 rounded-xl p-6 md:p-8 max-w-md w-full text-center shadow-lg">
+            <div className="w-16 h-16 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto mb-3">
+              <Skull className="w-9 h-9 text-rose-700" />
               </div>
               <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-1">
                 KAMU TERELIMINASI!
@@ -3098,7 +3103,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               {/* Instant Respawn Button */}
               <button
                 onClick={handleInstantRespawn}
-                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 px-6 rounded-lg bg-slate-900 hover:bg-slate-700 text-white font-semibold text-sm active:scale-[0.99] transition-colors flex items-center justify-center gap-2"
               >
                 <Zap className="w-4 h-4 fill-white" />
                 Respawn Sekarang (Instan)
@@ -3116,13 +3121,13 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 onTouchStart={handleJoyTouchStart}
                 onTouchMove={handleJoyTouchMove}
                 onTouchEnd={handleJoyTouchEnd}
-                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/80 backdrop-blur-md border-2 border-slate-300 flex items-center justify-center touch-none shadow-xl active:border-cyan-500"
+                className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/90 border border-slate-300 flex items-center justify-center touch-none shadow-md active:border-sky-700"
               >
                 {/* Center crosshair mark */}
                 <div className="w-2 h-2 rounded-full bg-slate-400" />
                 {/* Floating Knob */}
                 <div
-                  className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 border-2 border-white shadow-lg pointer-events-none flex items-center justify-center transition-transform duration-75"
+                  className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full bg-sky-700 border-2 border-white shadow pointer-events-none flex items-center justify-center transition-transform duration-75"
                   style={{
                     transform: `translate(${joyKnobPos.x}px, ${joyKnobPos.y}px)`,
                   }}
@@ -3141,7 +3146,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 {/* Dash / Evade Button */}
                 <button
                   onClick={handleMobileDash}
-                  className="px-3 py-1.5 rounded-xl text-[10px] font-bold bg-emerald-50 border border-emerald-300 text-emerald-700 active:scale-90 transition-transform flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-md text-[10px] font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-colors flex items-center gap-1"
                 >
                   <Wind className="w-3.5 h-3.5" />
                   <span>DASH</span>
@@ -3153,7 +3158,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                 {/* Touch Aim Wheel */}
                 <div
                   onTouchMove={handleAimTouchMove}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/80 backdrop-blur-md border-2 border-slate-300 flex items-center justify-center touch-none text-slate-500 active:border-rose-400"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/90 border border-slate-300 flex items-center justify-center touch-none text-slate-500 active:border-slate-500"
                 >
                   <Crosshair className="w-6 h-6 text-slate-500" />
                 </div>
@@ -3176,7 +3181,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onMouseUp={() => {
                     isMouseDown.current = false;
                   }}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 border-4 border-white/90 shadow-lg active:scale-90 transition-transform flex flex-col items-center justify-center text-white font-black"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-orange-600 hover:bg-orange-700 border-4 border-white shadow-md active:scale-[0.97] transition-transform flex flex-col items-center justify-center text-white font-semibold"
                 >
                   <Flame className="w-6 h-6 fill-white" />
                   <span className="text-[10px] uppercase font-bold tracking-wider">TEMBAK</span>
@@ -3189,59 +3194,66 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         {/* Lobby Overlay */}
         {inLobby && (
-          <div className="shop-shooter-lobby absolute inset-0 z-40 bg-slate-50/95 backdrop-blur-md flex flex-col items-center justify-start p-4 md:p-6 text-center overflow-y-auto">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-amber-500 to-rose-600 flex items-center justify-center mb-2 md:mb-3 shadow-xl shrink-0">
-              <Swords className="w-6 h-6 md:w-7 md:h-7 text-white" />
-            </div>
-
-            <h2 className="text-xl md:text-3xl font-black text-slate-900 mb-1">
-              Shop Shooter Arena: Team Deathmatch
-            </h2>
-            <p className="text-xs md:text-sm text-slate-600 max-w-lg mb-3 leading-relaxed">
-              2 Tim saling bertarung! Main di PC atau HP dengan joystick layar sentuh. Ambil skill &amp; kustomisasi karaktermu.
-            </p>
+          <div className="shop-shooter-lobby absolute inset-0 z-40 bg-[#f7f7f5] flex flex-col items-center justify-start p-3 md:p-5 overflow-y-auto">
+            <div className="w-full max-w-2xl py-2 md:py-4 flex flex-col gap-3 md:gap-4 text-left">
+              <div className="flex items-start gap-3 border-b border-slate-200 pb-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                  <Swords className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[9px] uppercase tracking-[0.16em] font-semibold text-slate-500 mb-0.5">
+                    Shop Shooter · Arena
+                  </div>
+                  <h2 className="text-lg md:text-2xl font-semibold tracking-tight text-slate-900 leading-tight">
+                    Team Deathmatch
+                  </h2>
+                  <p className="text-[11px] md:text-xs text-slate-600 mt-1 leading-relaxed">
+                    Pilih mode, atur pemain, lalu masuk ke arena.
+                  </p>
+                </div>
+              </div>
 
             {/* Mode Selector Tabs (Main Bareng vs Main vs Bot) */}
-            <div className="grid grid-cols-2 gap-2 max-w-lg w-full mb-3">
+            <div className="grid grid-cols-2 gap-2 w-full">
               <button
                 onClick={() => setGameModeType('multiplayer')}
-                className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
+                className={`p-3 rounded-lg border transition-colors duration-200 flex flex-col items-start justify-center gap-1 text-xs md:text-sm ${
                   gameModeType === 'multiplayer'
-                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-300 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]'
-                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-white border-slate-400 text-slate-900 shadow-sm'
+                    : 'bg-transparent border-slate-200 text-slate-700 hover:bg-white'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-cyan-300" />
-                  <span>Main Bareng Teman</span>
+                  <Users className="w-4 h-4 text-slate-500" />
+                  <span className="font-semibold">Main bareng</span>
                 </div>
-                <span className="text-[9px] font-normal opacity-85">
-                  Pakai Kode Room untuk Mabar
+                <span className="text-[10px] font-normal text-slate-500">
+                  Bergabung dengan kode room
                 </span>
               </button>
 
               <button
                 onClick={() => setGameModeType('bot')}
-                className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 font-black text-xs md:text-sm ${
+                className={`p-3 rounded-lg border transition-colors duration-200 flex flex-col items-start justify-center gap-1 text-xs md:text-sm ${
                   gameModeType === 'bot'
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-300 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)]'
-                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-white border-slate-400 text-slate-900 shadow-sm'
+                    : 'bg-transparent border-slate-200 text-slate-700 hover:bg-white'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Bot className="w-4 h-4 text-amber-300" />
-                  <span>Main vs Bot (Solo)</span>
+                  <Bot className="w-4 h-4 text-slate-500" />
+                  <span className="font-semibold">Latihan solo</span>
                 </div>
-                <span className="text-[9px] font-normal opacity-85">
-                  Latihan Solo vs Bot AI
+                <span className="text-[10px] font-normal text-slate-500">
+                  Bermain melawan bot
                 </span>
               </button>
             </div>
 
             {/* Player Name Change Bar */}
-            <div className="max-w-lg w-full mb-3 bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 text-left shadow-md">
+            <div className="w-full bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-3">
               <div className="flex-1 flex flex-col gap-1">
-                <span className="text-[9px] uppercase text-cyan-700 font-bold flex items-center gap-1">
+                <span className="text-[9px] uppercase tracking-wide text-slate-500 font-semibold flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Ubah Nama Pemain Kamu:
                 </span>
@@ -3250,23 +3262,21 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   value={playerName}
                   onChange={(e) => handlePlayerNameChange(e.target.value)}
                   placeholder="Ketik Nama Kamu..."
-                  className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-cyan-500"
+                  className="bg-slate-50 border border-slate-200 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-900 focus:outline-none focus:border-slate-400"
                   maxLength={20}
                 />
               </div>
-              <span className="text-[9px] text-emerald-700 font-mono self-end pb-1.5">
-                ✓ Tersimpan
-              </span>
+              <span className="text-[9px] text-slate-400 self-end pb-1.5">Tersimpan</span>
             </div>
 
             {/* Character Customization Quick Trigger */}
-            <div className="max-w-lg w-full mb-3">
+            <div className="w-full">
               <button
                 onClick={() => setShowCustomizerModal(true)}
-                className="w-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 rounded-xl px-3 py-2 flex items-center justify-between text-left group transition-all"
+                className="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 flex items-center justify-between text-left group transition-colors duration-200"
               >
                 <div>
-                  <span className="text-[9px] uppercase text-amber-700 font-bold block flex items-center gap-1">
+                  <span className="text-[9px] uppercase tracking-wide text-slate-500 font-semibold block flex items-center gap-1">
                     <Palette className="w-3 h-3" />
                     Karakter Avatar Kamu:
                   </span>
@@ -3274,8 +3284,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {characterCustomization.characterClass} · {characterCustomization.weaponSkin.replace('_', ' ')}
                   </span>
                 </div>
-                <span className="text-[10px] bg-amber-400 text-slate-950 font-black px-2.5 py-1 rounded-md group-hover:scale-105 transition-transform">
-                  Ubah Kustomisasi
+                <span className="text-[10px] text-slate-600 font-medium px-2.5 py-1 rounded-md group-hover:text-slate-900 transition-colors">
+                  Ubah
                 </span>
               </button>
             </div>
@@ -3283,27 +3293,27 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             {/* CONDITIONAL SECTION BASED ON MODE */}
             {gameModeType === 'multiplayer' ? (
               /* MULTIPLAYER / MAIN BARENG ROOM CODE */
-              <div className="bg-white border border-cyan-200 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-md">
+              <div className="bg-white border border-slate-200 rounded-lg p-3 md:p-4 w-full flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-cyan-700 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                     <Users className="w-4 h-4" />
                     <span>LOBBY MULTIPLAYER</span>
                   </span>
                 </div>
 
                 {/* Team Selection */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">PILIH TIM:</span>
+                <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                  <span className="text-[10px] font-semibold text-slate-600 block mb-1.5">PILIH TIM</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setPlayerTeam('blue')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-white text-slate-700 border-slate-300'}`}
+                      className={`py-1.5 px-3 rounded-md text-xs font-medium border transition-colors ${playerTeam === 'blue' ? 'bg-sky-800 text-white border-sky-800' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`}
                     >
                       Tim Biru
                     </button>
                     <button
                       onClick={() => setPlayerTeam('red')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300'}`}
+                      className={`py-1.5 px-3 rounded-md text-xs font-medium border transition-colors ${playerTeam === 'red' ? 'bg-rose-800 text-white border-rose-800' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`}
                     >
                       Tim Merah
                     </button>
@@ -3312,31 +3322,31 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* Host Section */}
-                  <div className="bg-white border border-slate-200 rounded-lg p-3">
+                  <div className="bg-white border border-slate-200 rounded-md p-3">
                     <p className="text-[10px] text-slate-600 mb-2">Host Room:</p>
                     <div className="bg-slate-50 rounded p-2 mb-2 flex items-center justify-between">
                       <span className="text-sm font-mono font-bold text-cyan-700">{currentRoomCode}</span>
                       <button onClick={handleCopyRoomCode} className="text-[10px] text-slate-600">Salin</button>
                     </div>
-                    <button onClick={() => handleJoinMultiplayerRoom(currentRoomCode, true)} className="w-full py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-bold shadow flex items-center justify-center gap-1.5">
+                    <button onClick={() => handleJoinMultiplayerRoom(currentRoomCode, true)} className="w-full py-1.5 bg-slate-900 hover:bg-slate-700 text-white rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
                       <Building2 className="w-3.5 h-3.5" />
                       <span>{isJoinedRoom && isEffectiveHost ? 'Terhubung (Host)' : 'Buka Room (Host)'}</span>
                     </button>
                   </div>
 
                   {/* Join Section */}
-                  <div className="bg-white border border-slate-200 rounded-lg p-3">
+                  <div className="bg-white border border-slate-200 rounded-md p-3">
                     <p className="text-[10px] text-slate-600 mb-2">Gabung Room:</p>
                     <input
                       type="text"
                       value={roomCodeInput}
                       onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
                       placeholder="Ketik Kode..."
-                      className="w-full bg-white border border-slate-300 rounded px-2 py-1.5 text-xs text-slate-900 mb-2 font-mono font-bold"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-2 py-1.5 text-xs text-slate-900 mb-2 font-mono"
                     />
                     <button
                       onClick={() => handleJoinMultiplayerRoom(roomCodeInput, false)}
-                      className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded text-xs font-bold shadow flex items-center justify-center gap-1.5"
+                      className="w-full py-1.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <LogIn className="w-3.5 h-3.5" />
                       <span>{isJoinedRoom && !isEffectiveHost ? 'Terhubung (Pemain)' : 'Gabung'}</span>
@@ -3346,19 +3356,19 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
                 {/* Waiting Room Roster */}
                 {isJoinedRoom && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-600">
+                  <div className="bg-slate-50 border border-slate-200 rounded-md p-3 space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-semibold text-slate-600">
                       <span>DAFTAR PEMAIN ({roomPlayersList.length}/{totalPlayersConfig})</span>
-                      <span className="text-emerald-700 font-mono text-[10px] flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                      <span className="text-emerald-700 text-[10px] flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>
                         <span>Terhubung {isEffectiveHost ? '(Host)' : ''}</span>
                       </span>
                     </div>
                     <div className="max-h-36 overflow-y-auto space-y-1">
                       {roomPlayersList.map((p, idx) => (
                         <div key={p.id || idx} className="flex items-center justify-between bg-white p-1.5 rounded text-[10px] border border-slate-200">
-                          <span className="text-slate-800 flex items-center gap-1.5 font-bold">
-                             {p.isBot ? <Bot className="w-3.5 h-3.5 text-amber-600" /> : <Users className="w-3.5 h-3.5 text-cyan-700" />}
+                          <span className="text-slate-800 flex items-center gap-1.5 font-medium">
+                             {p.isBot ? <Bot className="w-3.5 h-3.5 text-slate-500" /> : <Users className="w-3.5 h-3.5 text-slate-500" />}
                              {p.username} {isLocalPlayer(p.id) ? '(Kamu)' : ''}
                           </span>
                           <div className="flex items-center gap-1.5">
@@ -3370,7 +3380,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                                   handleUpdateBotTeam(p.id, p.team === 'blue' ? 'red' : 'blue');
                                 }
                               }}
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold select-none ${(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:scale-105 active:scale-95 transition-all' : ''} ${p.team === 'blue' ? 'bg-cyan-50 text-cyan-800 border border-cyan-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-medium select-none ${(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? 'cursor-pointer hover:underline' : ''} ${p.team === 'blue' ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}
                               title={(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) ? "Klik untuk ganti tim" : undefined}
                             >
                               Tim {p.team === 'blue' ? 'Biru' : 'Merah'} {(isLocalPlayer(p.id) || (p.isBot && isEffectiveHost)) && '(Ubah)'}
@@ -3378,7 +3388,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                             {isEffectiveHost && !isLocalPlayer(p.id) && (
                               <button
                                 onClick={() => handleKickPlayer(p.id)}
-                                className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white px-2 py-0.5 rounded text-[9px] font-bold transition-all border border-rose-200 flex items-center gap-1"
+                                className="bg-white hover:bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-[9px] font-medium transition-colors border border-slate-200 flex items-center gap-1"
                                 title={p.isBot ? "Keluarkan Bot" : "Keluarkan Pemain"}
                               >
                                 <X className="w-2.5 h-2.5" />
@@ -3392,7 +3402,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {isEffectiveHost && (
                       <button
                         onClick={startMatch}
-                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded transition-all shadow flex items-center justify-center gap-1.5"
+                        className="w-full py-2 bg-slate-900 hover:bg-slate-700 text-white font-medium text-xs rounded-md transition-colors flex items-center justify-center gap-1.5"
                       >
                         <Play className="w-3.5 h-3.5 fill-current" />
                         <span>Mulai Pertandingan</span>
@@ -3401,7 +3411,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {roomPlayersList.length < totalPlayersConfig && isEffectiveHost && (
                       <button
                         onClick={handleAddBot}
-                        className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded transition-all shadow flex items-center justify-center gap-1.5"
+                        className="w-full py-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-medium text-xs rounded-md transition-colors flex items-center justify-center gap-1.5"
                       >
                         <Bot className="w-4 h-4" />
                         <span>Tambah Bot</span>
@@ -3410,7 +3420,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     {isEffectiveHost ? (
                       <button
                         onClick={handleDeleteRoom}
-                        className="w-full py-2 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2 bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 rounded-md text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Hapus Room (Host)</span>
@@ -3418,7 +3428,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                     ) : (
                       <button
                         onClick={handleLeaveRoom}
-                        className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow"
+                        className="w-full py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-md text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         <span>Tinggalkan Room</span>
@@ -3429,35 +3439,35 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
               </div>
             ) : (
               /* BOT PRACTICE / MAIN VS BOT */
-              <div className="bg-white border border-amber-200 rounded-xl p-4 max-w-lg w-full mb-3 flex flex-col gap-3 shadow-md">
+              <div className="bg-white border border-slate-200 rounded-lg p-3 md:p-4 w-full flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-700 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                     <Bot className="w-4 h-4" />
                     <span>LOBBY SOLO (VS BOT)</span>
                   </span>
                 </div>
 
                 {/* Team Selection */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">PILIH TIM:</span>
+                <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                  <span className="text-[10px] font-semibold text-slate-600 block mb-1.5">PILIH TIM</span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setPlayerTeam('blue')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'blue' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-white text-slate-700 border-slate-300'}`}
+                      className={`py-1.5 px-3 rounded-md text-xs font-medium border transition-colors ${playerTeam === 'blue' ? 'bg-sky-800 text-white border-sky-800' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`}
                     >
                       Tim Biru
                     </button>
                     <button
                       onClick={() => setPlayerTeam('red')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border ${playerTeam === 'red' ? 'bg-rose-600 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300'}`}
+                      className={`py-1.5 px-3 rounded-md text-xs font-medium border transition-colors ${playerTeam === 'red' ? 'bg-rose-800 text-white border-rose-800' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`}
                     >
                       Tim Merah
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <span className="text-[10px] font-bold text-slate-600 block mb-1.5">Pilih Total Pemain:</span>
+                <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
+                  <span className="text-[10px] font-semibold text-slate-600 block mb-1.5">Jumlah pemain</span>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[2, 4, 6, 8].map((count) => (
                       <button
@@ -3465,8 +3475,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                         onClick={() => setTotalPlayersConfig(count as 2 | 4 | 6 | 8)}
                         className={`py-1.5 px-2 rounded-lg text-xs font-bold border ${
                           totalPlayersConfig === count
-                            ? 'bg-amber-600 text-white border-amber-500'
-                            : 'bg-white text-slate-700 border-slate-300'
+                            ? 'bg-slate-900 text-white border-slate-900'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         {count}
@@ -3480,22 +3490,21 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             )}
 
             {/* Map Selector (4 Futuristic Shopping-Inspired Arenas) */}
-            <div className="mb-3 max-w-lg w-full text-left">
-              <span className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
-                <span>Pilih Arena Mall Futuristik:</span>
-                <span className="text-[10px] text-amber-700 font-normal">Identitas Tema Belanja</span>
+            <div className="w-full">
+              <span className="text-[10px] uppercase tracking-wide font-semibold text-slate-600 block mb-2">
+                Pilih arena
               </span>
               <div className="grid grid-cols-2 gap-2">
                 {/* 1. Shopping Mall */}
                 <button
                   onClick={() => setSelectedMapTheme('mall')}
-                  className={`p-2 rounded-xl border text-left transition-all ${
+                  className={`p-2.5 rounded-md border text-left transition-colors duration-200 ${
                     selectedMapTheme === 'mall'
-                      ? 'border-cyan-400 bg-cyan-950/70 shadow-md ring-1 ring-cyan-400'
-                      : 'border-slate-200 bg-white hover:bg-slate-100'
+                      ? 'border-slate-400 bg-white shadow-sm'
+                      : 'border-slate-200 bg-white/70 hover:bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-cyan-400 font-bold text-xs mb-0.5">
+                  <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-xs mb-0.5">
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Shopping Mall</span>
                   </div>
@@ -3509,11 +3518,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onClick={() => setSelectedMapTheme('rooftop')}
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'rooftop'
-                      ? 'border-rose-400 bg-rose-950/70 shadow-md ring-1 ring-rose-400'
-                      : 'border-slate-200 bg-white hover:bg-slate-100'
+                      ? 'border-slate-400 bg-white shadow-sm'
+                      : 'border-slate-200 bg-white/70 hover:bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs mb-0.5">
+                  <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-xs mb-0.5">
                     <Building2 className="w-3.5 h-3.5" />
                     <span>Neon Rooftop</span>
                   </div>
@@ -3527,11 +3536,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onClick={() => setSelectedMapTheme('warehouse')}
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'warehouse'
-                      ? 'border-amber-400 bg-amber-950/70 shadow-md ring-1 ring-amber-400'
-                      : 'border-slate-200 bg-white hover:bg-slate-100'
+                      ? 'border-slate-400 bg-white shadow-sm'
+                      : 'border-slate-200 bg-white/70 hover:bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs mb-0.5">
+                  <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-xs mb-0.5">
                     <Boxes className="w-3.5 h-3.5" />
                     <span>Tech Warehouse</span>
                   </div>
@@ -3545,11 +3554,11 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
                   onClick={() => setSelectedMapTheme('garden')}
                   className={`p-2 rounded-xl border text-left transition-all ${
                     selectedMapTheme === 'garden'
-                      ? 'border-emerald-400 bg-emerald-950/70 shadow-md ring-1 ring-emerald-400'
-                      : 'border-slate-200 bg-white hover:bg-slate-100'
+                      ? 'border-slate-400 bg-white shadow-sm'
+                      : 'border-slate-200 bg-white/70 hover:bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mb-0.5">
+                  <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-xs mb-0.5">
                     <Flower2 className="w-3.5 h-3.5" />
                     <span>Sky Garden</span>
                   </div>
@@ -3564,12 +3573,13 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             {gameModeType === 'bot' && (
               <button
                 onClick={startMatch}
-                className="py-3 px-8 text-white font-black rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2 max-w-lg w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-orange-500/25 active:scale-95"
+                className="py-2.5 px-5 text-white font-semibold rounded-md transition-colors text-sm flex items-center justify-center gap-2 w-full bg-slate-900 hover:bg-slate-700"
               >
                 <Play className="w-4 h-4 fill-white" />
                 <span>Mulai Pertandingan vs Bot ({totalPlayersConfig} Pemain)</span>
               </button>
             )}
+            </div>
           </div>
         )}
       </div>
