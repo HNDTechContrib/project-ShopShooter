@@ -66,13 +66,13 @@ const CLASS_OPTIONS: {
 ];
 
 const COLOR_PALETTES = [
-  { name: 'Cyber Cyan', hex: '#06b6d4', glow: '#38bdf8' },
-  { name: 'Plasma Rose', hex: '#f43f5e', glow: '#fb7185' },
-  { name: 'Gold Champion', hex: '#f59e0b', glow: '#fcd34d' },
-  { name: 'Toxic Emerald', hex: '#10b981', glow: '#34d399' },
-  { name: 'Void Violet', hex: '#8b5cf6', glow: '#c084fc' },
-  { name: 'Solar Orange', hex: '#ea580c', glow: '#fb923c' },
-  { name: 'Titanium White', hex: '#e2e8f0', glow: '#f8fafc' },
+  { name: 'Forest Sage', hex: '#657f72', glow: '#bdc9bb' },
+  { name: 'Slate Blue', hex: '#557d8b', glow: '#b5c5c0' },
+  { name: 'Terracotta', hex: '#a86d70', glow: '#d3b5a8' },
+  { name: 'Sandstone', hex: '#a18458', glow: '#d2c49f' },
+  { name: 'Olive Field', hex: '#71805e', glow: '#c1c49b' },
+  { name: 'Graphite', hex: '#59636a', glow: '#b7bdba' },
+  { name: 'Moss Green', hex: '#4f705e', glow: '#a9bd9d' },
 ];
 
 const WEAPON_OPTIONS: { id: WeaponSkin; name: string; icon: string; desc: string }[] = [

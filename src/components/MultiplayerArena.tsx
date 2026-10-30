@@ -207,13 +207,13 @@ const MAP_THEMES_CONFIG: Record<
 > = {
   mall: {
     name: 'Shopping Mall (Pusat Elektronik & Komputer)',
-    description: 'Arena di dalam pusat perbelanjaan futuristik dengan lorong belanja, etalase laptop & PC gaming, area tengah terbuka, serta papan promosi diskon.',
+    description: 'Arena pusat perbelanjaan modern dengan etalase elektronik, lorong terbuka, dan planter di area atrium.',
     bgColor: '#eef0e7',
     gridColor: 'rgba(92, 111, 87, 0.085)',
     particleColor: 'rgba(180, 130, 75, 0.24)',
     obstacles: [
       { x: 800, y: 220, w: 260, h: 140, label: 'STORE: CYBER PC & RIGS', color: '#e4e3d8', borderColor: '#738b78' },
-      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: NEON GADGETS', color: '#e4e3d8', borderColor: '#7f9280' },
+      { x: 1140, y: 220, w: 260, h: 140, label: 'STORE: SMART DEVICES', color: '#e4e3d8', borderColor: '#7f9280' },
       { x: 800, y: 940, w: 260, h: 140, label: 'STORE: MECHA GAMING GEAR', color: '#e5e0d2', borderColor: '#a18458' },
       { x: 1140, y: 940, w: 260, h: 140, label: 'STORE: AUDIO & VR PRO', color: '#e5e0d2', borderColor: '#9a7771' },
       { x: 480, y: 480, w: 130, h: 240, label: 'AISLE A: LAPTOP ZONE', color: '#dfe5da', borderColor: '#7d947d' },
@@ -240,9 +240,6 @@ const MAP_THEMES_CONFIG: Record<
       // Escalators
       { id: 'esc-1', type: 'escalator', x: 920, y: 760, size: 40, color: '#6486aa', label: 'LANTAI 2 ↗' },
       { id: 'esc-2', type: 'escalator', x: 1280, y: 760, size: 40, color: '#6486aa', label: 'LANTAI 2 ↗' },
-      // Mall Directory Kiosks
-      { id: 'kiosk-1', type: 'kiosk', x: 740, y: 640, size: 22, color: '#64899a', label: 'DIREKTORI' },
-      { id: 'kiosk-2', type: 'kiosk', x: 1460, y: 640, size: 22, color: '#64899a', label: 'DIREKTORI' },
     ],
   },
   rooftop: {
@@ -309,30 +306,27 @@ const MAP_THEMES_CONFIG: Record<
     ],
   },
   garden: {
-    name: 'Sky Garden (Taman Atrium Futuristik)',
-    description: 'Taman atap futuristik mall dengan jembatan layang kaca, air mancur cyber lotus, tanaman bercahaya, dan platform melingkar santai.',
-    bgColor: '#eef2ea',
-    gridColor: 'rgba(100, 116, 95, 0.055)',
+    name: 'Sky Garden (Atrium Taman)',
+    description: 'Atrium terbuka dengan pepohonan, kolam dangkal, jalur batu, dan area duduk taman.',
+    bgColor: '#e8ede3',
+    gridColor: 'rgba(91, 108, 81, 0.09)',
     particleColor: 'rgba(79, 125, 86, 0.22)',
     obstacles: [
-      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#dcfce7', borderColor: '#10b981' },
-      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#dcfce7', borderColor: '#10b981' },
-      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#cffafe', borderColor: '#06b6d4' },
-      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#fce7f3', borderColor: '#f43f5e' },
-      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#d1fae5', borderColor: '#34d399' },
-      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#d1fae5', borderColor: '#34d399' },
+      { x: 920, y: 250, w: 220, h: 130, label: 'ORCHID BIODOME CONSERVATORY', color: '#d9e1d1', borderColor: '#7d9273' },
+      { x: 920, y: 910, w: 220, h: 130, label: 'HYDRO FLORA PAVILION', color: '#d9e1d1', borderColor: '#7d9273' },
+      { x: 500, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY BARAT', color: '#d8e2df', borderColor: '#7d9995' },
+      { x: 1580, y: 450, w: 120, h: 240, label: 'SKYWALK CANOPY TIMUR', color: '#e4d9d2', borderColor: '#a47e6f' },
+      { x: 800, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK A', color: '#d7dfd0', borderColor: '#849778' },
+      { x: 1300, y: 640, w: 100, h: 100, label: 'GAZEBO HYDRO-PARK B', color: '#d7dfd0', borderColor: '#849778' },
     ],
     decorations: [
-      // Central Cyber Lotus Fountain
-      { id: 'fount-1', type: 'cyber_fountain', x: 1100, y: 640, size: 65, color: '#06b6d4', secondaryColor: '#34d399', label: 'CYBER LOTUS' },
-      // Luminous Hydroponic Trees
-      { id: 'tree-1', type: 'biophilic_tree', x: 740, y: 240, size: 45, color: '#10b981', secondaryColor: '#6ee7b7' },
-      { id: 'tree-2', type: 'biophilic_tree', x: 1460, y: 240, size: 45, color: '#10b981', secondaryColor: '#6ee7b7' },
-      { id: 'tree-3', type: 'biophilic_tree', x: 740, y: 1040, size: 45, color: '#059669', secondaryColor: '#34d399' },
-      { id: 'tree-4', type: 'biophilic_tree', x: 1460, y: 1040, size: 45, color: '#059669', secondaryColor: '#34d399' },
-      // Modern Planter Boxes with Neon Flowers
-      { id: 'plant-1', type: 'planter_box', x: 1100, y: 440, size: 30, color: '#10b981', secondaryColor: '#f43f5e' },
-      { id: 'plant-2', type: 'planter_box', x: 1100, y: 840, size: 30, color: '#10b981', secondaryColor: '#a855f7' },
+      { id: 'fount-1', type: 'cyber_fountain', x: 1100, y: 640, size: 65, color: '#71999a', secondaryColor: '#7d946b', label: 'GARDEN POND' },
+      { id: 'tree-1', type: 'biophilic_tree', x: 740, y: 240, size: 45, color: '#718567', secondaryColor: '#9aa987' },
+      { id: 'tree-2', type: 'biophilic_tree', x: 1460, y: 240, size: 45, color: '#718567', secondaryColor: '#9aa987' },
+      { id: 'tree-3', type: 'biophilic_tree', x: 740, y: 1040, size: 45, color: '#687e61', secondaryColor: '#94a383' },
+      { id: 'tree-4', type: 'biophilic_tree', x: 1460, y: 1040, size: 45, color: '#687e61', secondaryColor: '#94a383' },
+      { id: 'plant-1', type: 'planter_box', x: 1100, y: 440, size: 30, color: '#827a68', secondaryColor: '#78916d' },
+      { id: 'plant-2', type: 'planter_box', x: 1100, y: 840, size: 30, color: '#827a68', secondaryColor: '#78916d' },
       // Glass Skywalks
       { id: 'gw-1', type: 'glass_skywalk', x: 380, y: 260, size: 40, color: '#38bdf8' },
       { id: 'gw-2', type: 'glass_skywalk', x: 1820, y: 260, size: 40, color: '#38bdf8' },
@@ -508,12 +502,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
     }
     return {
       characterClass: 'phantom',
-      primaryColor: '#06b6d4',
-      secondaryColor: '#0284c7',
-      visorColor: '#38bdf8',
+      primaryColor: '#657f72',
+      secondaryColor: '#33483f',
+      visorColor: '#bdc9bb',
       weaponSkin: 'dual_blaster',
-      accessory: 'crown',
-      trailEffect: 'sparks',
+      accessory: 'none',
+      trailEffect: 'none',
     };
   });
   const [showCustomizerModal, setShowCustomizerModal] = useState<boolean>(false);
@@ -845,7 +839,7 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
     const botClasses: CharacterClass[] = ['phantom', 'ninja', 'tanker', 'commando', 'mecha'];
     const botWeapons: WeaponSkin[] = ['dual_blaster', 'laser_cannon', 'plasma_rifle', 'pulse_shotgun'];
-    const botAccessories: AccessoryType[] = ['horns', 'cyber_goggles', 'halo', 'none', 'crown'];
+    const botAccessories: AccessoryType[] = ['none'];
 
     const newPlayers: SimPlayer[] = [];
     const countPerTeam = totalPlayersConfig / 2;
@@ -904,15 +898,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         isShielded: true,
         isRespawning: false,
         respawnTimer: 0,
-        color: '#38bdf8',
+        color: '#557d8b',
         customization: {
           characterClass: botClass,
-          primaryColor: '#0284c7',
-          secondaryColor: '#0369a1',
-          visorColor: '#38bdf8',
+          primaryColor: '#557d8b',
+          secondaryColor: '#304b53',
+          visorColor: '#b5c5c0',
           weaponSkin: botWeapons[botIdx % botWeapons.length],
           accessory: botAccessories[botIdx % botAccessories.length],
-          trailEffect: 'sparks',
+          trailEffect: 'none',
         },
       });
       botIdx++;
@@ -946,15 +940,15 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
         isShielded: true,
         isRespawning: false,
         respawnTimer: 0,
-        color: '#f43f5e',
+        color: '#a86d70',
         customization: {
           characterClass: botClass,
-          primaryColor: '#e11d48',
-          secondaryColor: '#be123c',
-          visorColor: '#fb7185',
+          primaryColor: '#a86d70',
+          secondaryColor: '#60434a',
+          visorColor: '#d3b5a8',
           weaponSkin: botWeapons[botIdx % botWeapons.length],
           accessory: botAccessories[botIdx % botAccessories.length],
-          trailEffect: 'flames',
+          trailEffect: 'none',
         },
       });
       botIdx++;
@@ -1931,11 +1925,13 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         // Subtle stone floor tiles keep the arena grounded without overpowering play.
         const tileSize = 160;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
         for (let x = 0; x < WORLD_WIDTH; x += tileSize * 2) {
           for (let y = 0; y < WORLD_HEIGHT; y += tileSize * 2) {
             ctx.fillRect(x, y, tileSize, tileSize);
+            ctx.fillStyle = 'rgba(111, 129, 97, 0.035)';
             ctx.fillRect(x + tileSize, y + tileSize, tileSize, tileSize);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
           }
         }
 
@@ -2274,52 +2270,91 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
             ctx.stroke();
             ctx.restore();
           } else if (dec.type === 'cyber_fountain') {
-            // Sky Garden cyber lotus aquatic fountain with concentric pulsing water ripples
             ctx.save();
-            ctx.shadowBlur = 3;
-            ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
+            ctx.fillStyle = 'rgba(41, 37, 36, 0.16)';
+            ctx.beginPath();
+            ctx.ellipse(dec.x + 3, dec.y + 5, dec.size * 1.05, dec.size * 0.76, 0, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Concentric expanding ripples
-            const ripple1 = (Date.now() / 30) % dec.size;
-            const ripple2 = (Date.now() / 30 + dec.size * 0.5) % dec.size;
+            const water = ctx.createLinearGradient(dec.x, dec.y - dec.size, dec.x, dec.y + dec.size);
+            water.addColorStop(0, '#b8ccca');
+            water.addColorStop(1, '#8eaaa8');
+            ctx.fillStyle = water;
+            ctx.beginPath();
+            ctx.ellipse(dec.x, dec.y, dec.size, dec.size * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
 
-            ctx.strokeStyle = `${dec.color}66`;
+            ctx.strokeStyle = 'rgba(79, 111, 108, 0.48)';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.arc(dec.x, dec.y, ripple1, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(dec.x, dec.y, ripple2, 0, Math.PI * 2);
+            ctx.ellipse(dec.x, dec.y, dec.size, dec.size * 0.7, 0, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Central pool basin
-            ctx.fillStyle = '#ecfdf5';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.36)';
+            ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(dec.x, dec.y, 22, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = dec.secondaryColor || '#34d399';
-            ctx.lineWidth = 2.5;
+            ctx.ellipse(dec.x - 7, dec.y - 5, dec.size * 0.58, dec.size * 0.28, -0.12, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(dec.x + 12, dec.y + 8, dec.size * 0.34, dec.size * 0.16, 0.1, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Lotus emblem
-            ctx.font = '22px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🪷', dec.x, dec.y);
+            const pads = [
+              [-0.38, -0.04, 0.13],
+              [0.34, 0.22, 0.11],
+              [0.12, -0.36, 0.09],
+            ];
+            pads.forEach(([offsetX, offsetY, radius]) => {
+              const padX = dec.x + offsetX * dec.size;
+              const padY = dec.y + offsetY * dec.size;
+              ctx.fillStyle = dec.secondaryColor || '#7d946b';
+              ctx.beginPath();
+              ctx.moveTo(padX, padY);
+              ctx.arc(padX, padY, dec.size * radius, 0.35, Math.PI * 1.9);
+              ctx.closePath();
+              ctx.fill();
+              ctx.strokeStyle = 'rgba(55, 83, 61, 0.38)';
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(padX, padY);
+              ctx.lineTo(padX + dec.size * radius * 0.85, padY - dec.size * radius * 0.5);
+              ctx.stroke();
+            });
             ctx.restore();
           } else if (dec.type === 'biophilic_tree') {
-            // Luminous hydroponic tree
             ctx.save();
-            ctx.shadowBlur = 3;
-            ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
-            ctx.fillStyle = dec.color;
+            ctx.fillStyle = 'rgba(41, 37, 36, 0.18)';
             ctx.beginPath();
-            ctx.arc(dec.x, dec.y, dec.size, 0, Math.PI * 2);
+            ctx.ellipse(dec.x + 3, dec.y + 7, dec.size * 0.92, dec.size * 0.62, 0, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = dec.secondaryColor || '#34d399';
+
+            ctx.fillStyle = '#76684f';
             ctx.beginPath();
-            ctx.arc(dec.x, dec.y, dec.size * 0.6, 0, Math.PI * 2);
+            ctx.ellipse(dec.x, dec.y + 3, dec.size * 0.24, dec.size * 0.2, 0, 0, Math.PI * 2);
             ctx.fill();
+
+            const canopyColor = dec.color;
+            const leafColor = dec.secondaryColor || '#9aa987';
+            const foliage = [
+              [-0.38, -0.02, 0.38],
+              [0, -0.3, 0.42],
+              [0.38, -0.04, 0.37],
+              [-0.22, 0.32, 0.36],
+              [0.22, 0.3, 0.36],
+              [0, 0.02, 0.44],
+            ];
+            foliage.forEach(([offsetX, offsetY, radius], index) => {
+              const leafX = dec.x + offsetX * dec.size;
+              const leafY = dec.y + offsetY * dec.size;
+              ctx.fillStyle = index % 2 === 0 ? canopyColor : leafColor;
+              ctx.beginPath();
+              ctx.ellipse(leafX, leafY, dec.size * radius, dec.size * radius * 0.72, index * 0.18, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+              ctx.beginPath();
+              ctx.ellipse(leafX - dec.size * 0.08, leafY - dec.size * 0.09, dec.size * radius * 0.48, dec.size * radius * 0.2, -0.35, 0, Math.PI * 2);
+              ctx.fill();
+            });
             ctx.restore();
           } else if (dec.type === 'planter_box') {
             const planterWidth = dec.size * 2;
@@ -2740,12 +2775,12 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
           const custom = p.customization || {
             characterClass: 'phantom',
-            primaryColor: p.team === 'blue' ? '#0284c7' : '#e11d48',
-            secondaryColor: '#0f172a',
-            visorColor: p.team === 'blue' ? '#38bdf8' : '#fb7185',
+            primaryColor: p.team === 'blue' ? '#557d8b' : '#a86d70',
+            secondaryColor: '#33483f',
+            visorColor: '#bdc9bb',
             weaponSkin: 'dual_blaster',
             accessory: 'none',
-            trailEffect: 'sparks',
+            trailEffect: 'none',
           };
 
           const isHeavy = custom.characterClass === 'tanker';
@@ -3181,28 +3216,28 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
           : 'h-full min-h-full w-full overflow-hidden'
       }`}
     >
-      <div className="grid h-[58px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b border-slate-200 bg-[#fbfbfa] px-2 text-slate-900 select-none sm:h-[64px] sm:px-4">
+      <div className="grid h-[62px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b border-slate-200 bg-[#fbfbfa] px-2 text-slate-900 select-none sm:h-[68px] sm:px-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <span className="h-8 w-[3px] shrink-0 rounded-full bg-[#66899a]" />
           <div className="min-w-0">
-            <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[9px]">Tim Biru</div>
-            <div className="font-mono-numbers tabular-nums text-lg font-semibold leading-none text-slate-800 sm:text-xl">{hudBlueScore}</div>
+            <div className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px]">Tim Biru</div>
+            <div className="font-mono-numbers tabular-nums text-xl font-semibold leading-none text-slate-800 sm:text-2xl">{hudBlueScore}</div>
           </div>
         </div>
 
-        <div className="flex min-w-[112px] flex-col items-center text-center sm:min-w-[180px]">
-          <span className="max-w-[150px] truncate text-[8px] font-medium uppercase tracking-[0.12em] text-slate-500 sm:max-w-none sm:text-[9px]">
+        <div className="flex min-w-[112px] flex-col items-center text-center sm:min-w-[200px]">
+          <span className="max-w-[150px] truncate text-[9px] font-medium uppercase tracking-[0.1em] text-slate-500 sm:max-w-none sm:text-[10px]">
             Team Deathmatch · {MAP_THEMES_CONFIG[selectedMapTheme].name.split('(')[0]}
           </span>
           <div
             aria-label={`Sisa waktu ${Math.floor(hudTimeLeft / 60)} menit ${hudTimeLeft % 60} detik`}
-            className={`font-mono-numbers tabular-nums text-xl font-semibold leading-none tracking-tight sm:text-2xl ${
+            className={`font-mono-numbers tabular-nums text-2xl font-semibold leading-none tracking-tight sm:text-[28px] ${
               hudTimeLeft <= 10 ? 'text-rose-700' : 'text-slate-900'
             }`}
           >
             {Math.floor(hudTimeLeft / 60).toString().padStart(2, '0')}:{(hudTimeLeft % 60).toString().padStart(2, '0')}
           </div>
-          <span className="max-w-[160px] truncate text-[8px] leading-none text-slate-500 sm:text-[9px]">
+          <span className="max-w-[160px] truncate text-[9px] leading-none text-slate-500 sm:text-[10px]">
             {hudActiveSkill
               ? `${hudActiveSkill.label} · ${hudActiveSkill.timeLeft}s`
               : <>HP <strong className={hudMyHp < 30 ? 'text-rose-600' : 'text-emerald-700'}>{hudMyHp}%</strong><span className="mx-1.5 text-slate-300">|</span>Eliminasi <strong className="text-slate-700">{hudMyKills}</strong></>}
@@ -3211,8 +3246,8 @@ export const MultiplayerArena: React.FC<MultiplayerArenaProps> = ({
 
         <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
           <div className="mr-0.5 min-w-0 text-right sm:mr-2">
-            <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[9px]">Tim Merah</div>
-            <div className="font-mono-numbers tabular-nums text-lg font-semibold leading-none text-slate-800 sm:text-xl">{hudRedScore}</div>
+            <div className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500 sm:text-[10px]">Tim Merah</div>
+            <div className="font-mono-numbers tabular-nums text-xl font-semibold leading-none text-slate-800 sm:text-2xl">{hudRedScore}</div>
           </div>
           <span className="h-8 w-[3px] shrink-0 rounded-full bg-[#b8757e]" />
           <button
