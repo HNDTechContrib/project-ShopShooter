@@ -28,6 +28,7 @@ app.use(express.json());
 
 interface PlayerState {
   id: string;
+  name?: string;
   username: string;
   team: 'blue' | 'red';
   color: string;
@@ -54,7 +55,7 @@ interface RoomState {
   blueScore: number;
   redScore: number;
   timeLeft: number;
-  totalSlots: 2 | 4 | 6 | 8;
+  totalSlots: number;
   bots: any[];
 }
 
@@ -107,9 +108,9 @@ wss.on('connection', (ws: WebSocket) => {
             ...player,
             team: assignedTeam,
             color: assignedTeam === 'blue' ? '#38bdf8' : '#f43f5e',
-            x: 220 + Math.random() * 60,
-            y: assignedTeam === 'blue' ? 440 : 760,
-            angle: 0,
+            x: assignedTeam === 'blue' ? 220 + Math.random() * 60 : (2200 - 260) - Math.random() * 80,
+            y: 440 + Math.random() * 400,
+            angle: assignedTeam === 'blue' ? 0 : Math.PI,
             ws,
           };
 
@@ -125,9 +126,9 @@ wss.on('connection', (ws: WebSocket) => {
           const newTeam = msg.team === 'red' ? 'red' : 'blue';
           room.players[playerId].team = newTeam;
           room.players[playerId].color = newTeam === 'blue' ? '#38bdf8' : '#f43f5e';
-          room.players[playerId].x = 220 + Math.random() * 60;
-          room.players[playerId].y = newTeam === 'blue' ? 440 : 760;
-          room.players[playerId].angle = 0;
+          room.players[playerId].x = newTeam === 'blue' ? 220 + Math.random() * 60 : (2200 - 260) - Math.random() * 80;
+          room.players[playerId].y = 440 + Math.random() * 400;
+          room.players[playerId].angle = newTeam === 'blue' ? 0 : Math.PI;
           broadcastToRoom(currentRoom, {
             type: 'room-updated',
             room: sanitizeRoom(room),
@@ -170,10 +171,35 @@ wss.on('connection', (ws: WebSocket) => {
       } else if (msg.type === 'add-bot' && currentRoom) {
         const room = rooms[currentRoom];
         if (room) {
-          const currentCount = Object.keys(room.players).length + (room.bots ? room.bots.length : 0);
-          if (currentCount < room.totalSlots && msg.bot?.id) {
-            if (!room.bots) room.bots = [];
-            room.bots.push(msg.bot);
+          const currentCount = Object.keys(room.players).length + room.bots.length;
+          if (currentCount < room.totalSlots) {
+            let botToAdd = msg.bot;
+            if (!botToAdd) {
+              const botNames = ['Sniper_Elite', 'Valkyrie', 'Titan_Heavy', 'Shadow_Blade', 'Nexus_Pro', 'Apex_Striker'];
+              const botId = `server-bot-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+              const team = currentCount % 2 === 0 ? 'red' : 'blue';
+              const botDisplayName = `${botNames[currentCount % botNames.length]} (BOT)`;
+              botToAdd = {
+                id: botId,
+                name: botDisplayName,
+                username: botDisplayName,
+                team,
+                x: team === 'blue' ? 220 + Math.random() * 60 : (2200 - 260) - Math.random() * 80,
+                y: team === 'blue' ? 380 + (currentCount * 80) : 740 + (currentCount * 80),
+                angle: team === 'blue' ? 0 : Math.PI,
+                score: 0,
+                hp: 100,
+                maxHp: 100,
+                kills: 0,
+                deaths: 0,
+                isReady: true,
+                isBot: true,
+                color: team === 'blue' ? '#38bdf8' : '#f43f5e',
+              };
+            }
+            if (botToAdd?.id && !room.players[botToAdd.id] && !room.bots.some((bot) => bot.id === botToAdd.id)) {
+              room.players[botToAdd.id] = botToAdd;
+            }
             broadcastToRoom(currentRoom, {
               type: 'room-updated',
               room: sanitizeRoom(room),
@@ -184,7 +210,9 @@ wss.on('connection', (ws: WebSocket) => {
         const room = rooms[currentRoom];
         if (room) {
           room.gameState = 'playing';
-          room.timeLeft = 60;
+          room.timeLeft = 90;
+          room.blueScore = 0;
+          room.redScore = 0;
           broadcastToRoom(currentRoom, {
             type: 'match-started',
             room: sanitizeRoom(room),
@@ -194,15 +222,22 @@ wss.on('connection', (ws: WebSocket) => {
         const room = rooms[currentRoom];
         if (room) {
           const targetId = msg.targetId;
+          const target = room.players[targetId];
+          target?.ws?.send(JSON.stringify({ type: 'player-kicked' }));
+          target?.ws?.close();
+          delete room.players[targetId];
           if (room.bots) {
             room.bots = room.bots.filter(b => b.id !== targetId);
           }
-          if (room.players[targetId]) {
-            const target = room.players[targetId];
-            target.ws?.send(JSON.stringify({ type: 'player-kicked' }));
-            target.ws?.close();
-            delete room.players[targetId];
-          }
+          broadcastToRoom(currentRoom, {
+            type: 'room-updated',
+            room: sanitizeRoom(room),
+          });
+        }
+      } else if (msg.type === 'update-slots' && currentRoom) {
+        const room = rooms[currentRoom];
+        if (room && msg.totalSlots) {
+          room.totalSlots = msg.totalSlots;
           broadcastToRoom(currentRoom, {
             type: 'room-updated',
             room: sanitizeRoom(room),
@@ -309,7 +344,8 @@ function sanitizeRoom(room: RoomState) {
   Object.entries(room.players).forEach(([id, p]) => {
     sanitizedPlayers[id] = {
       id: p.id,
-      username: p.username,
+      name: p.name || p.username || 'Pemain',
+      username: p.username || p.name || 'Pemain',
       team: p.team || 'blue',
       color: p.color,
       x: p.x,
@@ -329,7 +365,11 @@ function sanitizeRoom(room: RoomState) {
   if (room.bots) {
     room.bots.forEach(bot => {
       if (!sanitizedPlayers[bot.id]) {
-        sanitizedPlayers[bot.id] = bot;
+        sanitizedPlayers[bot.id] = {
+          ...bot,
+          name: bot.name || bot.username || 'Pemain',
+          username: bot.username || bot.name || 'Pemain',
+        };
       }
     });
   }
